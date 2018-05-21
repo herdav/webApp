@@ -1,5 +1,6 @@
-function zeigeDaten(selcet) {
+function zeigeDaten(selcet, input) {
 	var i = 0;
+	var count = 0;
 	var ueberschriftPos;
 	var listenAusgabePos;
 	var kartenAusgabePos;
@@ -15,7 +16,8 @@ function zeigeDaten(selcet) {
 	
 	imageMuseumPos = document.getElementById('imageMuseum');
 	
-	function listenAusgabe() {		
+	function listenAusgabe() {
+		count++;
 		listenAusgabePos.innerHTML += '<h2>' + 
 		museen[i].bezeichnung + '</h2>' +
 		'<table><tr style="vertical-align:top"><td style="width:50%">' +
@@ -41,37 +43,54 @@ function zeigeDaten(selcet) {
 	}
 	
 	if (selcet == 'alle') {
-		ueberschriftPos.innerHTML = 'Alle Muessen';
 		while (i <= museen.length - 1) {
 			listenAusgabe();
 			i++;
 		}
+		ueberschriftPos.innerHTML = count + ' Museen insgesamt.';
 	}
 	if (selcet == 'frei') {
-		ueberschriftPos.innerHTML = 'Freier Eintritt';
 		while (i <= museen.length - 1) {
 			if (museen[i].eintritt == 'frei') {
-				listenAusgabe();		
+				listenAusgabe();
 			}
 			i++
 		}
+		ueberschriftPos.innerHTML += count + ' Museen mit freiem Eintritt.';
 	}
-	if (selcet == 'zeitgenössisch') {
-		ueberschriftPos.innerHTML = 'Zeitgenössisch';
+	if (selcet == 'zeitg') {
 		while (i <= museen.length - 1) {
 			if (museen[i].typ.includes('zeitgenössisch') == true) {
 				listenAusgabe();		
 			}
 			i++
 		}
+		ueberschriftPos.innerHTML += count + ' Museen mit zeitgenössischen Ausstellungen.';
 	}
 	if (selcet == 'historisch') {
-		ueberschriftPos.innerHTML = 'Historisch';
 		while (i <= museen.length - 1) {
 			if (museen[i].typ.includes('historisch') == true) {
 				listenAusgabe();		
 			}
 			i++
 		}
+		ueberschriftPos.innerHTML += count + ' Museen mit historischen Ausstellungen.';
 	}
+	if (input != '') {
+		while (i <= museen.length - 1) {
+			if (museen[i].bezeichnung.includes(input) == true || museen[i].beschreibung.includes(input) == true) {
+				listenAusgabe();		
+			}
+			i++
+		}
+		if (count == 0) {
+			ueberschriftPos.innerHTML += '<em>' + input + '</em> wurde in keinem Beitrag gefunden.';
+		}
+		if (count == 1) {
+			ueberschriftPos.innerHTML += '<em>' + input + '</em> wurde in einem Beitrag gefunden.';
+		} 
+		if (count > 1) {
+			ueberschriftPos.innerHTML += '<em>' + input + '</em> wurde in ' + count + ' Beiträgen gefunden.';
+		}
+	}		
 }
