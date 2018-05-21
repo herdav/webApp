@@ -14,8 +14,8 @@ function zeigeKarte() {
 	listenAusgabePos.innerHTML = '';
 
 	pos = {
-		lat: museen[0].latitude,
-		lng: museen[0].longitude
+		lat: 47.0617343,
+		lng: 8.2864024
 	};
 
 	options = {
