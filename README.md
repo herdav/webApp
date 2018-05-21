@@ -1,2 +1,2 @@
 # webApp
-Simple website project @Hochschule-Luzern
+Simple website project at Lucerne University of Applied Sciences and Arts - Information Technology.
