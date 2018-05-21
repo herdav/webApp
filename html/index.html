@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link type="text/css" rel="stylesheet" href="css/standard.css"/>
+<title>museumWebApp</title>
+</head>
+
+<body>
+<header>
+	<h1>museumWebApp</h1>
+</header>
+<article>
+	<button style="width: 50%" onclick="zeigeKarte()">Karte</button>
+  	<br><br>
+	<button style="width: 50%" onclick="zeigeDaten('alle')">Alle</button>
+	<br><br>
+	<button style="width: 50%" onclick="zeigeDaten('frei')">Freier Eintritt</button>
+	<br><br>
+	<button style="width: 50%" onclick="zeigeDaten('zeitgenössisch')">Zeitgenössisch</button>
+	<br><br>
+	<button style="width: 50%" onclick="zeigeDaten('historisch')">Historisch</button>
+	
+	<p id="ueberschrift"></p>
+	<p id="listenAusgabe"></p>
+	
+	<div id="kartenAusgabe" style="height: 600px; width: 100%;"></div>
+</article>
+
+<footer data-role="footer">
+	<p>2018, David Herren</p>
+</footer>
+
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js? 
+key=AIzaSyAZDsGJnpCjTrNtKQm4ztj1FAW08Itwgao&v=3"></script>
+<script type="text/javascript" src="js/model.js"></script> 
+<script type="text/javascript" src="js/zeigeKarte.js"></script>
+<script type="text/javascript" src="js/zeigeDaten.js"></script>
+
+</body>
+</html>
