@@ -11,25 +11,29 @@
 <header>
 	<h1>museumWebApp</h1>
 </header>
-<article>
-	<button style="width: 50%" onclick="zeigeKarte()">Karte</button>
-  	<br><br>
-	<button style="width: 50%" onclick="zeigeDaten('alle')">Alle</button>
+	<a id="menu" href="javascript:zeigeKarte();">Karte</a>&nbsp;
+	<a id="menu" href="javascript:zeigeDaten('alle', '');">Alle</a>&nbsp;
+	<a id="menu" href="javascript:zeigeDaten('frei', '');">Freier Eintritt</a>&nbsp;
+	<a id="menu" href="javascript:zeigeDaten('zeitg', '');">Zeitgenössisch</a>&nbsp;
+	<a id="menu" href="javascript:zeigeDaten('historisch', '');">Historisch</a>
 	<br><br>
-	<button style="width: 50%" onclick="zeigeDaten('frei')">Freier Eintritt</button>
-	<br><br>
-	<button style="width: 50%" onclick="zeigeDaten('zeitgenössisch')">Zeitgenössisch</button>
-	<br><br>
-	<button style="width: 50%" onclick="zeigeDaten('historisch')">Historisch</button>
+		
+	<input id="txt" type="text" name="txt" onclick="this.value = ''">
+	<button onclick="getVal()">Suchen</button>
+	<script>
+		document.getElementById('txt').value = 'Sichwort';
+		function getVal() {
+			var txt = document.getElementById('txt').value;
+			zeigeDaten('', txt);
+		}
+	</script>
 	
 	<p id="ueberschrift"></p>
 	<p id="listenAusgabe"></p>
-	
-	<div id="kartenAusgabe" style="height: 600px; width: 100%;"></div>
-</article>
+	<div id="kartenAusgabe" style="height: 400px; width: 100%;"></div>
 
 <footer data-role="footer">
-	<p>2018, David Herren</p>
+	<p>2018 by David Herren</p>
 </footer>
 
 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js? 
@@ -37,6 +41,5 @@ key="></script>
 <script type="text/javascript" src="js/model.js"></script> 
 <script type="text/javascript" src="js/zeigeKarte.js"></script>
 <script type="text/javascript" src="js/zeigeDaten.js"></script>
-
 </body>
 </html>
