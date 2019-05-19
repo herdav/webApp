@@ -85,6 +85,7 @@ function content(selector) {
 				works[id].image_meta + '" src="./img/' +
 				works[id].image + '" width="100%"><div class="text"><h1>' +
 				works[id].title + '</h1>' + '<p>' +
+				works[id].year + ', ' +
 				works[id].data_en + ', ' +
 				works[id].size_en +
 				works[id].edition + '<br><p class="column">' +
@@ -233,21 +234,24 @@ function content(selector) {
 		var langDE = document.getElementById("langDE");
 		var langEN = document.getElementById("langEN");
 
-		langDE.href = urlIndex + "?" + selector + ";de";
+		langDE.href = urlIndex + "?" + selector + "=de";
 		langDE.hreflang = "de";
 
-		langEN.href = urlIndex + "?" + selector + ";en";
+		langEN.href = urlIndex + "?" + selector + "=en";
 		langEN.hreflang = "en";
 	}
 
 	function urlUpdate() {
-		var urlSelect = "?" + selector + ";" + langCurrent;
-		var urlNew = urlIndex + urlSelect;
+		var urlNew = "?" + selector + "=" + langCurrent;
 
 		if (history.pushState && selector !== "index") {
-			window.history.pushState({ path: urlNew }, "", urlNew);
+			window.history.pushState({
+				path: urlNew
+			}, "", urlNew);
 		} else {
-			window.history.pushState({ path: urlIndex }, "", urlIndex);
+			window.history.pushState({
+				path: urlIndex
+			}, "", urlIndex);
 		}
 	}
 
@@ -361,8 +365,7 @@ function scrollTo(to, duration) {
 			element.scrollTop = parseInt(easeInOutQuad(currentTime, start, change, duration));
 			if (currentTime < duration) {
 				requestAnimationFrame(animateScroll);
-			}
-			else {
+			} else {
 				element.scrollTop = to;
 			}
 		};
@@ -373,16 +376,19 @@ function scrollTo(to, duration) {
 function urlPara() {
 	var urlPar = location.search;
 	var langTag;
+	var firstLoad = false;
+	
+	if (!firstLoad) {
+		content("index");
+		firstLoad = true;
+	}
 
-	if (urlPar.includes(";") === true) {
-		langTag = urlPar.indexOf(";");
+	if (urlPar.includes("=") === true) {
+		langTag = urlPar.indexOf("=");
 		parContent = urlPar.substring(1, langTag);
-		parLang = urlPar.substring(langTag + 1, urlPar.length);
+		parLang = urlPar.substring(langTag + 1, langTag + 3);
 		content(parContent);
 		language(parLang);
-	} else {
-		parContent = urlPar.substring(1, urlPar.length);
-		content(parContent);
 	}
 }
 
