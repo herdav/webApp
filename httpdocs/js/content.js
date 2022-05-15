@@ -1,7 +1,7 @@
-// ----------------------------------//
-// -- Created 2018 by David Herren --//
-// ----- https://davidherren.ch -----//
-// ----------------------------------//
+// ---------------------------------------//
+// -- Created 2018-2022 by David Herren --//
+// ------- https://davidherren.ch --------//
+// ---------------------------------------//
 
 var id, workSelected, savedSelector;
 var langCurrent;
@@ -66,31 +66,65 @@ function content(selector) {
 		function work_de() {
 			document.getElementsByTagName("META")[0].content = works[id].description_de;
 
-			workPos.innerHTML = '<img alt="' +
-				works[id].image_meta + '" src="./img/' +
-				works[id].image + '" width="100%"><div class="text"><h1>' +
-				works[id].title + '</h1>' + '<p>' +
-				works[id].year + ', ' +
-				works[id].data_de + ', ' +
-				works[id].size_de +
-				works[id].edition + '<br><p class="column">' +
-				works[id].text_de + '</p>' +
-				works[id].links + '</p></div>';
+			if (works[id].text_copy.match(/[a-z]/i)) {
+				for (var i = 0; i < works.length; i++) {
+					if (works[i].name === works[id].text_copy) {
+						workPos.innerHTML = '<img alt="' +
+							works[id].image_meta + '" src="./img/' +
+							works[id].image + '" width="100%"><div class="text"><h1>' +
+							works[id].title + '</h1>' + '<p>' +
+							works[id].year + ', ' +
+							works[id].data_de + ', ' +
+							works[id].size_de +
+							works[id].edition + '<br><p class="column">' +
+							works[i].text_de + '</p>' +
+							works[id].links + '</p></div>';
+					}
+				}
+			} else {
+				workPos.innerHTML = '<img alt="' +
+					works[id].image_meta + '" src="./img/' +
+					works[id].image + '" width="100%"><div class="text"><h1>' +
+					works[id].title + '</h1>' + '<p>' +
+					works[id].year + ', ' +
+					works[id].data_de + ', ' +
+					works[id].size_de +
+					works[id].edition + '<br><p class="column">' +
+					works[id].text_de + '</p>' +
+					works[id].links + '</p></div>';
+			}
 		}
 
 		function work_en() {
 			document.getElementsByTagName("META")[0].content = works[id].description_en;
 
-			workPos.innerHTML = '<img alt="' +
-				works[id].image_meta + '" src="./img/' +
-				works[id].image + '" width="100%"><div class="text"><h1>' +
-				works[id].title + '</h1>' + '<p>' +
-				works[id].year + ', ' +
-				works[id].data_en + ', ' +
-				works[id].size_en +
-				works[id].edition + '<br><p class="column">' +
-				works[id].text_en + '</p>' +
-				works[id].links + '</p></div>';
+			if (works[id].text_copy.match(/[a-z]/i)) {
+				for (var i = 0; i < works.length; i++) {
+					if (works[i].name === works[id].text_copy) {
+						workPos.innerHTML = '<img alt="' +
+							works[id].image_meta + '" src="./img/' +
+							works[id].image + '" width="100%"><div class="text"><h1>' +
+							works[id].title + '</h1>' + '<p>' +
+							works[id].year + ', ' +
+							works[id].data_en + ', ' +
+							works[id].size_en +
+							works[id].edition + '<br><p class="column">' +
+							works[i].text_en + '</p>' +
+							works[id].links + '</p></div>';
+					}
+				}
+			} else {
+				workPos.innerHTML = '<img alt="' +
+					works[id].image_meta + '" src="./img/' +
+					works[id].image + '" width="100%"><div class="text"><h1>' +
+					works[id].title + '</h1>' + '<p>' +
+					works[id].year + ', ' +
+					works[id].data_en + ', ' +
+					works[id].size_en +
+					works[id].edition + '<br><p class="column">' +
+					works[id].text_en + '</p>' +
+					works[id].links + '</p></div>';
+			}
 		}
 
 		function workDetail() {
@@ -113,7 +147,12 @@ function content(selector) {
 		function pages() {
 			if (id === "index") {
 				currentLang();
-				document.body.style.backgroundImage = "none";
+				//document.body.style.backgroundImage = "none";
+				if (window.innerWidth >= 600) {
+					document.body.style.backgroundImage = "url('./img/back/davidherren-atlas-back.jpg')";
+				} else {
+					document.body.style.backgroundImage = null;
+				}
 
 				if (langCurrent === "de") {
 					document.getElementsByTagName("META")[0].content = about[0].text_de;
@@ -341,9 +380,7 @@ function along() {
 	navAlong();
 }
 
-function scrollTo(to, duration) {
-	// scrollTo copied from github.com/andjosh > https://gist.github.com/andjosh/6764939
-
+function scrollTo(to, duration) { // copied from https://gist.github.com/andjosh/6764939
 	const
 		element = document.scrollingElement || document.documentElement,
 		start = element.scrollTop,
@@ -377,7 +414,7 @@ function urlPara() {
 	var urlPar = location.search;
 	var langTag;
 	var firstLoad = false;
-	
+
 	if (!firstLoad) {
 		content("index");
 		firstLoad = true;
