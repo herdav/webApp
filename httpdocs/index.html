@@ -1,31 +1,46 @@
 <!doctype html>
-<!-- Created 2018 by David Herren -->
-<!--    https://davidherren.ch    -->
-<html>
+<!--Created 2018-2022 by David Herren-->
+<html lang="de">
+
 <head>
 	<title>David Herren</title>
 	<meta name="description" content="David Herren (born 1984 in Arbon, Switzerland), is a Swiss artist, based in Lucerne.">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link id="langDE" rel="alternate" hreflang="de" href="https://www.davidherren.ch/?index;de">
-	<link id="langEN" rel="alternate" hreflang="en" href="https://www.davidherren.ch/?index;en">
+	<link id="langDE" rel="alternate" hreflang="de" href="https://www.davidherren.ch/?index=de">
+	<link id="langEN" rel="alternate" hreflang="en" href="https://www.davidherren.ch/?index=en">
 	<link type="text/css" rel="stylesheet" href="css/standard.css">
 	<link rel="shortcut icon" href="./ico/davidherren-favicon.ico">
 	<link href="https://fonts.googleapis.com/css?family=Overpass+Mono|Open+Sans:400,700" rel="stylesheet">
 	<script type="text/javascript" src="js/data.js"></script>
 	<script type="text/javascript" src="js/content.js"></script>
+	<script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
 	<meta name="msvalidate.01" content="6CAAADF85832829FF4E01279F948463D">
 	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-114694374-1"></script>
 	<script>
 		window.dataLayer = window.dataLayer || [];
-		function gtag() { dataLayer.push(arguments); }
+		function gtag() {
+			dataLayer.push(arguments);
+		}
 		gtag('js', new Date());
 		gtag('config', 'UA-114694374-1');
 	</script>
 </head>
 
 <body>
-	<script>window.onload = function () { navLang(); urlPara() }</script>
+	<script>
+		jQuery(document).ready(function($) {
+			if (window.history && window.history.pushState) {
+				$(window).on('popstate', function() {
+					location.reload();
+				});
+			}
+			});
+		window.onload = function () {
+			navLang()
+			urlPara()
+		}
+	</script>
 
 	<header id="menu">
 		<div id="main">
@@ -43,6 +58,10 @@
 				<a class="link" href="javascript:content('remap')">remap</a>
 				<a class="link" href="javascript:content('interference')">Interference</a>
 				<a class="link" href="javascript:content('n')">N</a>
+				<a class="link" href="javascript:content('atlas')">Atlas</a>
+				<a class="link" href="javascript:content('firstday1')">First Day #1</a>
+				<a class="link" href="javascript:content('firstday2')">#2</a>
+				<a class="link" href="javascript:content('beliefrevision')">Belief Revision</a>
 			</div>
 			<div id="infos">
 				<a class="link" href="javascript:content('exhibitions')">Exhibitions</a>
@@ -51,21 +70,23 @@
 			</div>
 		</div>
 	</header>
-
 	<div id="content">
 		<div id="flex"></div>
 		<div id="work"></div>
 		<div id="list"></div>
 		<div id="exhi"></div>
 	</div>
-
 	<div id="logos"></div>
-
 	<footer>
-		<script>window.onscroll = function () { along() }</script>
+		<script>
+			window.onscroll = function () {
+				along()
+			}
+		</script>
 		<div id="along-left"></div>
 		<div id="along-right"></div>
 		<div id="along-top"></div>
 	</footer>
 </body>
+
 </html>
