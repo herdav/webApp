@@ -157,10 +157,10 @@ function content(selector) {
 				if (langCurrent === "de") {
 					document.getElementsByTagName("META")[0].content = about[0].text_de;
 					for (var i = 0; i < works.length; i++) {
-						flexPos.innerHTML += '<div class="flxSub"><a class="imgLink" href="javascript:content(' + "'" +
+						flexPos.innerHTML += '<div class="flxSub"><div class="flxSubImg"><a class="imgLink" href="javascript:content(' + "'" +
 							works[i].name + "'" + ')"><img alt="' +
 							works[i].image_prev_meta + '" src="./img/' +
-							works[i].image_prev + '" width="100%"></a><div class="text"><h2>' +
+							works[i].image_prev + '" width="100%"></a></div><div class="text"><h2>' +
 							works[i].title + '</h2><p>' +
 							works[i].year + ', ' +
 							works[i].data_de + ', ' +
@@ -172,10 +172,10 @@ function content(selector) {
 				if (langCurrent === "en") {
 					document.getElementsByTagName("META")[0].content = about[0].text_en;
 					for (var j = 0; j < works.length; j++) {
-						flexPos.innerHTML += '<div class="flxSub"><a class="imgLink" href="javascript:content(' + "'" +
+						flexPos.innerHTML += '<div class="flxSub"><div class="flxSubImg"><a class="imgLink" href="javascript:content(' + "'" +
 							works[j].name + "'" + ')"><img alt="' +
 							works[j].image_prev_meta + '" src="./img/' +
-							works[j].image_prev + '" width="100%"></a><div class="text"><h2>' +
+							works[j].image_prev + '" width="100%"></a></div><div class="text"><h2>' +
 							works[j].title + '</h2><p>' +
 							works[j].year + ', ' +
 							works[j].data_en + ', ' +
@@ -380,36 +380,6 @@ function along() {
 	navAlong();
 }
 
-function scrollTo(to, duration) { // copied from https://gist.github.com/andjosh/6764939
-	const
-		element = document.scrollingElement || document.documentElement,
-		start = element.scrollTop,
-		change = to - start,
-		startDate = +new Date(),
-
-		easeInOutQuad = function (t, b, c, d) {
-			t /= d / 2;
-			if (t < 1) {
-				return c / 2 * t * t + b;
-			}
-			t--;
-			return -c / 2 * (t * (t - 2) - 1) + b;
-		},
-
-		animateScroll = function () {
-			const currentDate = +new Date();
-			const currentTime = currentDate - startDate;
-			element.scrollTop = parseInt(easeInOutQuad(currentTime, start, change, duration));
-			if (currentTime < duration) {
-				requestAnimationFrame(animateScroll);
-			} else {
-				element.scrollTop = to;
-			}
-		};
-
-	animateScroll();
-}
-
 function urlPara() {
 	var urlPar = location.search;
 	var langTag;
@@ -439,4 +409,34 @@ function logos() {
 			links[i].title + '" src="./img/logos/' +
 			links[i].img + '" >' + '</a>' + '</div>';
 	}
+}
+
+function scrollTo(to, duration) { // copied from https://gist.github.com/andjosh/6764939
+	const
+		element = document.scrollingElement || document.documentElement,
+		start = element.scrollTop,
+		change = to - start,
+		startDate = +new Date(),
+
+		easeInOutQuad = function (t, b, c, d) {
+			t /= d / 2;
+			if (t < 1) {
+				return c / 2 * t * t + b;
+			}
+			t--;
+			return -c / 2 * (t * (t - 2) - 1) + b;
+		},
+
+		animateScroll = function () {
+			const currentDate = +new Date();
+			const currentTime = currentDate - startDate;
+			element.scrollTop = parseInt(easeInOutQuad(currentTime, start, change, duration));
+			if (currentTime < duration) {
+				requestAnimationFrame(animateScroll);
+			} else {
+				element.scrollTop = to;
+			}
+		};
+
+	animateScroll();
 }
