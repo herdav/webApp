@@ -1,7 +1,7 @@
-// ---------------------------------------//
-// -- Created 2018-2022 by David Herren --//
-// ------- https://davidherren.ch --------//
-// ---------------------------------------//
+// --------------------------------------- //
+// -- Created 2018-2022 by David Herren -- //
+// ------- https://davidherren.ch -------- //
+// --------------------------------------- //
 
 var id, workSelected, savedSelector;
 var langCurrent;
@@ -15,14 +15,12 @@ function content(selector) {
 		if (selector === "") {
 			selector = "index";
 		}
-
 		if (selector !== "index" && selector !== "about" && selector !== "exhibitions") {
 			workSelected = true;
 		} else {
 			workSelected = false;
 			id = selector;
 		}
-
 		if (workSelected === true) {
 			for (var i = 0; i < works.length; i++) {
 				if (works[i].name === selector) {
@@ -31,98 +29,172 @@ function content(selector) {
 			}
 		}
 	}
-
 	function docTitle() {
 		if (workSelected === true) {
 			document.title = works[id].title + " | David Herren";
 		}
-
 		if (selector === "index") {
 			document.title = "David Herren";
 		}
-
 		if (selector === "about") {
 			document.title = "About | David Herren";
 		}
-
 		if (selector === "exhibitions") {
 			document.title = "Exhibitions | David Herren";
 		}
 	}
-
 	function dynamic() {
-		window.scrollTo(0, 0);
-
-		var workPos = document.getElementById("work");
-		var flexPos = document.getElementById("flex");
-		var listPos = document.getElementById("list");
-		var exhiPos = document.getElementById("exhi");
-
-		workPos.innerHTML = "";
-		flexPos.innerHTML = "";
-		listPos.innerHTML = "";
-		exhiPos.innerHTML = "";
-
-		function work_de() {
-			document.getElementsByTagName("META")[0].content = works[id].description_de;
-
-			if (works[id].text_copy) { // copy description from another project
-				for (var i = 0; i < works.length; i++) {
-					if (works[i].name === works[id].text_copy) {
-						workPos.innerHTML = '<img alt="' +
-							works[id].image_meta + '" src="./img/' +
-							works[id].image + '" width="100%"><div class="text"><h1>' +
-							works[id].title + '</h1>' + '<p>' +
-							works[id].year + ', ' +
-							works[id].data_de + ', ' +
-							works[id].size_de +
-							works[id].edition + '<br><p class="column">' +
-							works[i].text_de + '</p>' +
-							works[id].links + '</p></div>';
-					}
-				}
-			} else if (works[id].vimeo_id) { // show video instead of image
-				workPos.innerHTML = '<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/' + works[id].vimeo_id + '?h=543f1f4ab7&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>' + '<div class="text"><h1>' +
-					works[id].title + '</h1>' + '<p>' +
-					works[id].year + ', ' +
-					works[id].data_de + ', ' +
-					works[id].size_de +
-					works[id].edition + '<br><p class="column">' +
-					works[id].text_de + '</p>' +
-					works[id].links + '</p></div>';
-			} else if (works[id].image_highres) { // show high resolution image with zoom function
-				workPos.innerHTML = '<div class="zoom_outer"><div id="zoom"><img alt="' + 
-					works[id].image_meta + '" src="./img/' +
-					works[id].image_highres + '" alt="zoom"></div></div><div class="text"><h1>' +
-					works[id].title + '</h1>' + '<p>' +
-					works[id].year + ', ' +
-					works[id].data_de + ', ' +
-					works[id].size_de +
-					works[id].edition + '<br><p class="column">' +
-					works[id].text_de + '</p>' +
-					works[id].links + '</p></div>';
-					imageZoom();
-			}
-			else { // show image
-				workPos.innerHTML = '<img alt="' +
-					works[id].image_meta + '" src="./img/' +
-					works[id].image + '" width="100%"><div class="text"><h1>' +
-					works[id].title + '</h1>' + '<p>' +
-					works[id].year + ', ' +
-					works[id].data_de + ', ' +
-					works[id].size_de +
-					works[id].edition + '<br><p class="column">' +
-					works[id].text_de + '</p>' +
-					works[id].links + '</p></div>';
-			}
+		{
+			window.scrollTo(0, 0);
+			var workPos = document.getElementById("work");
+			var flexPos = document.getElementById("flex");
+			var listPos = document.getElementById("list");
+			var exhiPos = document.getElementById("exhi");
+			workPos.innerHTML = "";
+			flexPos.innerHTML = "";
+			listPos.innerHTML = "";
+			exhiPos.innerHTML = "";
+			document.getElementById("load").style.visibility = "hidden";
 		}
-
-		function work_en() {
-			document.getElementsByTagName("META")[0].content = works[id].description_en;
-
-			if (works[id].text_copy) { // copy description from another project
-				for (var i = 0; i < works.length; i++) {
-					if (works[i].name === works[id].text_copy) {
+		{ // work project pages
+			function work_de() {
+				document.getElementsByTagName("META")[0].content = works[id].description_de;
+				if (works[id].text_copy) { // copy description from another project
+					for (var i = 0; i < works.length; i++) {
+						if (works[i].name === works[id].text_copy) {
+							workPos.innerHTML = '<img alt="' +
+								works[id].image_meta + '" src="./img/' +
+								works[id].image + '" width="100%"><div class="text"><h1>' +
+								works[id].title + '</h1>' + '<p>' +
+								works[id].year + ', ' +
+								works[id].data_de + ', ' +
+								works[id].size_de +
+								works[id].edition + '<br><p class="column">' +
+								works[i].text_de + '</p>' +
+								works[id].links + '</p></div>';
+						}
+					}
+				} else if (works[id].vimeo_id) { // show video instead of image
+					workPos.innerHTML = '<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/' + works[id].vimeo_id + '?h=543f1f4ab7&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>' + '<div class="text"><h1>' +
+						works[id].title + '</h1>' + '<p>' +
+						works[id].year + ', ' +
+						works[id].data_de + ', ' +
+						works[id].size_de +
+						works[id].edition + '<br><p class="column">' +
+						works[id].text_de + '</p>' +
+						works[id].links + '</p></div>';
+				} else if (works[id].image_highres && window.innerWidth >= 1200) { // show high resolution image with zoom function
+					document.getElementById("load").style.visibility = "visible";
+					let outerHeigh = 500;
+					let initialScale = 0.1;
+					let newHeigh = initialScale * works[id].image_highres_heigh;
+					let deltaTopA = (works[id].image_highres_heigh - newHeigh) / 2;
+					let deltaTopB = (works[id].image_highres_heigh + newHeigh - outerHeigh) / 2 - outerHeigh / 2;
+					let deltaTop = -1 * (deltaTopA + deltaTopB) / 2;
+					let newWidth = initialScale * works[id].image_highres_width;
+					let deltaLeftA = (works[id].image_highres_width - newWidth) / 2;
+					let deltaLeftB = (works[id].image_highres_width + newWidth - outerHeigh) / 2 - outerHeigh / 2;
+					let deltaLeft = -1 * (deltaLeftA + deltaLeftB) / 2;
+					workPos.innerHTML = '<div id="zoom_outer" style="height:'+ outerHeigh + 'px"><img ' + 
+						'style="transform: matrix('+ initialScale + ', 0, 0,' + initialScale + ', 0, 0);' + // set initial scale
+						'left:' + deltaLeft +'px; top:' + deltaTop + 'px"' + // set inital position
+						'id="zoom_element" alt="' + 
+						works[id].image_meta + '" src="./img/' +
+						works[id].image_highres + '"></div><div class="text"><h1>' +
+						works[id].title + '</h1>' + '<p>' +
+						works[id].year + ', ' +
+						works[id].data_de + ', ' +
+						works[id].size_de +
+						works[id].edition + '<br><p class="column">' +
+						works[id].text_de + '</p>' +
+						works[id].links + '</p></div>';
+					panzoom('#zoom_element', {
+						bound:'outer',
+						scale_min: 0.01, // 0.01 to 20
+						scale_max: 0.8 // 0.01 to 20
+					});
+				} else if (works[id].essay) {
+					workPos.innerHTML = '<img alt="' +
+						works[id].image_meta + '" src="./img/' +
+						works[id].image + '" width="100%"><div class="text"><h1>' +
+						works[id].title + '</h1>' + '<p>' +
+						works[id].year + ', ' +
+						works[id].data_de + ', ' +
+						works[id].size_de +
+						works[id].edition + '<br><div id="essay">' +
+						works[id].essay + 
+						works[id].links + '</p></div>';
+				}
+				else { // show image
+					workPos.innerHTML = '<img alt="' +
+						works[id].image_meta + '" src="./img/' +
+						works[id].image + '" width="100%"><div class="text"><h1>' +
+						works[id].title + '</h1>' + '<p>' +
+						works[id].year + ', ' +
+						works[id].data_de + ', ' +
+						works[id].size_de +
+						works[id].edition + '<br><p class="column">' +
+						works[id].text_de + '</p>' +
+						works[id].links + '</p></div>';
+				}
+			}
+			function work_en() {
+				document.getElementsByTagName("META")[0].content = works[id].description_en;
+				if (works[id].text_copy) { // copy description from another project
+					for (var i = 0; i < works.length; i++) {
+						if (works[i].name === works[id].text_copy) {
+							workPos.innerHTML = '<img alt="' +
+								works[id].image_meta + '" src="./img/' +
+								works[id].image + '" width="100%"><div class="text"><h1>' +
+								works[id].title + '</h1>' + '<p>' +
+								works[id].year + ', ' +
+								works[id].data_en + ', ' +
+								works[id].size_en +
+								works[id].edition + '<br><p class="column">' +
+								works[i].text_en + '</p>' +
+								works[id].links + '</p></div>';
+						}
+					}
+				} else if (works[id].vimeo_id) { // show video instead of image
+					workPos.innerHTML = '<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/' + works[id].vimeo_id + '?h=543f1f4ab7&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>' + '<div class="text"><h1>' +
+						works[id].title + '</h1>' + '<p>' +
+						works[id].year + ', ' +
+						works[id].data_en + ', ' +
+						works[id].size_en +
+						works[id].edition + '<br><p class="column">' +
+						works[id].text_en + '</p>' +
+						works[id].links + '</p></div>';
+				} else if (works[id].image_highres && window.innerWidth >= 1200) { // show high resolution image with zoom function
+					document.getElementById("load").style.visibility = "visible";
+					let outerHeigh = 500;
+					let initialScale = 0.1;
+					let newHeigh = initialScale * works[id].image_highres_heigh;
+					let deltaTopA = (works[id].image_highres_heigh - newHeigh) / 2;
+					let deltaTopB = (works[id].image_highres_heigh + newHeigh - outerHeigh) / 2 - outerHeigh / 2;
+					let deltaTop = -1 * (deltaTopA + deltaTopB) / 2;
+					let newWidth = initialScale * works[id].image_highres_width;
+					let deltaLeftA = (works[id].image_highres_width - newWidth) / 2;
+					let deltaLeftB = (works[id].image_highres_width + newWidth - outerHeigh) / 2 - outerHeigh / 2;
+					let deltaLeft = -1 * (deltaLeftA + deltaLeftB) / 2;
+					workPos.innerHTML = '<div id="zoom_outer" style="height:'+ outerHeigh + 'px"><img ' + 
+						'style="transform: matrix('+ initialScale + ', 0, 0,' + initialScale + ', 0, 0);' + // set initial scale
+						'left:' + deltaLeft +'px; top:' + deltaTop + 'px"' + // set inital position
+						'id="zoom_element" alt="' + 
+						works[id].image_meta + '" src="./img/' +
+						works[id].image_highres + '"></div><div class="text"><h1>' +
+						works[id].title + '</h1>' + '<p>' +
+						works[id].year + ', ' +
+						works[id].data_en + ', ' +
+						works[id].size_en +
+						works[id].edition + '<br><p class="column">' +
+						works[id].text_en + '</p>' +
+						works[id].links + '</p></div>'
+					panzoom('#zoom_element', {
+						bound:'outer',
+						scale_min: 0.01, // 0.01 to 20
+						scale_max: 0.8 // 0.01 to 20
+					});
+				} else if (works[id].essay) {
 						workPos.innerHTML = '<img alt="' +
 							works[id].image_meta + '" src="./img/' +
 							works[id].image + '" width="100%"><div class="text"><h1>' +
@@ -130,46 +202,23 @@ function content(selector) {
 							works[id].year + ', ' +
 							works[id].data_en + ', ' +
 							works[id].size_en +
-							works[id].edition + '<br><p class="column">' +
-							works[i].text_en + '</p>' +
+							works[id].edition + '<br><div id="essay">' +
+							works[id].essay + 
 							works[id].links + '</p></div>';
-					}
+				} else { // show image
+					workPos.innerHTML = '<img alt="' +
+						works[id].image_meta + '" src="./img/' +
+						works[id].image + '" width="100%"><div class="text"><h1>' +
+						works[id].title + '</h1>' + '<p>' +
+						works[id].year + ', ' +
+						works[id].data_en + ', ' +
+						works[id].size_en +
+						works[id].edition + '<br><p class="column">' +
+						works[id].text_en + '</p>' +
+						works[id].links + '</p></div>';
 				}
-			} else if (works[id].vimeo_id) { // show video instead of image
-				workPos.innerHTML = '<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/' + works[id].vimeo_id + '?h=543f1f4ab7&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>' + '<div class="text"><h1>' +
-					works[id].title + '</h1>' + '<p>' +
-					works[id].year + ', ' +
-					works[id].data_en + ', ' +
-					works[id].size_en +
-					works[id].edition + '<br><p class="column">' +
-					works[id].text_en + '</p>' +
-					works[id].links + '</p></div>';
-			} else if (works[id].image_highres) { // show high resolution image with zoom function
-				workPos.innerHTML = '<div class="zoom_outer"><div id="zoom"><img alt="' + 
-					works[id].image_meta + '" src="./img/' +
-					works[id].image_highres + '" alt="zoom"></div></div><div class="text"><h1>' +
-					works[id].title + '</h1>' + '<p>' +
-					works[id].year + ', ' +
-					works[id].data_en + ', ' +
-					works[id].size_en +
-					works[id].edition + '<br><p class="column">' +
-					works[id].text_en + '</p>' +
-					works[id].links + '</p></div>';
-					imageZoom();
-			} else {  // show image
-				workPos.innerHTML = '<img alt="' +
-					works[id].image_meta + '" src="./img/' +
-					works[id].image + '" width="100%"><div class="text"><h1>' +
-					works[id].title + '</h1>' + '<p>' +
-					works[id].year + ', ' +
-					works[id].data_en + ', ' +
-					works[id].size_en +
-					works[id].edition + '<br><p class="column">' +
-					works[id].text_en + '</p>' +
-					works[id].links + '</p></div>';
 			}
 		}
-
 		function workDetail() {
 			if (workSelected === true && (id >= 0 || langChanged === true)) {
 				if (window.innerWidth >= 600) {
@@ -186,11 +235,9 @@ function content(selector) {
 				}
 			}
 		}
-
 		function pages() {
 			if (id === "index") {
 				currentLang();
-				//document.body.style.backgroundImage = "none";
 				if (window.innerWidth >= 600) {
 					document.body.style.backgroundImage = "url('./img/back/davidherren-atlas-back.jpg')";
 				} else {
@@ -279,11 +326,9 @@ function content(selector) {
 				}
 			}
 		}
-
 		pages();
 		workDetail();
 	}
-
 	function currentLink() {
 		var links = document.getElementsByClassName("link");
 		for (var i = 0; i < links.length; i++) {
@@ -300,7 +345,6 @@ function content(selector) {
 			links[works.length].classList.add("current");
 		}
 	}
-
 	function currentLang() {
 		var langPos = document.getElementsByClassName("lang");
 
@@ -322,7 +366,6 @@ function content(selector) {
 		langEN.href = urlIndex + "?" + selector + "=en";
 		langEN.hreflang = "en";
 	}
-
 	function urlUpdate() {
 		var urlNew = "?" + selector + "=" + langCurrent;
 
@@ -336,7 +379,6 @@ function content(selector) {
 			}, "", urlIndex);
 		}
 	}
-
 	contentSelect();
 	docTitle();
 	dynamic();
@@ -409,7 +451,7 @@ function along() {
 				rightPos.innerHTML = btnSVGstart + "'" + works[id + 1].name + "'" + btnSVGend;
 			}
 
-			if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
+			if ((document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) && window.innerWidth > 1200) {
 				document.getElementById("along-left").className = "along-visible";
 				document.getElementById("along-right").className = "along-visible";
 			} else {
@@ -439,6 +481,11 @@ function urlPara() {
 		parLang = urlPar.substring(langTag + 1, langTag + 3);
 		content(parContent);
 		language(parLang);
+	}
+
+	if (window.location.hash) {
+		console.log("HASH");
+		window.alert("HASH");
 	}
 }
 
@@ -482,4 +529,16 @@ function scrollTo(to, duration) { // copied from https://gist.github.com/andjosh
 		};
 
 	animateScroll();
+}
+
+function popstate() {
+	jQuery(document).ready(function($) {
+		if (window.history && window.history.pushState) {
+			$(window).on('popstate', function() {
+				if ($(location).prop('hash') === "") {
+					location.reload();
+				}
+			});
+		}
+	});
 }
