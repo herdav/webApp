@@ -1,5 +1,5 @@
 // --------------------------------------- //
-// -- Created 2018-2022 by David Herren -- //
+// -- Created 2016-2022 by David Herren -- //
 // ------- https://davidherren.ch -------- //
 // --------------------------------------- //
 
@@ -7,6 +7,18 @@ var id, workSelected, savedSelector;
 var langCurrent;
 var langChanged = false;
 var urlIndex = window.location.protocol + "//" + window.location.host + window.location.pathname;
+
+function menu() {
+	var menuPos = document.getElementById("works");
+	menuPos.innerHTML = "";
+	for (var i = 0; i < works.length; i++) {
+		if (works[i].menu) {
+			menuPos.innerHTML += `<a class="link" href="javascript:content('` + works[i].name + `')">` + works[i].menu + `</a>`;
+		} else {
+			menuPos.innerHTML += `<a class="link" href="javascript:content('` + works[i].name + `')">` + works[i].title + `</a>`;
+		}
+	}
+}
 
 function content(selector) {
 	savedSelector = selector;
