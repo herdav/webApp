@@ -56,20 +56,22 @@ function content(selector) {
 		}
 	}
 	function dynamic() {
-		{
+		{ // setup
 			window.scrollTo(0, 0);
 			var workPos = document.getElementById("work");
 			var flexPos = document.getElementById("flex");
 			var listPos = document.getElementById("list");
 			var exhiPos = document.getElementById("exhi");
+
+			document.getElementById("load").style.visibility = "hidden";
+
 			workPos.innerHTML = "";
 			flexPos.innerHTML = "";
 			listPos.innerHTML = "";
 			exhiPos.innerHTML = "";
-			document.getElementById("load").style.visibility = "hidden";
 		}
 		{ // work project pages
-			function work_de() {
+			function work_de() { // german data
 				document.getElementsByTagName("META")[0].content = works[id].description_de;
 				if (works[id].text_copy) { // copy description from another project
 					for (var i = 0; i < works.length; i++) {
@@ -95,7 +97,7 @@ function content(selector) {
 						works[id].edition + '<br><p class="column">' +
 						works[id].text_de + '</p>' +
 						works[id].links + '</p></div>';
-				} else if (works[id].image_highres && window.innerWidth >= 1200) { // show high resolution image with zoom function
+				} else if (works[id].image_highres /*&& window.innerWidth >= 1200*/) { // show high resolution image with zoom function
 					document.getElementById("load").style.visibility = "visible";
 					let outerHeigh = 500;
 					let initialScale = 0.1;
@@ -125,7 +127,7 @@ function content(selector) {
 						scale_min: 0.01, // 0.01 to 20
 						scale_max: 0.8 // 0.01 to 20
 					});
-				} else if (works[id].essay) {
+				} else if (works[id].essay) { // show essay (long text)
 					workPos.innerHTML = '<img alt="' +
 						works[id].image_meta + '" src="./img/' +
 						works[id].image + '" width="100%"><div class="text"><h1>' +
@@ -136,8 +138,7 @@ function content(selector) {
 						works[id].edition + '<br><div id="essay">' +
 						works[id].essay + 
 						works[id].links + '</p></div>';
-				}
-				else { // show image
+				} else { // show image and (short) text
 					workPos.innerHTML = '<img alt="' +
 						works[id].image_meta + '" src="./img/' +
 						works[id].image + '" width="100%"><div class="text"><h1>' +
@@ -150,7 +151,7 @@ function content(selector) {
 						works[id].links + '</p></div>';
 				}
 			}
-			function work_en() {
+			function work_en() { // english data
 				document.getElementsByTagName("META")[0].content = works[id].description_en;
 				if (works[id].text_copy) { // copy description from another project
 					for (var i = 0; i < works.length; i++) {
@@ -176,7 +177,7 @@ function content(selector) {
 						works[id].edition + '<br><p class="column">' +
 						works[id].text_en + '</p>' +
 						works[id].links + '</p></div>';
-				} else if (works[id].image_highres && window.innerWidth >= 1200) { // show high resolution image with zoom function
+				} else if (works[id].image_highres /*&& window.innerWidth >= 1200*/) { // show high resolution image with zoom function
 					document.getElementById("load").style.visibility = "visible";
 					let outerHeigh = 500;
 					let initialScale = 0.1;
@@ -217,7 +218,7 @@ function content(selector) {
 							works[id].edition + '<br><div id="essay">' +
 							works[id].essay + 
 							works[id].links + '</p></div>';
-				} else { // show image
+				} else { // show image and (short) text
 					workPos.innerHTML = '<img alt="' +
 						works[id].image_meta + '" src="./img/' +
 						works[id].image + '" width="100%"><div class="text"><h1>' +
@@ -231,23 +232,23 @@ function content(selector) {
 				}
 			}
 		}
-		function workDetail() {
+		function workDetail() { // load detail site
 			if (workSelected === true && (id >= 0 || langChanged === true)) {
-				if (window.innerWidth >= 600) {
+				if (langCurrent === "de") { // load german site
+					work_de();
+				}
+				if (langCurrent === "en") { // load english site
+					work_en();
+				}
+				if (window.innerWidth >= 600) { // hide background image
 					document.body.style.backgroundImage = "url('./img/" +
 						works[id].image_back + "')";
 				} else {
 					document.body.style.backgroundImage = null;
 				}
-				if (langCurrent === "de") {
-					work_de();
-				}
-				if (langCurrent === "en") {
-					work_en();
-				}
 			}
 		}
-		function pages() {
+		function pages() { // index site
 			if (id === "index") {
 				currentLang();
 				if (window.innerWidth >= 600) {
@@ -363,10 +364,12 @@ function content(selector) {
 		if (langCurrent === "de") {
 			langPos[0].classList.add("current");
 			langPos[1].classList.remove("current");
+			document.documentElement.setAttribute("lang", 'DE');
 		}
 		if (langCurrent === "en") {
 			langPos[0].classList.remove("current");
 			langPos[1].classList.add("current");
+			document.documentElement.setAttribute("lang", 'EN');
 		}
 
 		var langDE = document.getElementById("langDE");
@@ -430,7 +433,7 @@ function along() {
 		var offset = d.scrollTop + window.innerHeight;
 		var height = d.offsetHeight;
 
-		if (height - offset < 80) {
+		if (height - offset < 80 && window.innerWidth >= 1200) {
 			document.getElementById("along-top").className = "top-visible";
 		} else {
 			document.getElementById("along-top").className = "top-hidden";
@@ -466,9 +469,11 @@ function along() {
 			if ((document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) && window.innerWidth > 1200) {
 				document.getElementById("along-left").className = "along-visible";
 				document.getElementById("along-right").className = "along-visible";
+				document.getElementById("along-top").className = "top-visible";
 			} else {
 				document.getElementById("along-left").className = "along-hidden";
 				document.getElementById("along-right").className = "along-hidden";
+				document.getElementById("along-top").className = "top-hidden";
 			}
 		}
 	}
@@ -552,5 +557,20 @@ function popstate() {
 				}
 			});
 		}
+	});
+}
+
+function scrollAnimation() {
+	window.addEventListener('scroll', function() {
+		if (window.pageYOffset > 80 && window.innerWidth > 1200) {  // 80
+			document.getElementById("menu").style.position = "relative";
+			document.getElementById("menu").style.marginTop = "80px";
+			document.getElementById("menu").style.marginBottom = "0px";
+			document.getElementById("content").style.marginTop = "0px";
+			} else {
+				document.getElementById("menu").style.position = "sticky";
+				document.getElementById("menu").style.marginTop = "40px";
+				document.getElementById("menu").style.marginBottom = "40px";
+			}
 	});
 }
