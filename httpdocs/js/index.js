@@ -60,17 +60,27 @@ var loadModell = false;
 			{ // work project pages
 				function work() {
 					document.getElementsByTagName("META")[0].content = works[id][`description_${langCurrent}`];
+
+					const imageHTML = () => `
+					<div id="image"><div id="dots"></div><img id="workImg" onclick="changeImg()" alt="
+					${works[id].image_meta}" src="./img/
+					${works[id].image}" width="100%"><div class="text"><h1>
+					`;
+
+					const commonHTML = () => `
+					<h1>${works[id].title}</h1>
+					<p>${works[id].year}, ${works[id][`data_${langCurrent}`]}, ${works[id][`size_${langCurrent}`]}${works[id].edition}<br><p class="column">
+					`;
+
+					const textHTML = () => `
+					${works[id][`text_${langCurrent}`]}</p>
+					${works[id].links}</p></div>
+					`;
+
 					if (works[id].text_copy) { // copy description from another project
 						for (var i = 0; i < works.length; i++) {
 							if (works[i].name === works[id].text_copy) {
-								workPos.innerHTML = '<div id="image"><div id="dots"></div><img id="workImg" onclick="changeImg()" alt="' +
-									works[id].image_meta + '" src="./img/' +
-									works[id].image + '" width="100%"><div class="text"><h1>' +
-									works[id].title + '</h1>' + '<p>' +
-									works[id].year + ', ' +
-									works[id][`data_${langCurrent}`] + ', ' +
-									works[id][`size_${langCurrent}`] +
-									works[id].edition + '<br><p class="column">' +
+								workPos.innerHTML = imageHTML() + commonHTML() +
 									works[i][`text_${langCurrent}`] + '</p>' +
 									works[id].links + '</p></div>';
 								if (works[id].image_set) {imageChange()}
@@ -78,13 +88,7 @@ var loadModell = false;
 						}
 					} else if (works[id].vimeo_id && !works[id].essay) { // show video
 						workPos.innerHTML = '<div style="padding:'+ works[id].vimeo_padding + '% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/' + works[id].vimeo_id + '?h=543f1f4ab7&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>' + '<div class="text"><h1>' +
-							works[id].title + '</h1>' + '<p>' +
-							works[id].year + ', ' +
-							works[id][`data_${langCurrent}`] + ', ' +
-							works[id][`size_${langCurrent}`] +
-							works[id].edition + '<br><p class="column">' +
-							works[id][`text_${langCurrent}`] + '</p>' +
-							works[id].links + '</p></div>';
+						commonHTML() + textHTML();
 					} else if (works[id].image_highres && window.innerWidth >= 1200) { // show high resolution image with zoom function
 						document.getElementById("load").style.visibility = "visible";
 						let outerHeigh = 500;
@@ -103,49 +107,20 @@ var loadModell = false;
 							'id="zoom_element" alt="' + 
 							works[id].image_meta + '" src="./img/' +
 							works[id].image_highres + '"></div><div class="text"><h1>' +
-							works[id].title + '</h1>' + '<p>' +
-							works[id].year + ', ' +
-							works[id].data_de + ', ' +
-							works[id][`size_${langCurrent}`] +
-							works[id].edition + '<br><p class="column">' +
-							works[id][`text_${langCurrent}`] + '</p>' +
-							works[id].links + '</p></div>';
-						panzoom('#zoom_element', {
+							commonHTML() + textHTML();
+							panzoom('#zoom_element', {
 							bound:'outer',
 							scale_min: 0.01, // 0.01 to 20
 							scale_max: 0.8 // 0.01 to 20
 						});
 					} else if (works[id].essay && !works[id].vimeo_id) { // show essay (long text)
-						workPos.innerHTML = '<img alt="' +
-							works[id].image_meta + '" src="./img/' +
-							works[id].image + '" width="100%"><div class="text"><h1>' +
-							works[id].title + '</h1>' + '<p>' +
-							works[id].year + ', ' +
-							works[id][`data_${langCurrent}`] + ', ' +
-							works[id][`size_${langCurrent}`] +
-							works[id].edition + '<br><div id="essay">' +
-							works[id].essay + 
-							works[id].links + '</p></div>';
+						workPos.innerHTML = imageHTML() + commonHTML() +
+							works[id].essay + works[id].links + '</p></div>';
 					} else if (works[id].essay &&  works[id].vimeo_id) { // show essay (long text) with video
 						workPos.innerHTML = '<div style="padding:'+ works[id].vimeo_padding + '% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/' + works[id].vimeo_id + '?h=543f1f4ab7&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>' + '<div class="text"><h1>' +
-							works[id].title + '</h1>' + '<p>' +
-							works[id].year + ', ' +
-							works[id][`data_${langCurrent}`] + ', ' +
-							works[id][`size_${langCurrent}`] +
-							works[id].edition + '<br><p class="column">' +
-							works[id].essay + 
-							works[id].links + '</p></div>';
+							commonHTML() + works[id].essay + works[id].links + '</p></div>';
 					} else { // show image and (short) text
-						workPos.innerHTML = '<div id="image"><div id="dots"></div><img id="workImg" onclick="changeImg()" alt="' +
-							works[id].image_meta + '" src="./img/' +
-							works[id].image + '" width="100%"></div><div class="text"><h1>' +
-							works[id].title + '</h1>' + '<p>' +
-							works[id].year + ', ' +
-							works[id][`data_${langCurrent}`] + ', ' +
-							works[id][`size_${langCurrent}`] +
-							works[id].edition + '<br><p class="column">' +
-							works[id][`text_${langCurrent}`] + '</p>' +
-							works[id].links + '</p></div>';
+						workPos.innerHTML = imageHTML() + commonHTML() + textHTML();
 						if (works[id].image_set) {imageChange()}
 					}
 				}
@@ -485,19 +460,6 @@ function scrollAnimation() {
 				document.getElementById("menu").style.marginTop = "40px";
 				document.getElementById("menu").style.marginBottom = "40px";
 			}
-	});
-}
-
-function loadScript(src) {
-	return new Promise((resolve, reject) => {
-			const script = document.createElement('script');
-			script.type = 'module';
-			script.src = src;
-
-			script.onload = () => resolve(script);
-			script.onerror = () => reject(new Error(`Script load error for ${src}`));
-
-			document.head.append(script);
 	});
 }
 
