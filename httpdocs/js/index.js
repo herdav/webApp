@@ -22,7 +22,7 @@ var loadModell = false;
 				workSelected = false;
 				id = selector;
 			}
-			if (workSelected === true) {
+			if (workSelected) {
 				for (var i = 0; i < works.length; i++) {
 					if (works[i].name === selector) {
 						id = i;
@@ -31,7 +31,7 @@ var loadModell = false;
 			}
 		}
 		function docTitle() {
-			if (workSelected === true) {
+			if (workSelected) {
 				document.title = works[id].title + " | David Herren";
 			}
 			if (selector === "index") {
@@ -60,23 +60,19 @@ var loadModell = false;
 			{ // work project pages
 				function work() {
 					document.getElementsByTagName("META")[0].content = works[id][`description_${langCurrent}`];
-
 					const imageHTML = () => `
 					<div id="image"><div id="dots"></div><img id="workImg" onclick="changeImg()" alt="
 					${works[id].image_meta}" src="./img/
 					${works[id].image}" width="100%"><div class="text"><h1>
 					`;
-
 					const commonHTML = () => `
 					<h1>${works[id].title}</h1>
 					<p>${works[id].year}, ${works[id][`data_${langCurrent}`]}, ${works[id][`size_${langCurrent}`]}${works[id].edition}<br><p class="column">
 					`;
-
 					const textHTML = () => `
 					${works[id][`text_${langCurrent}`]}</p>
 					${works[id].links}</p></div>
 					`;
-
 					if (works[id].text_copy) { // copy description from another project
 						for (var i = 0; i < works.length; i++) {
 							if (works[i].name === works[id].text_copy) {
@@ -148,7 +144,7 @@ var loadModell = false;
 				}
 			}
 			function workDetail() { // load detail site
-				if (workSelected === true && (id >= 0 || langChanged === true)) {
+				if (workSelected && (id >= 0 || langChanged)) {
 					work();
 					if (window.innerWidth >= 600) { // hide background image
 						document.body.style.backgroundImage = "url('./img/" +
@@ -180,7 +176,6 @@ var loadModell = false;
 							works[i].links + '</p></div></div>';
 						}
 				}
-
 				if (id === "about") {
 					currentLang();
 					document.body.style.backgroundImage = "none";
@@ -209,56 +204,35 @@ var loadModell = false;
 			workDetail();
 		}
 		function currentLink() {
-			var links = document.getElementsByClassName("link");
-			for (var i = 0; i < links.length; i++) {
-				if (i === id) {
-					links[i].classList.add("current");
+			let links = Array.from(document.getElementsByClassName("link"));
+			links.forEach((link, index) => {
+				if (index === id || (id === "about" && index === works.length + 1) || (id === "exhibitions" && index === works.length)) {
+					link.classList.add("current");
 				} else {
-					links[i].classList.remove("current");
+					link.classList.remove("current");
 				}
-			}
-			if (id === "about") {
-				links[works.length + 1].classList.add("current");
-			}
-			if (id === "exhibitions") {
-				links[works.length].classList.add("current");
-			}
+			});
 		}
 		function currentLang() {
-			var langPos = document.getElementsByClassName("lang");
-
+			const langPos = Array.from(document.getElementsByClassName("lang"));
+			const langDE = document.getElementById("langDE");
+			const langEN = document.getElementById("langEN");
+			const setLang = (lang, pos) => {
+				langPos.forEach((el, index) => el.classList.toggle("current", index === pos));
+				document.documentElement.setAttribute("lang", lang.toUpperCase());
+				langDE.href = `${urlIndex}?${selector}=${lang}`;
+				langDE.hreflang = lang;
+			};
 			if (langCurrent === "de") {
-				langPos[0].classList.add("current");
-				langPos[1].classList.remove("current");
-				document.documentElement.setAttribute("lang", 'DE');
+				setLang('de', 0);
+			} else if (langCurrent === "en") {
+				setLang('en', 1);
 			}
-			if (langCurrent === "en") {
-				langPos[0].classList.remove("current");
-				langPos[1].classList.add("current");
-				document.documentElement.setAttribute("lang", 'EN');
-			}
-
-			var langDE = document.getElementById("langDE");
-			var langEN = document.getElementById("langEN");
-
-			langDE.href = urlIndex + "?" + selector + "=de";
-			langDE.hreflang = "de";
-
-			langEN.href = urlIndex + "?" + selector + "=en";
-			langEN.hreflang = "en";
 		}
 		function urlUpdate() {
-			var urlNew = "?" + selector + "=" + langCurrent;
-
-			if (history.pushState && selector !== "index") {
-				window.history.pushState({
-					path: urlNew
-				}, "", urlNew);
-			} else {
-				window.history.pushState({
-					path: urlIndex
-				}, "", urlIndex);
-			}
+			const urlNew = `?${selector}=${langCurrent}`;
+			const newPath = (history.pushState && selector !== "index") ? urlNew : urlIndex;
+			window.history.pushState({ path: newPath }, "", newPath);
 		}
 		contentSelect();
 		docTitle();
@@ -268,7 +242,6 @@ var loadModell = false;
 		logos();
 		urlUpdate();
 	}
-
 	{ // If more than one img available, click through (required for work project pages)
 		var imgIndex = 0;
 		var dots = [];
@@ -290,96 +263,54 @@ var loadModell = false;
 		}
 	}
 }
-
 function language(langSelector) {
-	if (langSelector !== langCurrent) {
-		langChanged = true;
-		langCurrent = langSelector;
-		content(savedSelector);
-		langChanged = false;
-	}
+  if (langSelector === langCurrent) return;
+  langChanged = true;
+  langCurrent = langSelector;
+  content(savedSelector);
+  langChanged = false;
 }
-
 function navLang() {
-	if (navigator.language.includes("de") === true) {
-		langCurrent = "de";
-	} else {
-		langCurrent = "en";
-	}
+  langCurrent = navigator.language.includes("de") ? "de" : "en";
 }
-
 function along() {
 	var alongPolyline = '<polyline class="along" points="20,2 35,20 20,38" />';
-
 	function navTop() {
-		var btnSVG = '<svg width="40" height="40"><a ' + 'href="javascript:scrollTo(0, 500)"' + ' style="cursor:pointer" target="_self">' + alongPolyline + '</a></svg>';
-
-		var topPos = document.getElementById("along-top");
-		topPos.innerHTML = btnSVG;
-
-		var d = document.documentElement;
-		var offset = d.scrollTop + window.innerHeight;
-		var height = d.offsetHeight;
-
-		if (height - offset < 80 && window.innerWidth >= 1200) {
-			document.getElementById("along-top").className = "top-visible";
-		} else {
-			document.getElementById("along-top").className = "top-hidden";
-		}
+		const topPos = document.getElementById("along-top");
+		topPos.innerHTML = `<svg width="40" height="40"><a href="javascript:scrollTo(0, 500)" style="cursor:pointer" target="_self">${alongPolyline}</a></svg>`;
+		const isVisible = document.documentElement.offsetHeight - (document.documentElement.scrollTop + window.innerHeight) < 80 && window.innerWidth >= 1200;
+		topPos.className = isVisible ? "top-visible" : "top-hidden";
 	}
-
 	function navAlong() {
-		var leftPos = document.getElementById("along-left");
-		var rightPos = document.getElementById("along-right");
-
+    const leftPos = document.getElementById("along-left");
+    const rightPos = document.getElementById("along-right");
 		leftPos.innerHTML = "";
-		rightPos.innerHTML = "";
-
-		var btnSVGstart = '<svg width="40" height="40"><a href="javascript:content(';
-		var btnSVGend = ')" style="cursor:pointer" target="_self">' + alongPolyline + '</a></svg>';
-
-		if (workSelected === true) {
-			if (id === 0) {
-				leftPos.innerHTML = btnSVGstart + "'" + works[works.length - 1].name + "'" + btnSVGend;
-				rightPos.innerHTML = btnSVGstart + "'" + works[id + 1].name + "'" + btnSVGend;
-			}
-
-			if (id === works.length - 1) {
-				leftPos.innerHTML = btnSVGstart + "'" + works[id - 1].name + "'" + btnSVGend;
-				rightPos.innerHTML = btnSVGstart + "'" + works[0].name + "'" + btnSVGend;
-			}
-
-			if (id > 0 && id < works.length - 1) {
-				leftPos.innerHTML = btnSVGstart + "'" + works[id - 1].name + "'" + btnSVGend;
-				rightPos.innerHTML = btnSVGstart + "'" + works[id + 1].name + "'" + btnSVGend;
-			}
-
-			if ((document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) && window.innerWidth > 1200) {
-				document.getElementById("along-left").className = "along-visible";
-				document.getElementById("along-right").className = "along-visible";
-				document.getElementById("along-top").className = "top-visible";
-			} else {
-				document.getElementById("along-left").className = "along-hidden";
-				document.getElementById("along-right").className = "along-hidden";
-				document.getElementById("along-top").className = "top-hidden";
-			}
-		}
+    rightPos.innerHTML = "";
+    const btnSVGstart = '<svg width="40" height="40"><a href="javascript:content(';
+    const btnSVGend = ')" style="cursor:pointer" target="_self">' + alongPolyline + '</a></svg>';
+    if (workSelected) {
+        const prevWorkName = works[id === 0 ? works.length - 1 : id - 1].name;
+        const nextWorkName = works[id === works.length - 1 ? 0 : id + 1].name;
+        leftPos.innerHTML = btnSVGstart + "'" + prevWorkName + "'" + btnSVGend;
+        rightPos.innerHTML = btnSVGstart + "'" + nextWorkName + "'" + btnSVGend;
+        const isScrollDownAndWideScreen = (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) && window.innerWidth > 1200;
+        const visibilityClassSuffix = isScrollDownAndWideScreen ? 'visible' : 'hidden';
+        document.getElementById("along-left").className = "along-" + visibilityClassSuffix;
+        document.getElementById("along-right").className = "along-" + visibilityClassSuffix;
+        document.getElementById("along-top").className = "top-" + visibilityClassSuffix;
+    }
 	}
-
 	navTop();
 	navAlong();
 }
-
 function urlPara() {
 	var urlPar = location.search;
 	var langTag;
 	var firstLoad = false;
-
 	if (!firstLoad) {
 		content("index");
 		firstLoad = true;
 	}
-
 	if (urlPar.includes("=")) { // if language selected
 		langTag = urlPar.indexOf("=");
 		parContent = urlPar.substring(1, langTag);
@@ -393,7 +324,6 @@ function urlPara() {
 		language(currentLang);
 	}
 }
-
 function logos() {
 	var logosPos = document.getElementById("logos");
 	logosPos.innerHTML = "";
@@ -405,14 +335,12 @@ function logos() {
 			links[i].img + '" >' + '</a>' + '</div>';
 	}
 }
-
 function scrollTo(to, duration) { // copied from https://gist.github.com/andjosh/6764939
 	const
 		element = document.scrollingElement || document.documentElement,
 		start = element.scrollTop,
 		change = to - start,
 		startDate = +new Date(),
-
 		easeInOutQuad = function (t, b, c, d) {
 			t /= d / 2;
 			if (t < 1) {
@@ -421,7 +349,6 @@ function scrollTo(to, duration) { // copied from https://gist.github.com/andjosh
 			t--;
 			return -c / 2 * (t * (t - 2) - 1) + b;
 		},
-
 		animateScroll = function () {
 			const currentDate = +new Date();
 			const currentTime = currentDate - startDate;
@@ -432,10 +359,8 @@ function scrollTo(to, duration) { // copied from https://gist.github.com/andjosh
 				element.scrollTop = to;
 			}
 		};
-
 	animateScroll();
 }
-
 function popstate() {
 	jQuery(document).ready(function($) {
 		if (window.history && window.history.pushState) {
@@ -447,7 +372,6 @@ function popstate() {
 		}
 	});
 }
-
 function scrollAnimation() {
 	window.addEventListener('scroll', function() {
 		if (window.pageYOffset > 80 && window.innerWidth > 1200) {  // 80
@@ -462,7 +386,6 @@ function scrollAnimation() {
 			}
 	});
 }
-
 function loader() {
 	document.getElementById("#loader").style.visibility = "visible";
 }
