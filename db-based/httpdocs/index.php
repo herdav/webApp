@@ -1,35 +1,54 @@
+<!--index.php-->
 <!DOCTYPE html>
 <html lang="de">
-<head>
+  <head>
     <meta charset="UTF-8">
     <title>David Herren</title>
-    <script src="data.js"></script>
-</head>
-<body>
-    <a href="./">David Herren</a>
-    <div id="menu">
-        <?php
-        include 'config.php';
-        $conn = new mysqli($servername, $username, $password, $dbname);
-        if ($conn->connect_error) {
-            die("Verbindung zur Datenbank fehlgeschlagen: " . $conn->connect_error);
-        }
-        // SQL-Abfrage, um alle Buttons aus der Datenbank zu laden und nach Nummer sortieren
-        $sql = "SELECT slug, title FROM works ORDER BY nr DESC";
-        $result = $conn->query($sql);
-        // Buttons erstellen und anzeigen
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $slug = $row["slug"];
-                $title = $row["title"];
-                echo '<button onclick="loadData(\'' . $slug . '\')">' . $title . '</button>' . PHP_EOL;
-            }
-        } else {
-            echo "Keine Buttons gefunden.";
-        }
-        $conn->close();
-        ?>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <script src="/js/data.js" defer></script>
+    <script type="module" src="https://unpkg.com/@google/model-viewer@latest"></script>
+  </head>
+  <body>
+    <div id="header">
+      <a href="./">David Herren</a>
+      <div id="language-switch">
+        <button id="button-de" class="button-language" onclick="switchLanguage('de')">de</button>
+        <button id="button-en" class="button-language" onclick="switchLanguage('en')">en</button>
+      </div>
     </div>
-    <div id="content"></div>
-</body>
+
+    <?php
+    include 'data.php';
+    $menuResult = $database->fetchMenuItems();
+    $indexResult = $database->fetchIndexItems();
+    ?>
+    <div id="menu">
+      <div id="menu-works">
+        <?php
+        if (count($menuResult) > 0) {
+          foreach ($menuResult as $row) {
+            $slug = $row["slug"];
+            $title = $row["title"];
+            echo '<button id="button-' . htmlspecialchars($slug) . '" class="button-navigation" onclick="loadWorks(\'' . htmlspecialchars($slug) . '\')">' . htmlspecialchars($title) . '</button>' . PHP_EOL;
+          }
+        } else { echo "No Buttons found!"; }
+        ?>
+      </div>
+      <div id="menu-about">
+        <button id="button-exhibitions" class="button-navigation" onclick="loadExhibitions()">Exhibitions</button>
+        <button id="button-about" class="button-navigation" onclick="loadAbout()">About</button>
+      </div>
+    </div>
+    <div id="index">
+      <?php
+      if (count($indexResult) > 0) {
+        foreach ($indexResult as $row) {
+          $title = $row["title"];
+          echo "<p>" . htmlspecialchars($title) . "</p>" . PHP_EOL;
+        }
+      } else { echo "No works found!"; }
+      ?>
+    </div>
+    <div id="content"></div
+  </body> 
 </html>
