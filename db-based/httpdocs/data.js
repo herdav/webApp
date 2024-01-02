@@ -45,9 +45,20 @@ function switchLanguage(lang) {
 // Function to highlight the active language button
 function highlightLanguageButton(lang) {
   document.querySelectorAll('#language-switch button').forEach(button => {
-    button.classList.remove('highlighted'); // Removes highlight from all buttons
+    button.classList.remove('button-highlighted'); // Removes highlight from all buttons
   });
-  document.querySelector('#button-' + lang).classList.add('highlighted'); // Adds highlight to the selected button
+  document.querySelector('#button-' + lang).classList.add('button-highlighted'); // Adds highlight to the selected button
+}
+
+// Function to highlight the active content button
+function highlightContentButton(buttonId) {
+  document.querySelectorAll('#menu-works button, #menu-about button').forEach(btn => {
+    btn.classList.remove('button-highlighted'); // Removes highlight from all buttons
+  });
+  const button = document.getElementById(buttonId);
+  if (button) {
+    button.classList.add('button-highlighted'); // Adds highlight to the selected button
+  }
 }
 
 // Function to load content for a specific work
@@ -89,7 +100,7 @@ function adjustWidth() {
     currentMinWidth = currentMinWidth === '35%' ? '65%' : '35%';
     contentLeft.style.minWidth = currentMinWidth;
     contentLeft.addEventListener('transitionend', () => {
-      let separatorLink = document.getElementById('seperator-link');
+      let separatorLink = document.getElementById('seperator-triangle');
       if (separatorLink) {
         updateTriangleDirection(); // Updates the direction of the triangle indicator
         separatorLink.style.transition = "transform 0.5s ease";
@@ -100,14 +111,14 @@ function adjustWidth() {
 
 // Function to update the direction of the triangle used as a separator
 function updateTriangleDirection() {
-  let separatorLink = document.getElementById('seperator-link');
+  let separatorLink = document.getElementById('seperator-triangle');
   let contentLeft = document.getElementById('content-inner-left');
   if (separatorLink && contentLeft) {
     // Calculates the width ratio to determine the triangle's direction
     let contentLeftWidth = contentLeft.offsetWidth;
     let parentWidth = contentLeft.parentNode.offsetWidth;
     if (contentLeftWidth / parentWidth < 0.5) {
-      separatorLink.className = 'triangle rotated'; // Rotates the triangle
+      separatorLink.className = 'triangle rotated-180'; // Rotates the triangle
     } else {
       separatorLink.className = 'triangle'; // Sets the triangle to default position
     }
@@ -176,17 +187,6 @@ function updateHrefLangTags(slug) {
   });
 }
 
-// Function to highlight the active content button
-function highlightContentButton(buttonId) {
-  document.querySelectorAll('#menu-works button, #menu-about button').forEach(btn => {
-    btn.classList.remove('highlighted'); // Removes highlight from all buttons
-  });
-  const button = document.getElementById(buttonId);
-  if (button) {
-    button.classList.add('highlighted'); // Adds highlight to the selected button
-  }
-}
-
 // Event listener for the DOMContentLoaded event to initialize the page based on URL
 document.addEventListener("DOMContentLoaded", () => {
   // Highlight the current language button
@@ -206,21 +206,94 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Event listeners for additional functionalities can be added here
+  let blurApplied = false;
+  let currentTriangleDirection = '';
+  
   window.addEventListener('scroll', () => {
-    // Logic for behavior on scrolling
     let images = document.querySelectorAll('#content-inner-right img');
     let allTitleDivs = document.querySelectorAll('#content-inner-right .work-image-title');
+    let separator = document.querySelector('#separator');
+    let contentInnerLeft = document.querySelector('#content-inner-left');
+  
     allTitleDivs.forEach(div => div.style.display = 'none');
     let currentVisibleImageIndex = -1;
+  
     images.forEach((img, index) => {
       let rect = img.getBoundingClientRect();
-      if (rect.bottom > 0 && rect.top < window.innerHeight) {
+      if (rect.bottom > 0 && rect.top < window.innerHeight / 2) {
         currentVisibleImageIndex = index;
       }
     });
-    if (currentVisibleImageIndex !== -1) {
-      allTitleDivs[currentVisibleImageIndex].style.display = 'block';
+
+    let separatorTriangle = document.getElementById('seperator-triangle');
+    let separatorLink = document.getElementById('seperator-link');
+    if (separatorTriangle) {
+      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+        if (!currentTriangleDirection) {
+          if (separatorTriangle.classList.contains('rotated-180')) {
+            currentTriangleDirection = 'rotated-180';
+          } else {
+            currentTriangleDirection = '';
+          }
+        }
+        separatorTriangle.classList.add('rotated-90');
+        separatorTriangle.classList.remove('rotated-180');
+        separatorLink.href = '#top';
+      } else {
+        separatorTriangle.classList.remove('rotated-90');
+        if (currentTriangleDirection) {
+          separatorTriangle.classList.add(currentTriangleDirection);
+          currentTriangleDirection = '';
+        }
+        separatorLink.href = 'javascript:adjustWidth()';
+      }
+    }
+  
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+      allTitleDivs.forEach(div => div.style.display = 'none');
+      if (blurApplied) {
+        /*applyBlurAndGray(contentInnerLeft, 1, 0, 100, 0, 500);
+        blurApplied = false;*/
+      }
+      } else if (currentVisibleImageIndex !== -1) {
+        allTitleDivs[currentVisibleImageIndex].style.display = 'block';
+        if (!blurApplied) {
+          applyBlurAndGray(contentInnerLeft, 0, 0, 0, 100, 500);
+          blurApplied = true;
+        }
+      } else {
+        if (blurApplied) {
+          applyBlurAndGray(contentInnerLeft, 0, 0, 100, 0, 500);
+          blurApplied = false;
+        }
+      }
+    
+    // Logic for adjusting the position of the separator
+    let firstImage = document.querySelector('#content-inner-right img');
+    if (firstImage) {
+      let rect = firstImage.getBoundingClientRect();
+      if (rect.top > window.innerHeight / 2) {
+        separator.style.top = '2rem';
+      } else {
+        separator.style.top = (window.innerHeight / 2) + 'px';
+      }
     }
   });
 });
+
+function applyBlurAndGray(element, startBlur, endBlur, startGray, endGray, duration) {
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    const blurValue = progress * (endBlur - startBlur) + startBlur;
+    const grayValue = progress * (endGray - startGray) + startGray;
+    
+    element.style.filter = `blur(${blurValue}px) grayscale(${grayValue}%)`;
+
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    }
+  };
+  window.requestAnimationFrame(step);
+}
