@@ -103,7 +103,7 @@ function adjustWidth() {
       let separatorLink = document.getElementById('seperator-triangle');
       if (separatorLink) {
         updateTriangleDirection(); // Updates the direction of the triangle indicator
-        separatorLink.style.transition = "transform 0.5s ease";
+        //separatorLink.style.transition = "transform 0.5s ease";*/
       }
     }, { once: true });
   }
@@ -111,16 +111,23 @@ function adjustWidth() {
 
 // Function to update the direction of the triangle used as a separator
 function updateTriangleDirection() {
-  let separatorLink = document.getElementById('seperator-triangle');
+  let separatorTriangle = document.getElementById('seperator-triangle');
   let contentLeft = document.getElementById('content-inner-left');
-  if (separatorLink && contentLeft) {
+  if (separatorTriangle && contentLeft) {
     // Calculates the width ratio to determine the triangle's direction
     let contentLeftWidth = contentLeft.offsetWidth;
     let parentWidth = contentLeft.parentNode.offsetWidth;
     if (contentLeftWidth / parentWidth < 0.5) {
-      separatorLink.className = 'triangle rotated-180'; // Rotates the triangle
+      if (isLoadingWork) {
+        separatorTriangle.style.transition = 'none';
+      }
+      separatorTriangle.className = 'triangle rotated-180';
     } else {
-      separatorLink.className = 'triangle'; // Sets the triangle to default position
+      separatorTriangle.className = 'triangle';
+      if (!isLoadingWork) {
+        // Sets the triangle to default position
+        separatorTriangle.style.transition = 'transform 0.3s ease-in-out';
+      }
     }
   }
 }
@@ -241,6 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
         separatorLink.href = '#top';
       } else {
         separatorTriangle.classList.remove('rotated-90');
+
         if (currentTriangleDirection) {
           separatorTriangle.classList.add(currentTriangleDirection);
           currentTriangleDirection = '';
