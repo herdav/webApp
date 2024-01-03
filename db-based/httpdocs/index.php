@@ -50,5 +50,5 @@
       ?>
     </div>
     <div id="content"></div
-  </body> 
+  </body>
 </html>
