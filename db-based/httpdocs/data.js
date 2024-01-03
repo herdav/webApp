@@ -3,8 +3,6 @@
 // Initialization of global variables
 let currentLanguage = 'de'; // Sets the default language to German
 let currentSlug = ''; // Stores the current slug for content
-let isLoadingWork = false; // Flag to indicate if work is currently being loaded
-let currentMinWidth = '65%'; // Default minimum width for a section of the content
 
 // Function to handle sending requests to a server
 const sendRequest = (url, successCallback, errorCallback) => {
@@ -76,60 +74,8 @@ function loadWorks(slug) {
     updateMetaDescription(description); // Updates the meta description
     updateUrl(slug); // Updates the URL
     updateHrefLangTags(slug); // Updates hreflang tags for SEO
-    let contentLeft = document.getElementById('content-inner-left');
-    if (contentLeft) {
-      contentLeft.style.transition = 'none';
-      contentLeft.style.minWidth = currentMinWidth;
-      setTimeout(() => {
-        isLoadingWork = false; // Resets the loading flag
-        contentLeft.style.transition = 'min-width 1.5s ease-in-out';
-      }, 50);
-      updateTriangleDirection(); // Updates the direction of the triangle indicator
-    }
-  }, (error) => {
-    console.error('Error with the request:', error); // Logs any errors
   });
   highlightContentButton('button-' + slug); // Highlights the active content button
-}
-
-// Function to adjust the width of a content section
-function adjustWidth() {
-  let contentLeft = document.getElementById('content-inner-left');
-  if (contentLeft) {
-    // Toggles the width between two values
-    currentMinWidth = currentMinWidth === '35%' ? '65%' : '35%';
-    contentLeft.style.minWidth = currentMinWidth;
-    contentLeft.addEventListener('transitionend', () => {
-      let separatorLink = document.getElementById('seperator-triangle');
-      if (separatorLink) {
-        updateTriangleDirection(); // Updates the direction of the triangle indicator
-        //separatorLink.style.transition = "transform 0.5s ease";*/
-      }
-    }, { once: true });
-  }
-}
-
-// Function to update the direction of the triangle used as a separator
-function updateTriangleDirection() {
-  let separatorTriangle = document.getElementById('seperator-triangle');
-  let contentLeft = document.getElementById('content-inner-left');
-  if (separatorTriangle && contentLeft) {
-    // Calculates the width ratio to determine the triangle's direction
-    let contentLeftWidth = contentLeft.offsetWidth;
-    let parentWidth = contentLeft.parentNode.offsetWidth;
-    if (contentLeftWidth / parentWidth < 0.5) {
-      if (isLoadingWork) {
-        separatorTriangle.style.transition = 'none';
-      }
-      separatorTriangle.className = 'triangle rotated-180';
-    } else {
-      separatorTriangle.className = 'triangle';
-      if (!isLoadingWork) {
-        // Sets the triangle to default position
-        separatorTriangle.style.transition = 'transform 0.3s ease-in-out';
-      }
-    }
-  }
 }
 
 function loadExhibitions() {
@@ -194,6 +140,26 @@ function updateHrefLangTags(slug) {
   });
 }
 
+function applyBlurAndGray(element, startBlur, endBlur, startGray, endGray, duration) {
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    const blurValue = progress * (endBlur - startBlur) + startBlur;
+    const grayValue = progress * (endGray - startGray) + startGray;
+    
+    element.style.filter = `blur(${blurValue}px) grayscale(${grayValue}%)`;
+
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    }
+  };
+  window.requestAnimationFrame(step);
+}
+
+// Global variable to store the expanded/collapsed state of the left content
+let lastStateLeftExpanded = true;
+
 // Event listener for the DOMContentLoaded event to initialize the page based on URL
 document.addEventListener("DOMContentLoaded", () => {
   // Highlight the current language button
@@ -212,19 +178,26 @@ document.addEventListener("DOMContentLoaded", () => {
       loadWorks(pathParts[1]);
     }
   }
+/*
+  // Initialize the pointer's rotation based on the expanded/collapsed state
+  const svgArrow = document.querySelector('.svg-arrow');
+  if (svgArrow) {
+    svgArrow.classList.remove('no-transition');
+  }*/
 
   let blurApplied = false;
-  let currentTriangleDirection = '';
   
+  // Event listener for scroll events to handle image visibility and blur effects
   window.addEventListener('scroll', () => {
     let images = document.querySelectorAll('#content-inner-right img');
-    let allTitleDivs = document.querySelectorAll('#content-inner-right .work-image-title');
-    let separator = document.querySelector('#separator');
+    let allTitleDivs = document.querySelectorAll('#content-inner-left .work-image-title');
     let contentInnerLeft = document.querySelector('#content-inner-left');
-  
+    
+    // Initially hide all title divs
     allTitleDivs.forEach(div => div.style.display = 'none');
     let currentVisibleImageIndex = -1;
-  
+    
+    // Determine the visible image index based on the viewport position
     images.forEach((img, index) => {
       let rect = img.getBoundingClientRect();
       if (rect.bottom > 0 && rect.top < window.innerHeight / 2) {
@@ -232,76 +205,115 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    let separatorTriangle = document.getElementById('seperator-triangle');
-    let separatorLink = document.getElementById('seperator-link');
-    if (separatorTriangle) {
-      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-        if (!currentTriangleDirection) {
-          if (separatorTriangle.classList.contains('rotated-180')) {
-            currentTriangleDirection = 'rotated-180';
-          } else {
-            currentTriangleDirection = '';
-          }
-        }
-        separatorTriangle.classList.add('rotated-90');
-        separatorTriangle.classList.remove('rotated-180');
-        separatorLink.href = '#top';
-      } else {
-        separatorTriangle.classList.remove('rotated-90');
-
-        if (currentTriangleDirection) {
-          separatorTriangle.classList.add(currentTriangleDirection);
-          currentTriangleDirection = '';
-        }
-        separatorLink.href = 'javascript:adjustWidth()';
-      }
-    }
-  
+    // Handle the visibility of titles and blur effect based on scroll position
     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
       allTitleDivs.forEach(div => div.style.display = 'none');
-      if (blurApplied) {
-        /*applyBlurAndGray(contentInnerLeft, 1, 0, 100, 0, 500);
-        blurApplied = false;*/
+    } else if (currentVisibleImageIndex !== -1) {
+      allTitleDivs[currentVisibleImageIndex].style.display = 'block';
+      if (!blurApplied) {
+       applyBlurAndGray(contentInnerLeft, 0, 0, 0, 100, 500);
+        blurApplied = true;
       }
-      } else if (currentVisibleImageIndex !== -1) {
-        allTitleDivs[currentVisibleImageIndex].style.display = 'block';
-        if (!blurApplied) {
-          applyBlurAndGray(contentInnerLeft, 0, 0, 0, 100, 500);
-          blurApplied = true;
-        }
-      } else {
+    } else {
         if (blurApplied) {
           applyBlurAndGray(contentInnerLeft, 0, 0, 100, 0, 500);
           blurApplied = false;
         }
       }
-    
-    // Logic for adjusting the position of the separator
-    let firstImage = document.querySelector('#content-inner-right img');
-    if (firstImage) {
-      let rect = firstImage.getBoundingClientRect();
-      if (rect.top > window.innerHeight / 2) {
-        separator.style.top = '2rem';
-      } else {
-        separator.style.top = (window.innerHeight / 2) + 'px';
-      }
-    }
   });
 });
 
-function applyBlurAndGray(element, startBlur, endBlur, startGray, endGray, duration) {
-  let startTimestamp = null;
-  const step = (timestamp) => {
-    if (!startTimestamp) startTimestamp = timestamp;
-    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-    const blurValue = progress * (endBlur - startBlur) + startBlur;
-    const grayValue = progress * (endGray - startGray) + startGray;
-    
-    element.style.filter = `blur(${blurValue}px) grayscale(${grayValue}%)`;
+// MutationObserver to observe DOM changes and adjust the layout accordingly
+const observer = new MutationObserver((mutations, obs) => {
+  let isLeftExpanded = lastStateLeftExpanded;  // Initialize with the last known state
 
-    if (progress < 1) {
-      window.requestAnimationFrame(step);
+  const pointerButton = document.getElementById('pointer');
+  const contentLeft = document.getElementById('content-inner-left');
+  const contentRight = document.getElementById('content-inner-right');
+  const svgArrow = document.querySelector('.svg-arrow');
+
+  // Set the initial state based on the last known state
+  if (contentLeft) {
+    if (isLeftExpanded) {
+      contentLeft.classList.add('width-expanded');
+      contentRight.classList.add('width-collapsed');
+      svgArrow.style.transform = 'rotate(180deg)'; // Rotate pointer to indicate expanded state
+    } else {
+      contentLeft.classList.add('width-collapsed');
+      contentRight.classList.add('width-expanded');
+      svgArrow.style.transform = 'rotate(0deg)'; // Rotate pointer to indicate collapsed state
     }
-  };
-  window.requestAnimationFrame(step);
-}
+  }
+
+  // Event listener for click events on the pointer button
+  if (pointerButton) {
+    pointerButton.addEventListener('click', function(event) {
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = document.documentElement.clientHeight;
+      const scrolledToBottom = window.scrollY + clientHeight >= scrollHeight;
+
+      // Check if scrolled to the bottom of the page
+      if (scrolledToBottom) {
+        // Already at the bottom, so let the default anchor behavior take over
+        return;  // Exit the function without preventing the default behavior
+      }
+
+      // Toggle collapse/expand based on current state
+      isLeftExpanded = !isLeftExpanded;
+      lastStateLeftExpanded = isLeftExpanded;  // Update the global state
+
+      if (isLeftExpanded) {
+        // Logic for expanding
+        contentLeft.classList.remove('width-collapsed');
+        contentRight.classList.remove('width-expanded');
+        contentLeft.classList.add('width-expanded');
+        contentRight.classList.add('width-collapsed');
+        svgArrow.style.transform = 'rotate(180deg)';
+      } else {
+        // Logic for collapsing
+        contentLeft.classList.remove('width-expanded');
+        contentRight.classList.remove('width-collapsed');
+        contentLeft.classList.add('width-collapsed');
+        contentRight.classList.add('width-expanded');
+        svgArrow.style.transform = 'rotate(0deg)';
+
+      }
+      event.preventDefault();  // Prevent default only when not at the bottom
+    });
+
+    // Scroll event listener to adjust the pointer button position and behavior
+    window.addEventListener('scroll', function() {
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = document.documentElement.clientHeight;
+      const scrolledToBottom = window.scrollY + clientHeight >= scrollHeight;
+    
+      // Adjust the vertical position of the pointer
+      if (window.scrollY > 500) {
+        pointerButton.style.top = '50vh';
+      } else {
+        pointerButton.style.top = '4rem';
+      }
+    
+      // Check if scrolled to the bottom of the page
+      if (scrolledToBottom) {
+        // Rotate arrow upwards to indicate scroll to top (-90deg)
+        svgArrow.style.transform = 'rotate(-90deg)';
+        pointerButton.href = '#top'; // Set href to '#top' to enable scrolling to the top
+      } else {
+        // Reset arrow rotation based on the collapse state
+        if (contentLeft.classList.contains('width-collapsed')) {
+          svgArrow.style.transform = 'rotate(0deg)';
+        } else {
+          svgArrow.style.transform = 'rotate(180deg)';
+        }
+        pointerButton.href = '#'; // Remove link to #top when not at bottom
+      }
+    });
+
+    
+    
+    //obs.disconnect(); // Uncomment to stop the observer once the element is found
+  }
+});
+
+observer.observe(document, { childList: true, subtree: true });
