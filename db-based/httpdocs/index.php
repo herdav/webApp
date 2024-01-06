@@ -1,4 +1,4 @@
-<!--index.php-->
+<!--index.php for davidherren.ch / 2024-01-06-->
 <!DOCTYPE html>
 <html lang="de">
   <head>
@@ -16,11 +16,10 @@
         <button id="button-en" class="button-language" onclick="switchLanguage('en')">en</button>
       </div>
     </div>
-
     <?php
     include 'data.php';
     $menuResult = $database->fetchMenuItems();
-    $indexResult = $database->fetchIndexItems();
+    $indexResult = $database->fetchIndexItems(["motionstudy"]); // Exclude array of slugs from index site
     ?>
     <div id="menu">
       <div id="menu-works">
@@ -40,13 +39,17 @@
       </div>
     </div>
     <div id="index">
-      <?php
-      if (count($indexResult) > 0) {
+    <?php
+    if (count($indexResult) > 0) {
         foreach ($indexResult as $row) {
-          $title = $row["title"];
-          echo "<p>" . htmlspecialchars($title) . "</p>" . PHP_EOL;
+            $title = $row["title"];
+            $slug = $row["slug"];
+            echo "<a onclick='loadWorks(\"{$slug}\")'><div class='index-items'>";
+            echo "<img src='/img/prev/{$slug}-prev.jpg'></a></div>" . PHP_EOL;
         }
-      } else { echo "No works found!"; }
+      } else {
+          echo "No works found!";
+      }
       ?>
     </div>
     <div id="content"></div
