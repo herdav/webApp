@@ -1,10 +1,11 @@
-// data.js
+// data.js for davidherren.ch / 2024-01-06
 
 // Initialization of global variables
-let currentLanguage = 'de'; // Sets the default language to German
+let currentLanguage = ''; // Sets the default language to German
 let currentSlug = ''; // Stores the current slug for content
+let lastStateLeftExpanded = true; // Stores the expanded/collapsed state of the left content
 
-// Function to handle sending requests to a server
+// Function to handle sending requests to the server
 const sendRequest = (url, successCallback, errorCallback) => {
   fetch(url)
     .then(response => {
@@ -78,6 +79,7 @@ function loadWorks(slug) {
   highlightContentButton('button-' + slug); // Highlights the active content button
 }
 
+// Function to load content for exhibitions
 function loadExhibitions() {
   currentSlug = 'exhibitions';
   let url = "/data.php?lang=" + encodeURIComponent(currentLanguage) + "&exhibitions=1";
@@ -92,6 +94,7 @@ function loadExhibitions() {
   highlightContentButton('button-exhibitions');
 }
 
+// Function to load content about
 function loadAbout() {
   currentSlug = 'about';
   let url = "/data.php?lang=" + encodeURIComponent(currentLanguage) + "&about=1";
@@ -131,45 +134,46 @@ function updateUrl(slug) {
 // Function to update hreflang tags for SEO and accessibility
 function updateHrefLangTags(slug) {
   document.querySelectorAll('link[rel="alternate"]').forEach(tag => tag.remove()); // Removes existing hreflang tags
-  ['de', 'en'].forEach(lang => {
-    let linkTag = document.createElement('link'); // Creates a new link tag
+
+  // Define available languages
+  const availableLanguages = ['de', 'en'];
+
+  // Iterate through available languages to create hreflang tags
+  availableLanguages.forEach(lang => {
+    let linkTag = document.createElement('link');
     linkTag.rel = 'alternate';
-    linkTag.hreflang = lang; // Sets the hreflang attribute
-    linkTag.href = window.location.origin + '/' + lang + '/' + slug; // Sets the href attribute
-    document.head.appendChild(linkTag); // Appends the link tag to the document head
+    linkTag.hreflang = lang;
+    linkTag.href = window.location.origin + '/' + lang + '/' + slug;
+    document.head.appendChild(linkTag);
   });
+
+  // Ensure the current language is properly represented in the URL
+  let currentLangTag = document.createElement('link');
+  currentLangTag.rel = 'alternate';
+  currentLangTag.hreflang = currentLanguage;
+  currentLangTag.href = window.location.origin + '/' + currentLanguage + '/' + slug;
+  document.head.appendChild(currentLangTag);
 }
 
-function applyBlurAndGray(element, startBlur, endBlur, startGray, endGray, duration) {
-  let startTimestamp = null;
-  const step = (timestamp) => {
-    if (!startTimestamp) startTimestamp = timestamp;
-    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-    const blurValue = progress * (endBlur - startBlur) + startBlur;
-    const grayValue = progress * (endGray - startGray) + startGray;
-    
-    element.style.filter = `blur(${blurValue}px) grayscale(${grayValue}%)`;
-
-    if (progress < 1) {
-      window.requestAnimationFrame(step);
-    }
-  };
-  window.requestAnimationFrame(step);
-}
-
-// Global variable to store the expanded/collapsed state of the left content
-let lastStateLeftExpanded = true;
-
-// Event listener for the DOMContentLoaded event to initialize the page based on URL
+// Event listener for the DOMContentLoaded event to initialize the page based on URL and browser language
 document.addEventListener("DOMContentLoaded", () => {
-  // Highlight the current language button
-  highlightLanguageButton(currentLanguage);
-
-  // Reads the path part from the URL to determine the initial state of the page
   let pathParts = window.location.pathname.split('/').filter(Boolean);
+
+  // Check the URL for a language code, use it if present, otherwise use the browser's language
+  if (pathParts.length > 0 && (pathParts[0] === 'de' || pathParts[0] === 'en')) {
+    currentLanguage = pathParts[0];
+  } else {
+    // Check the browser language and set the default language
+    let browserLanguage = navigator.language || navigator.userLanguage;
+    currentLanguage = browserLanguage.startsWith('de') ? 'de' : 'en';
+  }
+
+  // Highlight the current language button an switch to current language
+  highlightLanguageButton(currentLanguage);
+  switchLanguage(currentLanguage);
+
+  // Load the appropriate content based on the URL
   if (pathParts.length > 1) {
-    // Set the language based on the URL path and load the corresponding content
-    switchLanguage(pathParts[0]);
     if (pathParts[1] === 'about') {
       loadAbout();
     } else if (pathParts[1] === 'exhibitions') {
@@ -178,16 +182,12 @@ document.addEventListener("DOMContentLoaded", () => {
       loadWorks(pathParts[1]);
     }
   }
-/*
-  // Initialize the pointer's rotation based on the expanded/collapsed state
-  const svgArrow = document.querySelector('.svg-arrow');
-  if (svgArrow) {
-    svgArrow.classList.remove('no-transition');
-  }*/
 
-  let blurApplied = false;
-  
+  // Update hreflang tags based on the current language and slug
+  updateHrefLangTags(pathParts.length > 1 ? pathParts[1] : '');
+
   // Event listener for scroll events to handle image visibility and blur effects
+  let blurApplied = false;
   window.addEventListener('scroll', () => {
     let images = document.querySelectorAll('#content-inner-right img');
     let allTitleDivs = document.querySelectorAll('#content-inner-left .work-image-title');
@@ -209,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
       allTitleDivs.forEach(div => div.style.display = 'none');
     } else if (currentVisibleImageIndex !== -1) {
-      allTitleDivs[currentVisibleImageIndex].style.display = 'block';
+      allTitleDivs[currentVisibleImageIndex].style.display = 'flex';
       if (!blurApplied) {
        applyBlurAndGray(contentInnerLeft, 0, 0, 0, 100, 500);
         blurApplied = true;
@@ -224,96 +224,113 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // MutationObserver to observe DOM changes and adjust the layout accordingly
-const observer = new MutationObserver((mutations, obs) => {
-  let isLeftExpanded = lastStateLeftExpanded;  // Initialize with the last known state
+{
+  const observer = new MutationObserver((mutations, obs) => {
+    const pointerButton = document.getElementById('pointer');
+    const contentLeft = document.getElementById('content-inner-left');
+    const contentRight = document.getElementById('content-inner-right');
+    const svgArrow = document.querySelector('.svg-arrow');
 
-  const pointerButton = document.getElementById('pointer');
-  const contentLeft = document.getElementById('content-inner-left');
-  const contentRight = document.getElementById('content-inner-right');
-  const svgArrow = document.querySelector('.svg-arrow');
+    let isLeftExpanded = lastStateLeftExpanded;
 
-  // Set the initial state based on the last known state
-  if (contentLeft) {
-    if (isLeftExpanded) {
-      contentLeft.classList.add('width-expanded');
-      contentRight.classList.add('width-collapsed');
-      svgArrow.style.transform = 'rotate(180deg)'; // Rotate pointer to indicate expanded state
-    } else {
-      contentLeft.classList.add('width-collapsed');
-      contentRight.classList.add('width-expanded');
-      svgArrow.style.transform = 'rotate(0deg)'; // Rotate pointer to indicate collapsed state
-    }
-  }
-
-  // Event listener for click events on the pointer button
-  if (pointerButton) {
-    pointerButton.addEventListener('click', function(event) {
-      const scrollHeight = document.documentElement.scrollHeight;
-      const clientHeight = document.documentElement.clientHeight;
-      const scrolledToBottom = window.scrollY + clientHeight >= scrollHeight;
-
-      // Check if scrolled to the bottom of the page
-      if (scrolledToBottom) {
-        // Already at the bottom, so let the default anchor behavior take over
-        return;  // Exit the function without preventing the default behavior
-      }
-
-      // Toggle collapse/expand based on current state
-      isLeftExpanded = !isLeftExpanded;
-      lastStateLeftExpanded = isLeftExpanded;  // Update the global state
-
+    // Set the initial state based on the last known state
+    if (contentLeft) {
       if (isLeftExpanded) {
-        // Logic for expanding
-        contentLeft.classList.remove('width-collapsed');
-        contentRight.classList.remove('width-expanded');
         contentLeft.classList.add('width-expanded');
         contentRight.classList.add('width-collapsed');
-        svgArrow.style.transform = 'rotate(180deg)';
+        svgArrow.style.transform = 'rotate(180deg)'; // Rotate pointer to indicate expanded state
       } else {
-        // Logic for collapsing
-        contentLeft.classList.remove('width-expanded');
-        contentRight.classList.remove('width-collapsed');
         contentLeft.classList.add('width-collapsed');
         contentRight.classList.add('width-expanded');
-        svgArrow.style.transform = 'rotate(0deg)';
-
+        svgArrow.style.transform = 'rotate(0deg)'; // Rotate pointer to indicate collapsed state
       }
-      event.preventDefault();  // Prevent default only when not at the bottom
-    });
+    }
 
-    // Scroll event listener to adjust the pointer button position and behavior
-    window.addEventListener('scroll', function() {
-      const scrollHeight = document.documentElement.scrollHeight;
-      const clientHeight = document.documentElement.clientHeight;
-      const scrolledToBottom = window.scrollY + clientHeight >= scrollHeight;
-    
-      // Adjust the vertical position of the pointer
-      if (window.scrollY > 500) {
-        pointerButton.style.top = '50vh';
-      } else {
-        pointerButton.style.top = '4rem';
-      }
-    
-      // Check if scrolled to the bottom of the page
-      if (scrolledToBottom) {
-        // Rotate arrow upwards to indicate scroll to top (-90deg)
-        svgArrow.style.transform = 'rotate(-90deg)';
-        pointerButton.href = '#top'; // Set href to '#top' to enable scrolling to the top
-      } else {
-        // Reset arrow rotation based on the collapse state
-        if (contentLeft.classList.contains('width-collapsed')) {
-          svgArrow.style.transform = 'rotate(0deg)';
-        } else {
-          svgArrow.style.transform = 'rotate(180deg)';
+    // Event listener for click events on the pointer button
+    if (pointerButton) {
+      pointerButton.addEventListener('click', function(event) {
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrolledToBottom = window.scrollY + clientHeight >= scrollHeight;
+
+        // Check if scrolled to the bottom of the page
+        if (scrolledToBottom) {
+          // Already at the bottom, so let the default anchor behavior take over
+          return;  // Exit the function without preventing the default behavior
         }
-        pointerButton.href = '#'; // Remove link to #top when not at bottom
-      }
-    });
 
-    
-    
-    //obs.disconnect(); // Uncomment to stop the observer once the element is found
-  }
-});
+        // Toggle collapse/expand based on current state
+        isLeftExpanded = !isLeftExpanded;
+        lastStateLeftExpanded = isLeftExpanded;  // Update the global state
 
-observer.observe(document, { childList: true, subtree: true });
+        if (isLeftExpanded) {
+          // Logic for expanding
+          contentLeft.classList.remove('width-collapsed');
+          contentRight.classList.remove('width-expanded');
+          contentLeft.classList.add('width-expanded');
+          contentRight.classList.add('width-collapsed');
+          svgArrow.style.transform = 'rotate(180deg)';
+        } else {
+          // Logic for collapsing
+          contentLeft.classList.remove('width-expanded');
+          contentRight.classList.remove('width-collapsed');
+          contentLeft.classList.add('width-collapsed');
+          contentRight.classList.add('width-expanded');
+          svgArrow.style.transform = 'rotate(0deg)';
+
+        }
+        event.preventDefault();  // Prevent default only when not at the bottom
+      });
+
+      // Scroll event listener to adjust the pointer button position and behavior
+      window.addEventListener('scroll', function() {
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrolledToBottom = window.scrollY + clientHeight >= scrollHeight;
+      
+        // Adjust the vertical position of the pointer
+        if (window.scrollY > 500) {
+          pointerButton.style.top = '50vh';
+        } else {
+          pointerButton.style.top = '4rem';
+        }
+      
+        // Check if scrolled to the bottom of the page
+        if (scrolledToBottom) {
+          // Rotate arrow upwards to indicate scroll to top (-90deg)
+          svgArrow.style.transform = 'rotate(-90deg)';
+          pointerButton.href = '#top'; // Set href to '#top' to enable scrolling to the top
+        } else {
+          // Reset arrow rotation based on the collapse state
+          if (contentLeft.classList.contains('width-collapsed')) {
+            svgArrow.style.transform = 'rotate(0deg)';
+          } else {
+            svgArrow.style.transform = 'rotate(180deg)';
+          }
+          pointerButton.href = ''; // Remove link to #top when not at bottom
+        }
+      });
+
+      //obs.disconnect(); // Uncomment to stop the observer once the element is found
+    }
+  });
+  observer.observe(document, { childList: true, subtree: true });
+}
+
+// Function to apply blur and/or gray to an element
+function applyBlurAndGray(element, startBlur, endBlur, startGray, endGray, duration) {
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    const blurValue = progress * (endBlur - startBlur) + startBlur;
+    const grayValue = progress * (endGray - startGray) + startGray;
+    
+    element.style.filter = `blur(${blurValue}px) grayscale(${grayValue}%)`;
+
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    }
+  };
+  window.requestAnimationFrame(step);
+}
