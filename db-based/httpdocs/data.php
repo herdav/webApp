@@ -50,19 +50,19 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     <div id="content-inner-center">
       <a id="pointer" href="">
         <svg width="72" height="56" viewBox="0 0 72 56" class="svg-arrow">
-          <rect id="svg-arrow-00" x="0"  y="24" width="72" height="4"/>
-          <rect id="svg-arrow-01" x="64" y="28" width="4" height="4"/>
-          <rect id="svg-arrow-02" x="60" y="32" width="4" height="4"/>
-          <rect id="svg-arrow-03" x="56" y="36" width="4" height="4"/>
-          <rect id="svg-arrow-04" x="52" y="40" width="4" height="4"/>
-          <rect id="svg-arrow-05" x="48" y="44" width="4" height="4"/>
-          <rect id="svg-arrow-06" x="44" y="48" width="4" height="4"/>
-          <rect id="svg-arrow-11" x="64" y="20" width="4" height="4"/>
-          <rect id="svg-arrow-12" x="60" y="16" width="4" height="4"/>
-          <rect id="svg-arrow-13" x="56" y="12" width="4" height="4"/>
-          <rect id="svg-arrow-14" x="52" y="8"  width="4" height="4"/>
-          <rect id="svg-arrow-15" x="48" y="4"  width="4" height="4"/>
-          <rect id="svg-arrow-16" x="44" y="0"  width="4" height="4"/>
+          <rect id="svg-arrow-0" x="0"  y="24" width="72" height="4"/>
+          <rect id="svg-arrow-1" x="64" y="28" width="4" height="4"/>
+          <rect id="svg-arrow-2" x="60" y="32" width="4" height="4"/>
+          <rect id="svg-arrow-3" x="56" y="36" width="4" height="4"/>
+          <rect id="svg-arrow-4" x="52" y="40" width="4" height="4"/>
+          <rect id="svg-arrow-5" x="48" y="44" width="4" height="4"/>
+          <rect id="svg-arrow-6" x="44" y="48" width="4" height="4"/>
+          <rect id="svg-arrow-7" x="64" y="20" width="4" height="4"/>
+          <rect id="svg-arrow-8" x="60" y="16" width="4" height="4"/>
+          <rect id="svg-arrow-9" x="56" y="12" width="4" height="4"/>
+          <rect id="svg-arrow-10" x="52" y="8"  width="4" height="4"/>
+          <rect id="svg-arrow-11" x="48" y="4"  width="4" height="4"/>
+          <rect id="svg-arrow-12" x="44" y="0"  width="4" height="4"/>
         </svg>
       </a>
     </div>
@@ -187,9 +187,9 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
         // Adding section titles
         if (!isset($lastSection) || $lastSection !== $about['section']) {
           if ($lang === 'de') {
-            $titleSection = htmlspecialchars(ucfirst($about['section_de'])); 
+            $titleSection = htmlspecialchars(ucfirst($about['section_de']));
           } else {
-            $titleSection = htmlspecialchars(ucfirst($about['section'])); 
+            $titleSection = htmlspecialchars(ucfirst($about['section']));
           }
           $htmlOutput .= "<h2>" . $titleSection . "</h2>";
           $lastSection = $about['section'];
