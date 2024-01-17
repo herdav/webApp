@@ -1,4 +1,4 @@
-<?php // data.php for davidherren.ch / 2024-01-06
+<?php // data.php for davidherren.ch / 2024-01-17
 
 include './php/db.php';
 include './php/fetchData.php';
@@ -30,9 +30,16 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     // Inserting the titles of the images here
     foreach ($workimages as $image) {
       $imageText = $image["text_$lang"];
+      $workTitle = $workData["title"];
       $htmlOutput .= <<<HTML
       <div class="work-image-title">
-        <p>$imageText</p>
+        <div class="frame">
+          <div class="frame-title">
+            <a href="#top" class="frame-title-left button-navigation"></a>
+            <h3 class="frame-title-center">$workTitle</h3>
+          </div>
+          <p>$imageText</p>
+        </div>
       </div>
       HTML;
     }
@@ -42,14 +49,26 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     $htmlOutput .= <<<HTML
     <div id="content-inner-center">
       <a id="pointer" href="">
-        <svg width="72" height="40" viewBox="0 0 72 40" class="svg-arrow">
-          <line x1="4" y1="20" x2="68" y2="20" />
-          <path d="M52 4 L68 20 L52 36" />
+        <svg width="72" height="56" viewBox="0 0 72 56" class="svg-arrow">
+          <rect id="svg-arrow-00" x="0"  y="24" width="72" height="4"/>
+          <rect id="svg-arrow-01" x="64" y="28" width="4" height="4"/>
+          <rect id="svg-arrow-02" x="60" y="32" width="4" height="4"/>
+          <rect id="svg-arrow-03" x="56" y="36" width="4" height="4"/>
+          <rect id="svg-arrow-04" x="52" y="40" width="4" height="4"/>
+          <rect id="svg-arrow-05" x="48" y="44" width="4" height="4"/>
+          <rect id="svg-arrow-06" x="44" y="48" width="4" height="4"/>
+          <rect id="svg-arrow-11" x="64" y="20" width="4" height="4"/>
+          <rect id="svg-arrow-12" x="60" y="16" width="4" height="4"/>
+          <rect id="svg-arrow-13" x="56" y="12" width="4" height="4"/>
+          <rect id="svg-arrow-14" x="52" y="8"  width="4" height="4"/>
+          <rect id="svg-arrow-15" x="48" y="4"  width="4" height="4"/>
+          <rect id="svg-arrow-16" x="44" y="0"  width="4" height="4"/>
         </svg>
       </a>
     </div>
     <div id='content-inner-right'>
-      <p>{$workData["text_$lang"]}</p>
+      <div id='work-text'>
+        <p>{$workData["text_$lang"]}</p>
       <div id='work-infos'>
     HTML;
 
@@ -70,14 +89,7 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     foreach ($worklinks as $link) {
       $htmlOutput .= "<a href='" . htmlspecialchars($link["address"]) . "' target='_blank'>" . htmlspecialchars($link["description"]) . "</a> ";
     }
-    $htmlOutput .= '</div>';
-
-    // Code for 3D model viewer
-    if (!empty($workData["3d"]) && $workData["3d"] == 1) {
-      $htmlOutput .= <<<HTML
-      <model-viewer id="embedded-model" src="/3d/{$slug}.gltf" alt="Ein 3D-Modell" camera-controls touch-action="pan-y" tone-mapping="agx" exposure="0.5" autoplay ar ar-modes="webxr scene-viewer" shadow-intensity="0" shadow-softness="1.5"></model-viewer>
-      HTML;
-    }
+    $htmlOutput .= '</div></div>';
 
     // Code for displaying additional images
     $htmlOutput .= "<div class='work-images'>";
@@ -89,6 +101,13 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
       HTML;
     }
     $htmlOutput .= "</div>";
+    
+    // Code for 3D model viewer
+    if (!empty($workData["3d"]) && $workData["3d"] == 1) {
+      $htmlOutput .= <<<HTML
+      <model-viewer id="embedded-model" src="/3d/{$slug}.gltf" alt="Ein 3D-Modell" camera-controls touch-action="pan-y" tone-mapping="agx" exposure="0.5" autoplay ar ar-modes="webxr scene-viewer" shadow-intensity="0" shadow-softness="1.5"></model-viewer>
+      HTML;
+    }
 
     // Code for Vimeo iframes
     function createVimeoIframe($vimeoId, $isLandscape = true) {
@@ -149,25 +168,158 @@ if (isset($_GET['exhibitions']) && isset($_GET['lang'])) {
 }
 
 if (isset($_GET['about']) && isset($_GET['lang'])) {
+  // Sanitize and validate input
   $lang = sanitizeInput($_GET['lang']);
   $lang = validateLanguage($lang);
 
+  // Fetch data from database
   $aboutData = $database->fetchAbout($lang);
+  $exhibitionData = $database->fetchExhibitions($lang);
 
+  $htmlOutput = "";
+  $htmlOutput .= "<div id='about'>";
+  $htmlOutput .= "<div id='about-left'>";
+
+  // Processing aboutData for 'about' and 'education'
   if ($aboutData) {
-    $htmlOutput = "";
     foreach ($aboutData as $about) {
-      $htmlOutput .= "<div class='about'>";
-      $htmlOutput .= "<h2>" . htmlspecialchars($about['title']) . "</h2>";
-      $htmlOutput .= "<p>" . htmlspecialchars($about["text_$lang"]) . "</p>";
+      if ($about['section'] === 'about' || $about['section'] === 'education') {
+        // Adding section titles
+        if (!isset($lastSection) || $lastSection !== $about['section']) {
+          if ($lang === 'de') {
+            $titleSection = htmlspecialchars(ucfirst($about['section_de'])); 
+          } else {
+            $titleSection = htmlspecialchars(ucfirst($about['section'])); 
+          }
+          $htmlOutput .= "<h2>" . $titleSection . "</h2>";
+          $lastSection = $about['section'];
+        }
+        // Displaying about-items
+        $htmlOutput .= "<div class='about-items' style='display: flex;'>";
+        if ($about['time']) {
+          $htmlOutput .= "<div style='flex: 1;'><p>" . htmlspecialchars($about['time']) . "</p></div>";
+        }
+        if ($about['title']) {
+          $htmlOutput .= "<div style='flex: 3;'>";
+          $htmlOutput .= "<p>" . htmlspecialchars($about['title']);
+
+        } else if (!$about['title'] && $about["text_$lang"]) {
+          $htmlOutput .= "<div style='flex: 3;'>";
+          $htmlOutput .= "<p>" . htmlspecialchars($about["text_$lang"]);
+
+        } else if ($about["text_$lang"]) {
+          $htmlOutput .= "<div style='flex: 3;'>";
+          $htmlOutput .= "<p>" . htmlspecialchars($about["text_$lang"]);
+        }
+
+        $htmlOutput .= "</p>" . "</div></div>";
+      }
+    }
+  }
+
+  // Processing exhibitionData for 'exhibition'
+  if ($exhibitionData) {
+    $lastYear = null;
+    $htmlOutput .= "<div id='exhibitions'>";
+    if ($lang === 'de') {
+      $htmlOutput .= "<h2>Austellungen</h2>";
+    } else {
+      $htmlOutput .= "<h2>Exhibitions</h2>";
+    }
+    foreach ($exhibitionData as $exhibition) {
+      $yearStart = substr($exhibition["date_start"], 0, 4);
+      $htmlOutput .= "<div class='about-items' style='display: flex;'>";
+      if ($yearStart !== $lastYear) {
+        $htmlOutput .= "<div style='flex: 1;'><p>" . htmlspecialchars($yearStart) . "</p></div>";
+        $lastYear = $yearStart;
+      } else {
+        $htmlOutput .= "<div style='flex: 1;'></div>";
+      }
+      $htmlOutput .= "<div style='flex: 3;'>";
+
+      $firstLink = $database->fetchExhibitionMainLink(htmlspecialchars($exhibition['title']));
+      if ($firstLink) {
+          $htmlOutput .= "<p>" . "<a target='_blank' href='" . htmlspecialchars($firstLink) . "'>" . htmlspecialchars($exhibition['title']) . "</a>" . ", ";
+      } else {
+          $htmlOutput .= "<p>"  . htmlspecialchars($exhibition['title']) . ", ";
+      }
+      $htmlOutput .= $exhibition['institution'];
+      $htmlOutput .= ", " . htmlspecialchars($exhibition['place']) . "</p>";
+      $htmlOutput .= "</div>";
       $htmlOutput .= "</div>";
     }
+    $htmlOutput .= "</div>"; // End of Exhibition section
+  }
 
-    $response = [
-      'html' => $htmlOutput
-    ];
-    echo json_encode($response);
-  } else { echo "No Data found!"; }
+  $htmlOutput .= "</div>"; // End of about-left
+
+  $htmlOutput .= "<div id='about-right'>";
+  // Processing aboutData for 'media'
+  if ($aboutData) {
+    foreach ($aboutData as $about) {
+      if ($about['section'] === 'media') {
+        // Adding section titles
+        if (!isset($lastSection) || $lastSection !== $about['section']) {
+          if ($lang === 'de') {
+            $titleSection = htmlspecialchars(ucfirst($about['section_de']));
+          } else {
+            $titleSection = htmlspecialchars(ucfirst($about['section']));
+          }
+          $htmlOutput .= "<h2>" . $titleSection . "</h2>";
+          $lastSection = $about['section'];
+        }
+        // Displaying about-items
+        $htmlOutput .= "<div class='about-items' style='display: flex;'>";
+        if ($about['time']) {
+          $htmlOutput .= "<div style='flex: 1;'><p>" . htmlspecialchars($about['time']) . "</p></div>";
+        }
+        if ($about['title']) {
+          $htmlOutput .= "<div style='flex: 3;'>";
+          $firstLink = $database->fetchMediaLink(htmlspecialchars($about['title']));
+          if ($firstLink) {
+              $htmlOutput .= "<p>" . "<a target='_blank' href='" . htmlspecialchars($firstLink) . "'>" . htmlspecialchars($about['title']) . "</a>";
+          } else {
+              $htmlOutput .= "<p>"  . htmlspecialchars($about['title']);
+          }
+        }
+        if ($about["text_$lang"]) {
+          $htmlOutput .= ", " . htmlspecialchars($about["text_$lang"]) . "</p>";
+        }
+        $htmlOutput .= "</div></div>";
+      }
+    }
+    if ($about['section'] === 'imprint') {
+      if (!isset($lastSection) || $lastSection !== $about['section']) {
+        if ($lang === 'de') {
+          $titleSection = htmlspecialchars(ucfirst($about['section_de']));
+        } else {
+          $titleSection = htmlspecialchars(ucfirst($about['section']));
+        }
+        $htmlOutput .= "<h2>" . $titleSection . "</h2>";
+        $htmlOutput .= "<p>" . $about["text_$lang"] . "</p>";
+      }
+    }
+  }
+
+  $htmlOutput .= "</div>"; // End of about-right
+  $htmlOutput .= "</div>"; // End of left
+
+  // Send response
+  $response = [
+    'html' => $htmlOutput,
+    'descriptionDe' => $database->fetchAboutStatement("de"),
+    'descriptionEn' => $database->fetchAboutStatement("en")
+  ];
+
+  echo json_encode($response);
+
+  // Close database connection
   $conn = null;
+}
+
+if (isset($_GET['statement'])) {
+  $lang = sanitizeInput($_GET['statement']);
+  $lang = validateLanguage($lang);
+  echo json_encode(['description' => $database->fetchAboutStatement($lang)]);
 }
 ?>
