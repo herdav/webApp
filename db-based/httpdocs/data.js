@@ -140,13 +140,14 @@ function loadAbout() {
     updateDocumentTitle('About');
     // Selects the appropriate description based on the current language
     let description = currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn;
-    updateMetaDescription(description); // Updates the meta description*/
+    updateMetaDescription(description); // Updates the meta description
     updateUrl('about');
     updateHrefLangTags('about'); // Updates hreflang tags for SEO
   }, (error) => {
     console.error('Error with the request:', error);
   });
   highlightContentButton('button-about');
+  /*imgOnMousePointer();*/
 }
 
 // Function to update the meta description tag of the document
@@ -272,11 +273,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (isLeftExpanded) {
         contentLeft.classList.add('width-expanded');
         contentRight.classList.add('width-collapsed');
-        svgArrow.style.transform = 'rotate(180deg)'; // Rotate pointer to indicate expanded state
+        applySvgTransformations(true);
       } else {
         contentLeft.classList.add('width-collapsed');
         contentRight.classList.add('width-expanded');
-        svgArrow.style.transform = 'rotate(0deg)'; // Rotate pointer to indicate collapsed state
+        applySvgTransformations(false);
       }
     }
 
@@ -303,16 +304,16 @@ document.addEventListener("DOMContentLoaded", () => {
           contentRight.classList.remove('width-expanded');
           contentLeft.classList.add('width-expanded');
           contentRight.classList.add('width-collapsed');
-          svgArrow.style.transform = 'rotate(180deg)';
+          applySvgTransformations(true);
         } else {
           // Logic for collapsing
           contentLeft.classList.remove('width-expanded');
           contentRight.classList.remove('width-collapsed');
           contentLeft.classList.add('width-collapsed');
           contentRight.classList.add('width-expanded');
-          svgArrow.style.transform = 'rotate(0deg)';
-
+          applySvgTransformations(false);
         }
+
         event.preventDefault();  // Prevent default only when not at the bottom
       });
 
@@ -328,38 +329,27 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           pointerButton.style.top = '4rem';
         }
-      
         // Check if scrolled to the bottom of the page
         if (scrolledToBottom) {
           // Rotate arrow upwards to indicate scroll to top (-90deg)
-          svgArrow.style.transform = 'rotate(-90deg)';
+          if (isLeftExpanded) {
+            svgArrow.style.transform = 'rotate(90deg)';
+          } else {
+            svgArrow.style.transform = 'rotate(-90deg)';
+          }
           pointerButton.href = '#top'; // Set href to '#top' to enable scrolling to the top
         } else {
           // Reset arrow rotation based on the collapse state
-          if (contentLeft.classList.contains('width-collapsed')) {
-            svgArrow.style.transform = 'rotate(0deg)';
-          } else {
-            svgArrow.style.transform = 'rotate(180deg)';
-          }
+          svgArrow.style.transform = '';
           pointerButton.href = ''; // Remove link to #top when not at bottom
         }
       });
 
-      //obs.disconnect(); // Uncomment to stop the observer once the element is found
+      // obs.disconnect(); // Uncomment to stop the observer once the element is found
     }
   });
   observer.observe(document, { childList: true, subtree: true });
 }
-
-/*
-function updateSvgArrowPosition(isLeftExpanded) {
-  const arrowElements = document.querySelectorAll('.svg-arrow rect[id^="svg-arrow-"]');
-  arrowElements.forEach(element => {
-    const currentX = parseInt(element.getAttribute('x'), 10);
-    const newX = isLeftExpanded ? (72 - currentX) : currentX;
-    element.setAttribute('x', newX);
-  });
-}*/
 
 // Function to apply blur and/or gray to an element
 function applyBlurAndGray(element, startBlur, endBlur, startGray, endGray, duration) {
@@ -387,4 +377,57 @@ function statement(lang) {
       console.error('Error fetching statement:', error);
     }
   );
+}
+
+function applySvgTransformations(expand) {
+  var translationValues = [62, 54, 46, 38, 30, 22];
+  function manageClass(element, className, add) {
+      if (element) {
+          if (add) {
+              element.classList.add(className);
+          } else {
+              element.classList.remove(className);
+          }
+      }
+  }
+  for (var i = 1; i <= 12; i++) {
+      var element = document.getElementById('svg-arrow-' + i);
+  }
+  translationValues.forEach(function(value, index) {
+      var element1 = document.getElementById('svg-arrow-' + (index + 1));
+      var element2 = document.getElementById('svg-arrow-' + (index + 7));
+      var className = 'translate-' + value;
+
+      if (expand) {
+          manageClass(element1, className, true);
+          manageClass(element2, className, true);
+          manageClass(element1, 'translate-00', false);
+          manageClass(element2, 'translate-00', false);
+      } else {
+          manageClass(element1, className, false);
+          manageClass(element2, className, false);
+          manageClass(element1, 'translate-00', true);
+          manageClass(element2, 'translate-00', true);
+      }
+  });
+}
+
+function imgOnMousePointer() {
+  var div = document.createElement('div');
+
+  // Setze Stil für das div (Größe, Farbe etc.)
+  div.style.width = '50px';
+  div.style.height = '50px';
+  div.style.backgroundColor = 'red';
+  div.style.position = 'absolute';
+
+  // Füge das div zum body hinzu
+  document.body.appendChild(div);
+
+  // Event-Listener für Mausbewegung
+  document.addEventListener('mousemove', function(e) {
+    // Aktualisiere die Position des divs entsprechend der Mausposition
+    div.style.left = e.clientX + 'px';
+    div.style.top = e.clientY + 'px';
+  });
 }
