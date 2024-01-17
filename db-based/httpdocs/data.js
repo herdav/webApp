@@ -1,4 +1,4 @@
-// data.js for davidherren.ch / 2024-01-06
+// data.js for davidherren.ch / 2024-01-17
 
 // Initialization of global variables
 let currentLanguage = ''; // Sets the default language to German
@@ -38,6 +38,8 @@ function switchLanguage(lang) {
     loadAbout();
   } else if (currentSlug) {
     loadWorks(currentSlug);
+  } else {
+    statement(currentLanguage);
   }
 }
 
@@ -59,6 +61,39 @@ function highlightContentButton(buttonId) {
     button.classList.add('button-highlighted'); // Adds highlight to the selected button
   }
 }
+
+function dropDown() {
+  var mediaQuery = window.matchMedia("(max-width: 1024px)");
+  var menuInner = document.getElementById('menu-inner');
+  var dropdownSVG = document.getElementById('dropdown-svg');
+
+  if (mediaQuery.matches) {
+    if (menuInner.style.height === 'auto') {
+      menuInner.style.height = '0px';
+      dropdownSVG.classList.remove('rotated');
+    } else {
+      menuInner.style.height = 'auto';
+      dropdownSVG.classList.add('rotated');
+    }
+  } else {
+    menuInner.style.height = 'auto';
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && entry.intersectionRatio === 1) {
+        entry.target.classList.add('visible');
+      } else {
+        entry.target.classList.remove('visible');
+      }
+    });
+  }, { threshold: [0, 1.0] });
+
+  var buttons = document.querySelectorAll('.button-navigation');
+  buttons.forEach(button => observer.observe(button));
+});
 
 // Function to load content for a specific work
 function loadWorks(slug) {
@@ -88,6 +123,7 @@ function loadExhibitions() {
     document.getElementById("content").innerHTML = response.html;
     updateDocumentTitle('Exhibitions');
     updateUrl('exhibitions');
+    updateHrefLangTags(slug); // Updates hreflang tags for SEO
   }, (error) => {
     console.error('Error with the request:', error);
   });
@@ -102,7 +138,11 @@ function loadAbout() {
     document.getElementById("index").innerHTML = '';
     document.getElementById("content").innerHTML = response.html;
     updateDocumentTitle('About');
+    // Selects the appropriate description based on the current language
+    let description = currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn;
+    updateMetaDescription(description); // Updates the meta description*/
     updateUrl('about');
+    updateHrefLangTags('about'); // Updates hreflang tags for SEO
   }, (error) => {
     console.error('Error with the request:', error);
   });
@@ -146,13 +186,6 @@ function updateHrefLangTags(slug) {
     linkTag.href = window.location.origin + '/' + lang + '/' + slug;
     document.head.appendChild(linkTag);
   });
-
-  // Ensure the current language is properly represented in the URL
-  let currentLangTag = document.createElement('link');
-  currentLangTag.rel = 'alternate';
-  currentLangTag.hreflang = currentLanguage;
-  currentLangTag.href = window.location.origin + '/' + currentLanguage + '/' + slug;
-  document.head.appendChild(currentLangTag);
 }
 
 // Event listener for the DOMContentLoaded event to initialize the page based on URL and browser language
@@ -171,6 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Highlight the current language button an switch to current language
   highlightLanguageButton(currentLanguage);
   switchLanguage(currentLanguage);
+  statement(currentLanguage);
 
   // Load the appropriate content based on the URL
   if (pathParts.length > 1) {
@@ -210,7 +244,7 @@ document.addEventListener("DOMContentLoaded", () => {
       allTitleDivs.forEach(div => div.style.display = 'none');
     } else if (currentVisibleImageIndex !== -1) {
       allTitleDivs[currentVisibleImageIndex].style.display = 'flex';
-      if (!blurApplied) {
+      /*if (!blurApplied) {
        applyBlurAndGray(contentInnerLeft, 0, 0, 0, 100, 500);
         blurApplied = true;
       }
@@ -218,7 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (blurApplied) {
           applyBlurAndGray(contentInnerLeft, 0, 0, 100, 0, 500);
           blurApplied = false;
-        }
+        }*/
       }
   });
 });
@@ -317,6 +351,16 @@ document.addEventListener("DOMContentLoaded", () => {
   observer.observe(document, { childList: true, subtree: true });
 }
 
+/*
+function updateSvgArrowPosition(isLeftExpanded) {
+  const arrowElements = document.querySelectorAll('.svg-arrow rect[id^="svg-arrow-"]');
+  arrowElements.forEach(element => {
+    const currentX = parseInt(element.getAttribute('x'), 10);
+    const newX = isLeftExpanded ? (72 - currentX) : currentX;
+    element.setAttribute('x', newX);
+  });
+}*/
+
 // Function to apply blur and/or gray to an element
 function applyBlurAndGray(element, startBlur, endBlur, startGray, endGray, duration) {
   let startTimestamp = null;
@@ -325,12 +369,22 @@ function applyBlurAndGray(element, startBlur, endBlur, startGray, endGray, durat
     const progress = Math.min((timestamp - startTimestamp) / duration, 1);
     const blurValue = progress * (endBlur - startBlur) + startBlur;
     const grayValue = progress * (endGray - startGray) + startGray;
-    
     element.style.filter = `blur(${blurValue}px) grayscale(${grayValue}%)`;
-
     if (progress < 1) {
       window.requestAnimationFrame(step);
     }
   };
   window.requestAnimationFrame(step);
+}
+
+function statement(lang) {
+  let url = "/data.php?statement=" + encodeURIComponent(lang);
+  sendRequest(url, 
+    response => {
+      updateMetaDescription(response.description); 
+    },
+    error => {
+      console.error('Error fetching statement:', error);
+    }
+  );
 }
