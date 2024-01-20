@@ -1,4 +1,4 @@
-<?php // data.php for davidherren.ch / 2024-01-17
+<?php // data.php for davidherren.ch / 2024-01-20
 
 include './php/db.php';
 include './php/fetchData.php';
@@ -89,7 +89,13 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     foreach ($worklinks as $link) {
       $htmlOutput .= "<a href='" . htmlspecialchars($link["address"]) . "' target='_blank'>" . htmlspecialchars($link["description"]) . "</a> ";
     }
-    $htmlOutput .= '</div></div>';
+    $htmlOutput .= '</div>';
+
+    if ($workData["github"]) {
+      $htmlOutput .= "<a id='github-link' href='" . htmlspecialchars($workData["github"]) . "' target='_blank'>&lt;&sol;&gt;</a>";
+    }
+
+    $htmlOutput .= '</div>';
 
     // Code for displaying additional images
     $htmlOutput .= "<div class='work-images'>";
@@ -191,7 +197,7 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
           } else {
             $titleSection = htmlspecialchars(ucfirst($about['section']));
           }
-          $htmlOutput .= "<h2>" . $titleSection . "</h2>";
+          $htmlOutput .= "<h2><mark>" . $titleSection . "</mark></h2>";
           $lastSection = $about['section'];
         }
         // Displaying about-items
@@ -222,9 +228,9 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
     $lastYear = null;
     $htmlOutput .= "<div id='exhibitions'>";
     if ($lang === 'de') {
-      $htmlOutput .= "<h2>Austellungen</h2>";
+      $htmlOutput .= "<h2><mark>Austellungen</mark></h2>";
     } else {
-      $htmlOutput .= "<h2>Exhibitions</h2>";
+      $htmlOutput .= "<h2><mark>Exhibitions</mark></h2>";
     }
     foreach ($exhibitionData as $exhibition) {
       $yearStart = substr($exhibition["date_start"], 0, 4);
@@ -237,16 +243,16 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
       }
       $htmlOutput .= "<div style='flex: 3;'>";
 
-      $firstLink = $database->fetchExhibitionMainLink(htmlspecialchars($exhibition['title']));
+      $firstLink = $database->fetchExhibitionMainLink($exhibition['title']);
       if ($firstLink) {
-          $htmlOutput .= "<p>" . "<a target='_blank' href='" . htmlspecialchars($firstLink) . "'>" . htmlspecialchars($exhibition['title']) . "</a>" . ", ";
+          $htmlOutput .= "<p>" . "<a target='_blank' href='" . $firstLink . "'>" . htmlspecialchars($exhibition['title']) . "</a>" . ", ";
       } else {
-          $htmlOutput .= "<p>"  . htmlspecialchars($exhibition['title']) . ", ";
+          $htmlOutput .= "<p>"  . $exhibition['title'] . ", ";
       }
       $htmlOutput .= $exhibition['institution'];
       $htmlOutput .= ", " . htmlspecialchars($exhibition['place']) . "</p>";
-      $htmlOutput .= "</div>";
-      $htmlOutput .= "</div>";
+      $htmlOutput .= "<div class='exhibition-img'><img src=/img/exhibitions/" . htmlspecialchars($exhibition['img']) . "></div>";
+      $htmlOutput .= "</div></div>";
     }
     $htmlOutput .= "</div>"; // End of Exhibition section
   }
@@ -265,7 +271,7 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
           } else {
             $titleSection = htmlspecialchars(ucfirst($about['section']));
           }
-          $htmlOutput .= "<h2>" . $titleSection . "</h2>";
+          $htmlOutput .= "<h2><mark>" . $titleSection . "</mark></h2>";
           $lastSection = $about['section'];
         }
         // Displaying about-items
@@ -295,7 +301,7 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
         } else {
           $titleSection = htmlspecialchars(ucfirst($about['section']));
         }
-        $htmlOutput .= "<h2>" . $titleSection . "</h2>";
+        $htmlOutput .= "<h2><mark>" . $titleSection . "</mark></h2>";
         $htmlOutput .= "<p>" . $about["text_$lang"] . "</p>";
       }
     }
