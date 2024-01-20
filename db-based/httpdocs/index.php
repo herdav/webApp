@@ -1,11 +1,12 @@
-<!--index.php for davidherren.ch / 2024-01-17-->
 <!DOCTYPE html>
+<!--index.php for davidherren.ch / 2024-01-20-->
 <html lang="de">
   <head>
     <meta charset="UTF-8">
     <title>David Herren</title>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <script src="/js/data.js" defer></script>
+    <script src="/js/animations.js" defer></script>
     <script type="module" src="https://unpkg.com/@google/model-viewer@latest"></script>
   </head>
   <body>
@@ -18,14 +19,20 @@
       <div id="menu-title">
         <div id="menu-title-left">
           <button id="button-dropdown" class="button-navigation" onclick="dropDown()">
-          <svg id="dropdown-svg" width="40px" height="40px" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="18,3 21,3 38,22 35,27 3,27 0,22 18,3"/>
+          <svg id="dropdown-svg" width="64px" height="32px" viewBox="0 0 64 32" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4"  y="24" id="svg-triangle-1" width="56" height="4"/>
+            <rect x="8"  y="20" id="svg-triangle-2"width="48"  height="4"/>
+            <rect x="12" y="16" id="svg-triangle-3" width="40" height="4"/>
+            <rect x="16" y="12" id="svg-triangle-4" width="32" height="4"/>
+            <rect x="20" y="8"  id="svg-triangle-5" width="24" height="4"/>
+            <rect x="24" y="4"  id="svg-triangle-6" width="16" height="4"/>
+            <rect x="28" y="0"  id="svg-triangle-7" width="8"  height="4"/>
           </svg>
           </button>
         </div>
         <a href="./" id="menu-title-center">
           <div id="menu-title-center-inner">
-            <h1>David Herren</h1>
+            <h1 id="title-text">David Herren</h1>
           </div>
         </a>
         <div id="menu-title-right">
@@ -48,7 +55,7 @@
           ?>
         </div>
         <div id="menu-about">
-          <!--<button id="button-exhibitions" class="button-navigation" onclick="loadExhibitions()">Exhibitions</button>-->
+          <button id="button-mail" class="button-navigation" onclick="window.location.href='mailto:info@davidherren.ch'">Mail</button>
           <button id="button-about" class="button-navigation" onclick="loadAbout()">About</button>
         </div>
       </div>
@@ -67,6 +74,6 @@
       }
       ?>
     </div>
-    <div id="content"></div
+    <div id="content"></div>
   </body>
 </html>
