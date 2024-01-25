@@ -1,4 +1,4 @@
-// animations.js for davidherren.ch / 2024-01-20
+// animations.js for davidherren.ch / 2024-01-24
 
 { // Animate Title Letters
   let isAnimating = false;
@@ -39,50 +39,6 @@ function imgOnMousePointer() {
   });
 }
 
-function dropDown() {
-  var mediaQueryMobile = window.matchMedia("(max-width: 1024px)");
-  var mediaQueryDesktop = window.matchMedia("(min-width: 1025px)");
-  var menuInner = document.getElementById('menu-inner');
-  var menuTitle = document.getElementById('menu-title');
-  var menu = document.getElementById('menu');
-  var triangles = [];
-
-  for (var i = 1; i <= 7; i++) {
-    triangles.push(document.getElementById(`svg-triangle-${i}`));
-  }
-
-  var computedStyle = window.getComputedStyle(menuInner);
-  var isExpanded = computedStyle.height !== '0px';
-
-  function toggleTriangles(add) {
-    triangles.forEach(function(triangle, index) {
-      triangle.classList.toggle(`translateY-0${index + 1}`, add);
-    });
-  }
-
-  if (mediaQueryMobile.matches) {
-    menuInner.style.height = isExpanded ? '0px' : 'auto';
-    toggleTriangles(!isExpanded);
-  } else if (mediaQueryDesktop.matches) {
-    if (isExpanded) {
-      menu.style.width = 'calc(33% - 2rem)';
-      menuInner.style.height = '0px';
-      menuInner.style.margin = '0rem';
-      menuTitle.style.height = 'calc(2rem - 2px)';
-      toggleTriangles(true);
-    } else {
-      menu.style.width = '100%';
-      menuInner.style.height = 'auto';
-      menuInner.style.margin = '2rem';
-      menuTitle.style.height = '2rem';
-      toggleTriangles(false);
-    }
-  } else {
-    menuInner.style.height = 'auto';
-  }
-  isExpanded = !isExpanded;
-}
-
 function applySvgTransformations(expand) {
   var translationValues = [62, 54, 46, 38, 30, 22];
   function manageClass(element, className, add) {
@@ -94,9 +50,7 @@ function applySvgTransformations(expand) {
           }
       }
   }
-  for (var i = 1; i <= 12; i++) {
-      var element = document.getElementById('svg-arrow-' + i);
-  }
+
   translationValues.forEach(function(value, index) {
       var element1 = document.getElementById('svg-arrow-' + (index + 1));
       var element2 = document.getElementById('svg-arrow-' + (index + 7));
@@ -222,3 +176,122 @@ function applyBlurAndGray(element, startBlur, endBlur, startGray, endGray, durat
   });
   observer.observe(document, { childList: true, subtree: true });
 }
+
+var currentOpenDropdownId = null; // Für das Dropdown-Menü
+var currentOpenImgDivId = null;   // Für das Bild-Div
+
+// Controls the dropdown menu
+function dropDownMenu() {
+  var mediaQueryMobile = window.matchMedia("(max-width: 1024px)");
+  var menuInner = document.getElementById('menu-inner');
+  var menuTitle = document.getElementById('menu-title');
+  var buttonId = "button-dropdown";
+  var computedStyle = window.getComputedStyle(menuInner);
+  var isExpanded = computedStyle.height !== '0px';
+
+  if (mediaQueryMobile.matches) {
+    menuInner.style.height = isExpanded ? '0px' : 'auto';
+  } else {
+    menuInner.style.height = isExpanded ? '0px' : 'auto';
+    menu.style.width = isExpanded ? 'calc(33% - 2rem)' : 'auto';
+    menuInner.style.margin = isExpanded ? '0rem' : '2rem';
+    menuTitle.style.height = isExpanded ? 'calc(2rem - 2px)' : '2rem';
+  }
+  
+  toggleTriangles(buttonId, !isExpanded);
+  isExpanded = !isExpanded;
+}
+
+function expandImage(imgDivId, dropdownButtonId) {
+  var imgDiv = document.getElementById(imgDivId);
+  if (!imgDiv) return;
+
+  var isClosingDiv = currentOpenImgDivId === imgDivId;
+  if (isClosingDiv) {
+    // Close the currently open image div
+    imgDiv.style.height = '0px';
+    currentOpenImgDivId = null;
+
+    // Remove the translateY class from the associated dropdown button
+    var dropdownSvg = document.querySelector(`#${dropdownButtonId} svg`);
+    var triangles = dropdownSvg.querySelectorAll('rect');
+    triangles.forEach(function(triangle, index) {
+      // Remove translateY class
+      triangle.classList.remove(`translateY-0${index + 1}`);
+    });
+  } else {
+    // Close previous image div if exists
+    if (currentOpenImgDivId) {
+      var currentOpenImgDiv = document.getElementById(currentOpenImgDivId);
+      if (currentOpenImgDiv) {
+        currentOpenImgDiv.style.height = '0px';
+        var previousDropdownButtonId = currentOpenImgDiv.getAttribute('data-dropdown-button-id');
+        if (previousDropdownButtonId) {
+          toggleTriangles(previousDropdownButtonId, false);
+        }
+      }
+    }
+    // Open new image div
+    imgDiv.style.height = '100%';
+    currentOpenImgDivId = imgDivId;
+    imgDiv.setAttribute('data-dropdown-button-id', dropdownButtonId);
+  }
+}
+
+
+function resetTriangles() {
+  if (currentOpenDropdownId) {
+    var dropdownSvg = document.querySelector(`#${currentOpenDropdownId} svg`);
+    var triangles = dropdownSvg.querySelectorAll('rect');
+    triangles.forEach(function(triangle, index) {
+      triangle.classList.remove(`translateY-0${index + 1}`);
+    });
+    currentOpenDropdownId = null;
+  }
+}
+
+function toggleTriangles(buttonId) {
+  var dropdownSvg = document.querySelector(`#${buttonId} svg`);
+  var triangles = dropdownSvg.querySelectorAll('rect');
+
+  // Prüfen, ob der Button bereits aktiv ist (d.h. ob er der aktuell geöffnete ist)
+  var isButtonAlreadyOpen = currentOpenDropdownId === buttonId;
+
+  if (isButtonAlreadyOpen) {
+    // Entfernen Sie alle translate-Klassen, wenn der Button bereits geöffnet ist
+    triangles.forEach(function(triangle) {
+      for (var i = 1; i <= triangles.length; i++) {
+        triangle.classList.remove(`translateY-0${i}`);
+      }
+    });
+    currentOpenDropdownId = null;
+  } else {
+    // Toggeln Sie die translate-Klassen, wenn der Button zum ersten Mal geklickt wird
+    triangles.forEach(function(triangle, index) {
+      triangle.classList.toggle(`translateY-0${index + 1}`, true);
+    });
+    currentOpenDropdownId = buttonId;
+  }
+}
+
+function resetTriangles() {
+  if (currentOpenDropdownId) {
+    var dropdownSvg = document.querySelector(`#${currentOpenDropdownId} svg`);
+    var triangles = dropdownSvg.querySelectorAll('rect');
+    triangles.forEach(function(triangle, index) {
+      triangle.classList.remove(`translateY-0${index + 1}`);
+    });
+    currentOpenDropdownId = null;
+  }
+}
+
+function adjustHeight() {
+  var items = document.querySelectorAll('.index-item');
+  items.forEach(function(item) {
+    var width = item.offsetWidth;
+    var height = width * 0.75;
+    item.style.height = height + 'px';
+  });
+}
+window.onload = adjustHeight;
+window.onresize = adjustHeight;
