@@ -1,4 +1,4 @@
-// data.js for davidherren.ch / 2024-01-17
+// data.js for davidherren.ch / 2024-01-20
 
 // Initialization of global variables
 let currentLanguage = ''; // Sets the default language to German
