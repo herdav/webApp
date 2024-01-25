@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!--index.php for davidherren.ch / 2024-01-20-->
+<!--index.php for davidherren.ch / 2024-01-24-->
 <html lang="de">
   <head>
     <meta charset="UTF-8">
@@ -18,7 +18,7 @@
     <div id="menu" class="frame">
       <div id="menu-title">
         <div id="menu-title-left">
-          <button id="button-dropdown" class="button-navigation" onclick="dropDown()">
+          <button id="button-dropdown" class="button-navigation" onclick="dropDownMenu()">
           <svg id="dropdown-svg" width="64px" height="32px" viewBox="0 0 64 32" xmlns="http://www.w3.org/2000/svg">
             <rect x="4"  y="24" id="svg-triangle-1" width="56" height="4"/>
             <rect x="8"  y="20" id="svg-triangle-2"width="48"  height="4"/>
@@ -66,13 +66,16 @@
         foreach ($indexResult as $row) {
             $title = $row["title"];
             $slug = $row["slug"];
-            echo "<a onclick='loadWorks(\"{$slug}\")'><div class='index-items'>";
-            echo "<img src='/img/prev/{$slug}-prev.jpg'></a></div>" . PHP_EOL;
+            echo "<a class='index-item' onclick=\"loadWorks('" . htmlspecialchars($slug) . "')\">";
+            echo "<div class='index-item-inner'>";
+            echo "<div class='index-item-inner-frame'></div>";
+            echo "<img src='/img/prev/{$slug}-prev.jpg'>";
+            echo "</div></a>" . PHP_EOL;
         }
-      } else {
-          echo "No works found!";
-      }
-      ?>
+    } else {
+        echo "No works found!";
+    }
+    ?>
     </div>
     <div id="content"></div>
   </body>
