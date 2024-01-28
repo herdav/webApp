@@ -1,4 +1,4 @@
-// data.js for davidherren.ch / 2024-01-20
+// data.js for davidherren.ch / 2024-01-28
 
 // Initialization of global variables
 let currentLanguage = ''; // Sets the default language to German
@@ -92,6 +92,7 @@ function loadWorks(slug) {
     updateMetaDescription(description); // Updates the meta description
     updateUrl(slug); // Updates the URL
     updateHrefLangTags(slug); // Updates hreflang tags for SEO
+    animateLetters('work-text-description');
   });
   highlightContentButton('button-' + slug); // Highlights the active content button
 }
@@ -132,15 +133,28 @@ function loadAbout() {
   /*imgOnMousePointer();*/
 }
 
-// Function to update the meta description tag of the document
-function updateMetaDescription(description) {
-  let metaDescription = document.querySelector('meta[name="description"]');
-  if (!metaDescription) {
-    metaDescription = document.createElement('meta'); // Creates a new meta tag if it doesn't exist
-    metaDescription.name = 'description';
-    document.head.appendChild(metaDescription); // Appends the meta tag to the document head
+{ // Function to update the meta description tag of the document
+  function updateMetaDescription(description) {
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta'); // Creates a new meta tag if it doesn't exist
+      metaDescription.name = 'description';
+      document.head.appendChild(metaDescription); // Appends the meta tag to the document head
+    }
+    metaDescription.content = description; // Updates the content of the meta tag
   }
-  metaDescription.content = description; // Updates the content of the meta tag
+
+  function statement(lang) {
+    let url = "/data.php?statement=" + encodeURIComponent(lang);
+    sendRequest(url, 
+      response => {
+        updateMetaDescription(response.description); 
+      },
+      error => {
+        console.error('Error fetching statement:', error);
+      }
+    );
+  }
 }
 
 // Function to update the document title
@@ -239,15 +253,3 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   });
 });
-
-function statement(lang) {
-  let url = "/data.php?statement=" + encodeURIComponent(lang);
-  sendRequest(url, 
-    response => {
-      updateMetaDescription(response.description); 
-    },
-    error => {
-      console.error('Error fetching statement:', error);
-    }
-  );
-}
