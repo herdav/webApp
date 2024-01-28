@@ -1,27 +1,30 @@
-// animations.js for davidherren.ch / 2024-01-24
+// animations.js for davidherren.ch / 2024-01-28
 
-{ // Animate Title Letters
+{ // Animate Words
   let isAnimating = false;
-  function animateTitleLetters() {
+  function animateLetters(id) {
     if (isAnimating) return;
     isAnimating = true;
-    const title = document.getElementById('frame-title-center');
+    const title = document.getElementById(id);
     const text = title.innerText;
     title.innerHTML = '';
-    text.split('').forEach((letter, index) => {
+    const words = text.split(' ');
+    words.forEach((word, index) => {
       const span = document.createElement('span');
-      span.innerText = letter;
+      span.innerText = word;
       span.style.opacity = 0;
       title.appendChild(span);
+      if (index < words.length - 1) {
+        title.appendChild(document.createTextNode(' ')); // Add space between words
+      }
       setTimeout(() => {
         span.style.opacity = 1;
-      }, 100 * index);
+      }, 100 * index); // Adjust the timeout as needed
     });
     setTimeout(() => {
       isAnimating = false;
-    }, 100 * text.length);
+    }, 100 * words.length); // Adjust the timeout as needed
   }
-  /*document.getElementById('frame-title-center').addEventListener('mouseover', animateTitleLetters);*/
 }
 
 function imgOnMousePointer() {
@@ -42,30 +45,30 @@ function imgOnMousePointer() {
 function applySvgTransformations(expand) {
   var translationValues = [62, 54, 46, 38, 30, 22];
   function manageClass(element, className, add) {
-      if (element) {
-          if (add) {
-              element.classList.add(className);
-          } else {
-              element.classList.remove(className);
-          }
+    if (element) {
+      if (add) {
+        element.classList.add(className);
+      } else {
+        element.classList.remove(className);
       }
+    }
   }
 
-  translationValues.forEach(function(value, index) {
-      var element1 = document.getElementById('svg-arrow-' + (index + 1));
-      var element2 = document.getElementById('svg-arrow-' + (index + 7));
-      var className = 'translate-' + value;
-      if (expand) {
-          manageClass(element1, className, true);
-          manageClass(element2, className, true);
-          manageClass(element1, 'translate-00', false);
-          manageClass(element2, 'translate-00', false);
-      } else {
-          manageClass(element1, className, false);
-          manageClass(element2, className, false);
-          manageClass(element1, 'translate-00', true);
-          manageClass(element2, 'translate-00', true);
-      }
+  translationValues.forEach(function (value, index) {
+    var element1 = document.getElementById("svg-arrow-" + (index + 1));
+    var element2 = document.getElementById("svg-arrow-" + (index + 7));
+    var className = "translate-" + value;
+    if (expand) {
+      manageClass(element1, className, true);
+      manageClass(element2, className, true);
+      manageClass(element1, "translate-00", false);
+      manageClass(element2, "translate-00", false);
+    } else {
+      manageClass(element1, className, false);
+      manageClass(element2, className, false);
+      manageClass(element1, "translate-00", true);
+      manageClass(element2, "translate-00", true);
+    }
   });
 }
 
@@ -99,11 +102,11 @@ function applyBlurAndGray(element, startBlur, endBlur, startGray, endGray, durat
       if (isLeftExpanded) {
         contentLeft.classList.add('width-expanded');
         contentRight.classList.add('width-collapsed');
-        applySvgTransformations(true);
+        applySvgTransformations(false);
       } else {
         contentLeft.classList.add('width-collapsed');
         contentRight.classList.add('width-expanded');
-        applySvgTransformations(false);
+        applySvgTransformations(true);
       }
     }
 
@@ -130,14 +133,14 @@ function applyBlurAndGray(element, startBlur, endBlur, startGray, endGray, durat
           contentRight.classList.remove('width-expanded');
           contentLeft.classList.add('width-expanded');
           contentRight.classList.add('width-collapsed');
-          applySvgTransformations(true);
+          applySvgTransformations(false);
         } else {
           // Logic for collapsing
           contentLeft.classList.remove('width-expanded');
           contentRight.classList.remove('width-collapsed');
           contentLeft.classList.add('width-collapsed');
           contentRight.classList.add('width-expanded');
-          applySvgTransformations(false);
+          applySvgTransformations(true);
         }
 
         event.preventDefault();  // Prevent default only when not at the bottom
@@ -177,29 +180,28 @@ function applyBlurAndGray(element, startBlur, endBlur, startGray, endGray, durat
   observer.observe(document, { childList: true, subtree: true });
 }
 
-var currentOpenDropdownId = null; // Für das Dropdown-Menü
-var currentOpenImgDivId = null;   // Für das Bild-Div
+{ // Controls the dropdown menu
+  var currentOpenDropdownId = null;
+  var currentOpenImgDivId = null;
+  function dropDownMenu() {
+    var mediaQueryMobile = window.matchMedia("(max-width: 1024px)");
+    var menuInner = document.getElementById('menu-inner');
+    var menuTitle = document.getElementById('menu-title');
+    var buttonId = "button-dropdown";
+    var computedStyle = window.getComputedStyle(menuInner);
+    var isExpanded = computedStyle.height !== '0px';
 
-// Controls the dropdown menu
-function dropDownMenu() {
-  var mediaQueryMobile = window.matchMedia("(max-width: 1024px)");
-  var menuInner = document.getElementById('menu-inner');
-  var menuTitle = document.getElementById('menu-title');
-  var buttonId = "button-dropdown";
-  var computedStyle = window.getComputedStyle(menuInner);
-  var isExpanded = computedStyle.height !== '0px';
-
-  if (mediaQueryMobile.matches) {
-    menuInner.style.height = isExpanded ? '0px' : 'auto';
-  } else {
-    menuInner.style.height = isExpanded ? '0px' : 'auto';
-    menu.style.width = isExpanded ? 'calc(33% - 2rem)' : 'auto';
-    menuInner.style.margin = isExpanded ? '0rem' : '2rem';
-    menuTitle.style.height = isExpanded ? 'calc(2rem - 2px)' : '2rem';
+    if (mediaQueryMobile.matches) {
+      menuInner.style.height = isExpanded ? '0px' : 'auto';
+    } else {
+      menuInner.style.height = isExpanded ? '0px' : 'auto';
+      menu.style.width = isExpanded ? 'calc(33% - 2rem)' : 'auto';
+      menuInner.style.margin = isExpanded ? '0rem' : '2rem';
+      menuTitle.style.height = isExpanded ? 'calc(2rem - 2px)' : '2rem';
+    }
+    toggleTriangles(buttonId, !isExpanded);
+    isExpanded = !isExpanded;
   }
-  
-  toggleTriangles(buttonId, !isExpanded);
-  isExpanded = !isExpanded;
 }
 
 function expandImage(imgDivId, dropdownButtonId) {
@@ -238,7 +240,6 @@ function expandImage(imgDivId, dropdownButtonId) {
   }
 }
 
-
 function resetTriangles() {
   if (currentOpenDropdownId) {
     var dropdownSvg = document.querySelector(`#${currentOpenDropdownId} svg`);
@@ -274,24 +275,15 @@ function toggleTriangles(buttonId) {
   }
 }
 
-function resetTriangles() {
-  if (currentOpenDropdownId) {
-    var dropdownSvg = document.querySelector(`#${currentOpenDropdownId} svg`);
-    var triangles = dropdownSvg.querySelectorAll('rect');
-    triangles.forEach(function(triangle, index) {
-      triangle.classList.remove(`translateY-0${index + 1}`);
+{ // Adjust height of index items
+  function adjustHeight() {
+    var items = document.querySelectorAll('.index-item');
+    items.forEach(function(item) {
+      var width = item.offsetWidth;
+      var height = width * 0.75;
+      item.style.height = height + 'px';
     });
-    currentOpenDropdownId = null;
   }
+  window.onload = adjustHeight;
+  window.onresize = adjustHeight;
 }
-
-function adjustHeight() {
-  var items = document.querySelectorAll('.index-item');
-  items.forEach(function(item) {
-    var width = item.offsetWidth;
-    var height = width * 0.75;
-    item.style.height = height + 'px';
-  });
-}
-window.onload = adjustHeight;
-window.onresize = adjustHeight;
