@@ -1,4 +1,4 @@
-<?php // data.php for davidherren.ch / 2024-01-24
+<?php // data.php for davidherren.ch / 2024-01-27
 
 include './php/db.php';
 include './php/fetchData.php';
@@ -23,7 +23,7 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     $htmlOutput = <<<HTML
     <div id='content-inner'>
       <div id='content-inner-left'>
-        <div class="content-left-img-outer"><img src='/img/{$workData["slug"]}-0.jpg'></div>
+        <div class="content-left-img-outer"><img src='/img/{$workData["slug"]}-0.jpg' alt='$workData[title] - $workData[year] © $workData[img_alt]'></div>
         <div id='content-inner-left-text'>
     HTML;
 
@@ -31,6 +31,7 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     foreach ($workimages as $image) {
       $imageText = $image["text_$lang"];
       $workTitle = $workData["title"];
+      $imageFoto = $image["foto"];
       $htmlOutput .= <<<HTML
       <div class="work-image-title">
         <div class="frame">
@@ -38,10 +39,21 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
             <a href="#top" class="frame-title-left button-navigation"></a>
             <h3 class="frame-title-center">$workTitle</h3>
           </div>
+          <div class="frame-title-text">
           <p>$imageText</p>
-        </div>
-      </div>
       HTML;
+        if ($imageFoto) {
+          $htmlOutput .= <<<HTML
+            <p>Foto: $imageFoto</p>
+          </div>
+        </div></div>
+        HTML;
+      } else {
+        $htmlOutput .= <<<HTML
+          </div>
+        </div></div>
+        HTML;
+      }
     }
 
     // Closing the left content div
@@ -51,24 +63,25 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
       <a id="pointer" href="">
         <svg width="72" height="56" viewBox="0 0 72 56" class="svg-arrow">
           <rect id="svg-arrow-0" x="0"  y="24" width="72" height="4"/>
-          <rect id="svg-arrow-1" x="64" y="28" width="4" height="4"/>
-          <rect id="svg-arrow-2" x="60" y="32" width="4" height="4"/>
-          <rect id="svg-arrow-3" x="56" y="36" width="4" height="4"/>
-          <rect id="svg-arrow-4" x="52" y="40" width="4" height="4"/>
-          <rect id="svg-arrow-5" x="48" y="44" width="4" height="4"/>
-          <rect id="svg-arrow-6" x="44" y="48" width="4" height="4"/>
-          <rect id="svg-arrow-7" x="64" y="20" width="4" height="4"/>
-          <rect id="svg-arrow-8" x="60" y="16" width="4" height="4"/>
-          <rect id="svg-arrow-9" x="56" y="12" width="4" height="4"/>
-          <rect id="svg-arrow-10" x="52" y="8"  width="4" height="4"/>
-          <rect id="svg-arrow-11" x="48" y="4"  width="4" height="4"/>
-          <rect id="svg-arrow-12" x="44" y="0"  width="4" height="4"/>
+          <rect id="svg-arrow-1" x="4"  y="28" width="4" height="4"/>
+          <rect id="svg-arrow-2" x="8"  y="32" width="4" height="4"/>
+          <rect id="svg-arrow-3" x="12" y="36" width="4" height="4"/>
+          <rect id="svg-arrow-4" x="16" y="40" width="4" height="4"/>
+          <rect id="svg-arrow-5" x="20" y="44" width="4" height="4"/>
+          <rect id="svg-arrow-6" x="24" y="48" width="4" height="4"/>
+          <rect id="svg-arrow-7" x="4"  y="20" width="4" height="4"/>
+          <rect id="svg-arrow-8" x="8"  y="16" width="4" height="4"/>
+          <rect id="svg-arrow-9" x="12" y="12" width="4" height="4"/>
+          <rect id="svg-arrow-10" x="16" y="8"  width="4" height="4"/>
+          <rect id="svg-arrow-11" x="20" y="4"  width="4" height="4"/>
+          <rect id="svg-arrow-12" x="24" y="0"  width="4" height="4"/>
         </svg>
       </a>
     </div>
     <div id='content-inner-right'>
       <div id='work-text'>
-        <p>{$workData["text_$lang"]}</p>
+        <p id="work-text-description">{$workData["description_$lang"]}</p>
+        <div id="work-text-inline"><p>{$workData["text_$lang"]}</p></div>
       <div id='work-infos'>
     HTML;
 
@@ -94,12 +107,19 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     // Code for displaying additional images
     $htmlOutput .= "<div class='work-images'>";
     foreach ($workimages as $image) {
+      $workTitle   = htmlspecialchars($workData["title"]);
       $imageName   = htmlspecialchars($image["name"]);
       $imageType   = htmlspecialchars($image["datatype"]);
-      $htmlOutput .= <<<HTML
-      <img src='/img/{$imageName}.{$imageType}'>
-      HTML;
+      $imageAlt    = htmlspecialchars($image["alt"]);
+      $imageFoto   = htmlspecialchars($image["foto"]);
+      $imageCopyr  = htmlspecialchars($image["copyright"]);
+      if ($imageFoto) {
+        $htmlOutput .= "<img src='/img/{$imageName}.{$imageType}' alt='$workTitle - Foto: $imageFoto'>";
+      } else {
+        $htmlOutput .= "<img src='/img/{$imageName}.{$imageType}' alt='David Herren'>";
+      }
     }
+
     $htmlOutput .= "</div>";
     
     // Code for 3D model viewer
@@ -147,32 +167,6 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
   $conn = null;
 }
 
-if (isset($_GET['exhibitions']) && isset($_GET['lang'])) {
-  $lang = sanitizeInput($_GET['lang']);
-  $lang = validateLanguage($lang);
-
-  $exhibitionData = $database->fetchExhibitions($lang);
-
-  if ($exhibitionData) {
-    $htmlOutput = "";
-    foreach ($exhibitionData as $exhibition) {
-      $htmlOutput .= "<div class='exhibition'>";
-      $htmlOutput .= "<h2>" . htmlspecialchars($exhibition['title']) . "</h2>";
-      $htmlOutput .= "<p>" . htmlspecialchars($exhibition["date_start"]) . " bis " . htmlspecialchars($exhibition["date_end"]);
-      $htmlOutput .= "<p>" . htmlspecialchars($exhibition['institution']);
-      $htmlOutput .= ", " . htmlspecialchars($exhibition['place']) . "</p>";
-      $htmlOutput .= "<p>" . htmlspecialchars($exhibition["text_$lang"]) . "</p>";
-      $htmlOutput .= "</div>";
-    }
-
-    $response = [
-      'html' => $htmlOutput
-    ];
-    echo json_encode($response);
-  } else { echo "No Data found!"; }
-  $conn = null;
-}
-
 if (isset($_GET['about']) && isset($_GET['lang'])) {
   // Sanitize and validate input
   $lang = sanitizeInput($_GET['lang']);
@@ -197,7 +191,7 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
           } else {
             $titleSection = htmlspecialchars(ucfirst($about['section']));
           }
-          $htmlOutput .= "<h2><mark>" . $titleSection . "</mark></h2>";
+          $htmlOutput .= "<h2>" . $titleSection . "</h2>";
           $lastSection = $about['section'];
         }
         // Displaying about-items
@@ -228,9 +222,9 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
     $lastYear = null;
     $htmlOutput .= "<div id='exhibitions'>";
     if ($lang === 'de') {
-      $htmlOutput .= "<h2><mark>Austellungen</mark></h2>";
+      $htmlOutput .= "<h2>Austellungen</h2>";
     } else {
-      $htmlOutput .= "<h2><mark>Exhibitions</mark></h2>";
+      $htmlOutput .= "<h2>Exhibitions</h2>";
     }
     foreach ($exhibitionData as $index => $exhibition) {
       $yearStart = substr($exhibition["date_start"], 0, 4);
@@ -291,7 +285,7 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
           } else {
             $titleSection = htmlspecialchars(ucfirst($about['section']));
           }
-          $htmlOutput .= "<h2><mark>" . $titleSection . "</mark></h2>";
+          $htmlOutput .= "<h2>" . $titleSection . "</h2>";
           $lastSection = $about['section'];
         }
         // Displaying about-items
@@ -321,7 +315,7 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
         } else {
           $titleSection = htmlspecialchars(ucfirst($about['section']));
         }
-        $htmlOutput .= "<h2><mark>" . $titleSection . "</mark></h2>";
+        $htmlOutput .= "<h2>" . $titleSection . "</h2>";
         $htmlOutput .= "<p>" . $about["text_$lang"] . "</p>";
       }
     }
