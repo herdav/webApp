@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!--index.php for davidherren.ch / 2024-01-28-->
+<!--index.php for davidherren.ch / 2024-02-02-->
 <html lang="de">
   <head>
     <meta charset="UTF-8">
@@ -13,7 +13,6 @@
     <?php
     include 'data.php';
     $menuResult = $database->fetchMenuItems();
-    $indexResult = $database->fetchIndexItems(["motionstudy", "sandbox"]);
     ?>
     <div id="menu" class="frame">
       <div id="menu-title">
@@ -62,27 +61,6 @@
     </div>
     <div id="index">
       <div id="index-inner">
-      <?php
-      if (count($indexResult) > 0) {
-          foreach ($indexResult as $row) {
-              $title = $row["title"];
-              $slug = $row["slug"];
-              $year = $row["year"];
-              $description = $row["description_en"];
-              echo "<a class='index-item' onclick=\"loadWorks('" . htmlspecialchars($slug) . "')\">";
-              echo "<div class='index-item-inner'>";
-              echo "<div class='index-item-inner-frame'></div>";
-              echo "<div class='index-item-inner-text'>
-                <h2>" . htmlspecialchars($title) . "</span></h2>
-                <p>" . htmlspecialchars($description) . "</p>
-                </div>";
-              echo "<img src='/img/prev/" . htmlspecialchars($slug) . "-prev.jpg' alt='" . htmlspecialchars($title) . " - " . htmlspecialchars($year) . " © David Herren'>";
-              echo "</div></a>" . PHP_EOL;
-          }
-      } else {
-          echo "No works found!";
-      }
-      ?>
       </div>
     </div>
     <div id="content"></div>
