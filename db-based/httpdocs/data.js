@@ -1,7 +1,7 @@
-// data.js for davidherren.ch / 2024-01-28
+// data.js for davidherren.ch / 2024-02-02
 
 // Initialization of global variables
-let currentLanguage = ''; // Sets the default language to German
+let currentLanguage = ''; // Sets the default language
 let currentSlug = ''; // Stores the current slug for content
 let lastStateLeftExpanded = true; // Stores the expanded/collapsed state of the left content
 
@@ -32,14 +32,13 @@ function switchLanguage(lang) {
   history.pushState(null, null, newPath); // Updates the browser's history
 
   // Loads the appropriate content based on the currentSlug
-  if (currentSlug === 'exhibitions') {
-    loadExhibitions();
-  } else if (currentSlug === 'about') {
+  if (currentSlug === 'about') {
     loadAbout();
   } else if (currentSlug) {
     loadWorks(currentSlug);
   } else {
     statement(currentLanguage);
+    loadIndex();
   }
 }
 
@@ -97,22 +96,6 @@ function loadWorks(slug) {
   highlightContentButton('button-' + slug); // Highlights the active content button
 }
 
-// Function to load content for exhibitions
-function loadExhibitions() {
-  currentSlug = 'exhibitions';
-  let url = "/data.php?lang=" + encodeURIComponent(currentLanguage) + "&exhibitions=1";
-  sendRequest(url, (response) => {
-    document.getElementById("index").innerHTML = '';
-    document.getElementById("content").innerHTML = response.html;
-    updateDocumentTitle('Exhibitions');
-    updateUrl('exhibitions');
-    updateHrefLangTags(slug); // Updates hreflang tags for SEO
-  }, (error) => {
-    console.error('Error with the request:', error);
-  });
-  highlightContentButton('button-exhibitions');
-}
-
 // Function to load content about
 function loadAbout() {
   currentSlug = 'about';
@@ -130,7 +113,31 @@ function loadAbout() {
     console.error('Error with the request:', error);
   });
   highlightContentButton('button-about');
-  /*imgOnMousePointer();*/
+}
+
+// Function to load content index
+function loadIndex() {
+  currentSlug = '';
+  let url = "/data.php?lang=" + encodeURIComponent(currentLanguage) + "&index=1";
+  sendRequest(url, (response) => {
+    document.getElementById("index-inner").innerHTML = response.html;
+    document.getElementById("content").innerHTML = '';
+    updateDocumentTitle('David Herren');
+    updateUrl('');
+    adjustHeight();
+  }, (error) => {
+    console.error('Error with the request:', error);
+  });
+}
+
+// Adjust height of index items
+function adjustHeight() {
+  var items = document.querySelectorAll('.index-item');
+  items.forEach(function(item) {
+    var width = item.offsetWidth;
+    var height = width * 0.75;
+    item.style.height = height + 'px';
+  });
 }
 
 { // Function to update the meta description tag of the document
@@ -185,71 +192,63 @@ function updateHrefLangTags(slug) {
   });
 }
 
-// Event listener for the DOMContentLoaded event to initialize the page based on URL and browser language
+// Event listener for the DOMContentLoaded event to ensure the page is fully loaded before executing any scripts
 document.addEventListener("DOMContentLoaded", () => {
+  // Extract parts of the URL path and filter out any empty elements
   let pathParts = window.location.pathname.split('/').filter(Boolean);
 
-  // Check the URL for a language code, use it if present, otherwise use the browser's language
+  // Check the URL for a language code, using it if present, otherwise default to the browser's language preference
   if (pathParts.length > 0 && (pathParts[0] === 'de' || pathParts[0] === 'en')) {
-    currentLanguage = pathParts[0];
+    currentLanguage = pathParts[0]; // Set the page language based on the URL
   } else {
-    // Check the browser language and set the default language
+    // Default to the browser's language, or English if the browser's language is not explicitly supported
     let browserLanguage = navigator.language || navigator.userLanguage;
     currentLanguage = browserLanguage.startsWith('de') ? 'de' : 'en';
   }
 
-  // Highlight the current language button an switch to current language
+  // Highlight the button for the current language and switch the page content to that language
   highlightLanguageButton(currentLanguage);
-  switchLanguage(currentLanguage);
-  statement(currentLanguage);
+  switchLanguage(currentLanguage); // This function updates the page to reflect the chosen language
 
-  // Load the appropriate content based on the URL
+  // Load the index or specific content based on the URL, defaulting to the index if no specific path is provided
   if (pathParts.length > 1) {
     if (pathParts[1] === 'about') {
-      loadAbout();
-    } else if (pathParts[1] === 'exhibitions') {
-      loadExhibitions();
+      loadAbout(); // Load 'About' content if specified in the URL
     } else {
-      loadWorks(pathParts[1]);
+      loadWorks(pathParts[1]); // Load specific work details based on the slug in the URL
     }
+  } else {
+    // If no specific content is requested, load the index content
+    /*loadIndex("motionstudy"); // Adjust this call to pass the correct exclusion parameter if necessary*/
   }
 
-  // Update hreflang tags based on the current language and slug
+  // Update the page's hreflang tags based on the current language, for SEO purposes
   updateHrefLangTags(pathParts.length > 1 ? pathParts[1] : '');
 
-  // Event listener for scroll events to handle image visibility and blur effects
-  let blurApplied = false;
-  window.addEventListener('scroll', () => {
-    let images = document.querySelectorAll('#content-inner-right img');
-    let allTitleDivs = document.querySelectorAll('#content-inner-left .work-image-title');
-    let contentInnerLeft = document.querySelector('#content-inner-left');
-    
-    // Initially hide all title divs
-    allTitleDivs.forEach(div => div.style.display = 'none');
-    let currentVisibleImageIndex = -1;
-    
-    // Determine the visible image index based on the viewport position
-    images.forEach((img, index) => {
-      let rect = img.getBoundingClientRect();
-      if (rect.bottom > 0 && rect.top < window.innerHeight / 2) {
-        currentVisibleImageIndex = index;
-      }
-    });
-
-    // Handle the visibility of titles and blur effect based on scroll position
-    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-      allTitleDivs.forEach(div => div.style.display = 'none');
-    } else if (currentVisibleImageIndex !== -1) {
-      allTitleDivs[currentVisibleImageIndex].style.display = 'flex';
-      /*if (!blurApplied) {
-       applyBlurAndGray(contentInnerLeft, 0, 0, 0, 100, 500);
-        blurApplied = true;
-      }
-    } else {
-        if (blurApplied) {
-          applyBlurAndGray(contentInnerLeft, 0, 0, 100, 0, 500);
-          blurApplied = false;
-        }*/
-      }
-  });
+  // Additional event listener for handling scroll events, for dynamically showing image titles based on scroll position
+  window.addEventListener('scroll', handleScrollEvent);
 });
+
+// Function to handle scroll events, used for dynamically adjusting visibility of image titles based on viewport position
+function handleScrollEvent() {
+  let images = document.querySelectorAll('#content-inner-right img');
+  let allTitleDivs = document.querySelectorAll('#content-inner-left .work-image-title');
+  
+  // Initially hide all title divs
+  allTitleDivs.forEach(div => div.style.display = 'none');
+  let currentVisibleImageIndex = -1;
+  
+  // Determine the currently visible image based on its viewport position
+  images.forEach((img, index) => {
+    let rect = img.getBoundingClientRect();
+    // Special handling for the first image or subsequent images based on their position in the viewport
+    if (rect.bottom > 0 && (index === 0 || rect.top < window.innerHeight / 2)) {
+      currentVisibleImageIndex = index;
+    }
+  });
+
+  // Display the title for the currently visible image, if any
+  if (currentVisibleImageIndex !== -1) {
+    allTitleDivs[currentVisibleImageIndex].style.display = 'flex';
+  }
+}
