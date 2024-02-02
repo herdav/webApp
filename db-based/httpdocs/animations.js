@@ -1,4 +1,4 @@
-// animations.js for davidherren.ch / 2024-01-28
+// animations.js for davidherren.ch / 2024-02-02
 
 { // Animate Words
   let isAnimating = false;
@@ -273,17 +273,4 @@ function toggleTriangles(buttonId) {
     });
     currentOpenDropdownId = buttonId;
   }
-}
-
-{ // Adjust height of index items
-  function adjustHeight() {
-    var items = document.querySelectorAll('.index-item');
-    items.forEach(function(item) {
-      var width = item.offsetWidth;
-      var height = width * 0.75;
-      item.style.height = height + 'px';
-    });
-  }
-  window.onload = adjustHeight;
-  window.onresize = adjustHeight;
 }
