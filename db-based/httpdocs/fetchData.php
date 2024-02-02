@@ -1,4 +1,4 @@
-<?php // fetchData.php for davidherren.ch / 2024-01-28
+<?php // fetchData.php for davidherren.ch / 2024-02-02
 class fetchData {
   private $conn;
 
@@ -116,40 +116,15 @@ class fetchData {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public function fetchIndexItems($excludedSlugs = []) {
-    // Start building the SQL query
-    $sql = "SELECT slug, title, year, description_de, description_en, nr FROM works";
-    
-    // Check if there are slugs to exclude and modify the SQL query accordingly
-    if (!empty($excludedSlugs)) {
-      $placeholders = implode(', ', array_fill(0, count($excludedSlugs), '?'));
-      $sql .= " WHERE slug NOT IN ($placeholders)";
-    }
-  
-    // Add sorting to the SQL query in descending order
-    $sql .= " ORDER BY nr DESC"; // Changed to DESC for descending order
-  
-    // Prepare the SQL statement
+  public function fetchIndexItems($lang) {
+    $sql = "SELECT slug, title, year, description_de, description_en, nr, landingpage FROM works WHERE landingpage = 1";
+    $sql .= " ORDER BY nr DESC";
     $stmt = $this->conn->prepare($sql);
-  
-    // Bind the values if there are slugs to exclude
-    if (!empty($excludedSlugs)) {
-      $i = 1;
-      foreach ($excludedSlugs as $slug) {
-        $stmt->bindValue($i, $slug);
-        $i++;
-      }
-    }
-  
-    // Execute the statement
     $stmt->execute();
-  
-    // Fetch the results as an associative array
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-  
     return $results;
   }
-  
+
   public function fetchAbout($lang) {
     $sql = "SELECT section, section_de, date, time, title, text_$lang, text_de FROM about ORDER BY section, date DESC";
     $stmt = $this->conn->prepare($sql);
