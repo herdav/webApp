@@ -1,4 +1,4 @@
-<?php // data.php for davidherren.ch / 2024-01-27
+<?php // data.php for davidherren.ch / 2024-02-02
 
 include './php/db.php';
 include './php/fetchData.php';
@@ -7,6 +7,34 @@ include './php/utilities.php';
 $db = new Database();
 $conn = $db->getConnection();
 $database = new fetchData($conn);
+
+if (isset($_GET['index']) && isset($_GET['lang'])) {
+  $lang = sanitizeInput($_GET['lang']);
+  $lang = validateLanguage($lang);
+  $indexResult = $database->fetchIndexItems($lang);
+  $htmlOutput = '';
+  if (count($indexResult) > 0) {
+    foreach ($indexResult as $row) {
+      $title = $row["title"];
+      $slug = $row["slug"];
+      $year = $row["year"];
+      $description = $lang === 'de' ? $row["description_de"] : $row["description_en"];
+      $htmlOutput .= "<a class='index-item' onclick=\"loadWorks('" . htmlspecialchars($slug) . "')\">";
+      $htmlOutput .= "<div class='index-item-inner'>";
+      $htmlOutput .= "<div class='index-item-inner-frame'></div>";
+      $htmlOutput .= "<div class='index-item-inner-text'>";
+      $htmlOutput .= "<h2>" . htmlspecialchars($title) . "</h2>";
+      $htmlOutput .= "<p>" . htmlspecialchars($description) . "</p>";
+      $htmlOutput .= "</div>";
+      $htmlOutput .= "<img src='/img/prev/" . htmlspecialchars($slug) . "-prev.jpg' alt='" . htmlspecialchars($title) . " - " . htmlspecialchars($year) . " © David Herren'>";
+      $htmlOutput .= "</div></a>";
+    }
+  } else {
+    $htmlOutput = "No works found!";
+  }
+  echo json_encode(['html' => $htmlOutput]);
+  exit;
+}
 
 if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
   $lang = sanitizeInput($_GET['lang']);
