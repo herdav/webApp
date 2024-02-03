@@ -1,4 +1,4 @@
-// data.js for davidherren.ch / 2024-02-02
+// data.js for davidherren.ch / 2024-02-03
 
 // Initialization of global variables
 let currentLanguage = ''; // Sets the default language
@@ -33,14 +33,92 @@ function switchLanguage(lang) {
 
   // Loads the appropriate content based on the currentSlug
   if (currentSlug === 'about') {
-    loadAbout();
+    loadAbout(false);
   } else if (currentSlug) {
-    loadWorks(currentSlug);
+    loadWorks(currentSlug, 0);
   } else {
     statement(currentLanguage);
-    loadIndex();
+    loadIndex(false);
   }
 }
+
+// Function to load content for a specific work
+function loadWorks(slug, popstate) {
+  isLoadingWork = true; // Sets the loading flag
+  currentSlug = slug; // Updates the currentSlug
+  // Constructs the URL for the request
+  let url = "/data.php?slug=" + encodeURIComponent(slug) + "&lang=" + currentLanguage + "&works=1";
+  sendRequest(url, (response) => {
+    document.getElementById("index-inner").innerHTML = ''; // Clears existing content
+    document.getElementById("content").innerHTML = response.html; // Inserts new content
+    updateDocumentTitle(response.title); // Updates the document title
+    // Selects the appropriate description based on the current language
+    let description = currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn;
+    updateMetaDescription(description); // Updates the meta description
+    if (!popstate) { updateUrl(slug); }// Updates the URL, except popstate event
+    updateHrefLangTags(slug); // Updates hreflang tags for SEO
+    animateLetters('work-text-description');
+  });
+  highlightContentButton('button-' + slug); // Highlights the active content button
+}
+
+// Function to load content about
+function loadAbout(popstate) {
+  currentSlug = 'about';
+  let url = "/data.php?lang=" + encodeURIComponent(currentLanguage) + "&about=1";
+  sendRequest(url, (response) => {
+    document.getElementById("index-inner").innerHTML = '';
+    document.getElementById("content").innerHTML = response.html;
+    updateDocumentTitle('About');
+    // Selects the appropriate description based on the current language
+    let description = currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn;
+    updateMetaDescription(description); // Updates the meta description
+    if (!popstate) { updateUrl('about'); } // Updates the url, except popstate event
+    updateHrefLangTags('about'); // Updates hreflang tags for SEO
+  }, (error) => {
+    console.error('Error with the request:', error);
+  });
+  highlightContentButton('button-about');
+}
+
+// Function to load content index
+function loadIndex(popstate) {
+  currentSlug = '';
+  let url = "/data.php?lang=" + encodeURIComponent(currentLanguage) + "&index=1";
+  sendRequest(url, (response) => {
+    document.getElementById("index-inner").innerHTML = response.html;
+    document.getElementById("content").innerHTML = '';
+    updateDocumentTitle('David Herren');
+    if (!popstate) { updateUrl('') };
+    adjustHeight();
+  }, (error) => {
+    console.error('Error with the request:', error);
+  });
+}
+
+// Function to update the URL in the browser's history
+function updateUrl(slug) {
+  let newUrl = '/' + currentLanguage + '/' + slug; // Constructs the new URL
+  window.history.pushState({path: newUrl}, '', newUrl); // Pushes the new URL to the browser's history
+}
+
+
+window.addEventListener('popstate', function(event) {
+  if (event.state && event.state.path) {
+    const pathParts = event.state.path.split('/').filter(Boolean);
+    const slug = pathParts[1];
+    if (pathParts.length === 2 ) {
+      popstate = true;
+      if (slug === 'about') {
+        loadAbout(true);
+      } else {
+        loadWorks(slug, true);
+      }
+    } else {
+      loadIndex(true);
+  }
+}
+});
 
 // Function to highlight the active language button
 function highlightLanguageButton(lang) {
@@ -61,6 +139,7 @@ function highlightContentButton(buttonId) {
   }
 }
 
+// Naviagtion button observer
 document.addEventListener("DOMContentLoaded", function() {
   var observer = new IntersectionObserver(function(entries) {
     entries.forEach(entry => {
@@ -76,68 +155,16 @@ document.addEventListener("DOMContentLoaded", function() {
   buttons.forEach(button => observer.observe(button));
 });
 
-// Function to load content for a specific work
-function loadWorks(slug) {
-  isLoadingWork = true; // Sets the loading flag
-  currentSlug = slug; // Updates the currentSlug
-  // Constructs the URL for the request
-  let url = "/data.php?slug=" + encodeURIComponent(slug) + "&lang=" + currentLanguage + "&works=1";
-  sendRequest(url, (response) => {
-    document.getElementById("index").innerHTML = ''; // Clears existing content
-    document.getElementById("content").innerHTML = response.html; // Inserts new content
-    updateDocumentTitle(response.title); // Updates the document title
-    // Selects the appropriate description based on the current language
-    let description = currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn;
-    updateMetaDescription(description); // Updates the meta description
-    updateUrl(slug); // Updates the URL
-    updateHrefLangTags(slug); // Updates hreflang tags for SEO
-    animateLetters('work-text-description');
-  });
-  highlightContentButton('button-' + slug); // Highlights the active content button
-}
-
-// Function to load content about
-function loadAbout() {
-  currentSlug = 'about';
-  let url = "/data.php?lang=" + encodeURIComponent(currentLanguage) + "&about=1";
-  sendRequest(url, (response) => {
-    document.getElementById("index").innerHTML = '';
-    document.getElementById("content").innerHTML = response.html;
-    updateDocumentTitle('About');
-    // Selects the appropriate description based on the current language
-    let description = currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn;
-    updateMetaDescription(description); // Updates the meta description
-    updateUrl('about');
-    updateHrefLangTags('about'); // Updates hreflang tags for SEO
-  }, (error) => {
-    console.error('Error with the request:', error);
-  });
-  highlightContentButton('button-about');
-}
-
-// Function to load content index
-function loadIndex() {
-  currentSlug = '';
-  let url = "/data.php?lang=" + encodeURIComponent(currentLanguage) + "&index=1";
-  sendRequest(url, (response) => {
-    document.getElementById("index-inner").innerHTML = response.html;
-    document.getElementById("content").innerHTML = '';
-    updateDocumentTitle('David Herren');
-    updateUrl('');
-    adjustHeight();
-  }, (error) => {
-    console.error('Error with the request:', error);
-  });
-}
-
-// Adjust height of index items
-function adjustHeight() {
-  var items = document.querySelectorAll('.index-item');
-  items.forEach(function(item) {
-    var width = item.offsetWidth;
-    var height = width * 0.75;
-    item.style.height = height + 'px';
-  });
+{ // Adjust height of index items
+  function adjustHeight() {
+    var items = document.querySelectorAll('.index-item');
+    items.forEach(function(item) {
+      var width = item.offsetWidth;
+      var height = width * 0.75;
+      item.style.height = height + 'px';
+    });
+  }
+  window.onresize = adjustHeight;
 }
 
 { // Function to update the meta description tag of the document
@@ -167,12 +194,6 @@ function adjustHeight() {
 // Function to update the document title
 function updateDocumentTitle(title) {
   document.title = title; // Sets the document's title
-}
-
-// Function to update the URL in the browser's history
-function updateUrl(slug) {
-  let newUrl = '/' + currentLanguage + '/' + slug; // Constructs the new URL
-  window.history.pushState({path: newUrl}, '', newUrl); // Pushes the new URL to the browser's history
 }
 
 // Function to update hreflang tags for SEO and accessibility
@@ -213,9 +234,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Load the index or specific content based on the URL, defaulting to the index if no specific path is provided
   if (pathParts.length > 1) {
     if (pathParts[1] === 'about') {
-      loadAbout(); // Load 'About' content if specified in the URL
+      loadAbout(false); // Load 'About' content if specified in the URL
     } else {
-      loadWorks(pathParts[1]); // Load specific work details based on the slug in the URL
+      loadWorks(pathParts[1], 0); // Load specific work details based on the slug in the URL
     }
   } else {
     // If no specific content is requested, load the index content
