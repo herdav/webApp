@@ -1,4 +1,4 @@
-// animations.js for davidherren.ch / 2024-02-02
+// animations.js for davidherren.ch / 2024-02-03
 
 { // Animate Words
   let isAnimating = false;
@@ -44,6 +44,7 @@ function imgOnMousePointer() {
 
 function applySvgTransformations(expand) {
   var translationValues = [62, 54, 46, 38, 30, 22];
+
   function manageClass(element, className, add) {
     if (element) {
       if (add) {
@@ -54,10 +55,22 @@ function applySvgTransformations(expand) {
     }
   }
 
-  translationValues.forEach(function (value, index) {
+  // Generate a random transition duration for each element separately
+  translationValues.forEach(function(value, index) {
+    // Adjusting to generate a random duration for each svg-arrow element
+    for (var elementIndex = 1; elementIndex <= 12; elementIndex++) {
+      var element = document.getElementById("svg-arrow-" + elementIndex);
+      var randomDuration = (Math.random() * 1.0 + 0.5).toFixed(2) + 's';
+
+      if (element) {
+        element.style.transition = 'transform ' + randomDuration + ' ease-in-out';
+      }
+    }
+
+    var className = "translate-" + value;
     var element1 = document.getElementById("svg-arrow-" + (index + 1));
     var element2 = document.getElementById("svg-arrow-" + (index + 7));
-    var className = "translate-" + value;
+
     if (expand) {
       manageClass(element1, className, true);
       manageClass(element2, className, true);
@@ -70,22 +83,6 @@ function applySvgTransformations(expand) {
       manageClass(element2, "translate-00", true);
     }
   });
-}
-
-// Function to apply blur and/or gray to an element
-function applyBlurAndGray(element, startBlur, endBlur, startGray, endGray, duration) {
-  let startTimestamp = null;
-  const step = (timestamp) => {
-    if (!startTimestamp) startTimestamp = timestamp;
-    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-    const blurValue = progress * (endBlur - startBlur) + startBlur;
-    const grayValue = progress * (endGray - startGray) + startGray;
-    element.style.filter = `blur(${blurValue}px) grayscale(${grayValue}%)`;
-    if (progress < 1) {
-      window.requestAnimationFrame(step);
-    }
-  };
-  window.requestAnimationFrame(step);
 }
 
 { // MutationObserver to observe DOM changes and adjust the layout accordingly
@@ -160,6 +157,7 @@ function applyBlurAndGray(element, startBlur, endBlur, startGray, endGray, durat
         }
         // Check if scrolled to the bottom of the page
         if (scrolledToBottom) {
+          svgArrow.style.transition = 'transform 0.5s ease-in-out';
           // Rotate arrow upwards to indicate scroll to top (-90deg)
           if (isLeftExpanded) {
             svgArrow.style.transform = 'rotate(90deg)';
@@ -254,12 +252,9 @@ function resetTriangles() {
 function toggleTriangles(buttonId) {
   var dropdownSvg = document.querySelector(`#${buttonId} svg`);
   var triangles = dropdownSvg.querySelectorAll('rect');
-
-  // Prüfen, ob der Button bereits aktiv ist (d.h. ob er der aktuell geöffnete ist)
   var isButtonAlreadyOpen = currentOpenDropdownId === buttonId;
 
   if (isButtonAlreadyOpen) {
-    // Entfernen Sie alle translate-Klassen, wenn der Button bereits geöffnet ist
     triangles.forEach(function(triangle) {
       for (var i = 1; i <= triangles.length; i++) {
         triangle.classList.remove(`translateY-0${i}`);
@@ -267,7 +262,6 @@ function toggleTriangles(buttonId) {
     });
     currentOpenDropdownId = null;
   } else {
-    // Toggeln Sie die translate-Klassen, wenn der Button zum ersten Mal geklickt wird
     triangles.forEach(function(triangle, index) {
       triangle.classList.toggle(`translateY-0${index + 1}`, true);
     });
