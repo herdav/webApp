@@ -1,4 +1,4 @@
-/* style.css for davidherren.ch / 2024-01-28 */
+/* style.css for davidherren.ch / 2024-02-04 */
 
 @font-face {
   font-family: 'Roboto';
@@ -101,7 +101,6 @@ a {
   text-decoration-thickness: 4px;
   line-height: 100%;
   color: var(--markColorA);
-  transition: color 0.2s ease-in-out;
 }
 
 a:hover {
@@ -153,12 +152,9 @@ button {
 }
 
 mark {
-  /*border: 4px var(--markColorA);
-  border-style: solid;*/
   background-color: var(--bgColor);
   color: var(--markColorA);
   font-weight: 500;
-  /*padding: 0px 32px 0px 32px;*/
 }
 
 .intext-link {
@@ -334,7 +330,6 @@ mark {
   align-items: center;
   justify-content: center;
   background-color: var(--markColorA);
-  transition: background-color 0.15s ease-in-out;
   text-decoration: none;
   margin-right: -2px;
 }
@@ -460,13 +455,11 @@ mark {
 }
 
 #button-dropdown:hover #dropdown-svg, #button-dropdown:hover #dropdown-svg rect, .button-navigation-about:hover #dropdown-svg rect {
-  transition: transform 0.3s ease-in-out;
   fill: var(--fontColor);
 }
 
 #dropdown-svg rect {
   fill: var(--markColorB);
-  transition: transform 0.3s ease-in-out;
 }
 
 .translateY-01 { transform: translateY(-24px); }
@@ -538,15 +531,6 @@ mark {
   margin-bottom: 2rem;
 }
 
-/*
-#work-text-description {
-  color: var(--markColorA);
-  margin-bottom: 2rem;
-  font-family: 'RTAliasRough', sans-serif;
-  letter-spacing: 0.1rem;
-  font-size: 1rem !important;
-}*/
-
 #work-infos {
   margin-top: var(--spacing);
   margin-bottom: var(--spacing);
@@ -576,7 +560,6 @@ mark {
 
 .svg-arrow rect {
   fill: var(--markColorA);
-  transition: transform 1.2s ease-in-out, fill 0.15s ease-in;
 }
 
 .svg-arrow:hover rect {
@@ -590,10 +573,6 @@ mark {
 .translate-38 { transform: translateX(38px); }
 .translate-30 { transform: translateX(30px); }
 .translate-22 { transform: translateX(22px); }
-
-.svg-arrow {
-  transition: transform 0.5s ease-in-out;
-}
 
 .svg-arrow.no-transition {
   transition: none;
@@ -666,27 +645,9 @@ mark {
   text-decoration: none;
 }
 
-#github-link {
-  margin-top: 2rem;
-    display: flex;
-    width: fit-content;
-    align-self: center;
-}
-
-#github-link svg {
-  transition: fill 0.2s ease-in-out;
-  fill: var(--markColorA);
-  transform: scale(0.5);
-}
-
-#github-link:hover svg {
-  fill: var(--markColorB);
-}
-
 .exhibition-img {
   display: flex;
   height: 0px;
-  /*ransition: height 0.5s ease;*/
   overflow: hidden;
   flex-direction: row-reverse;
   align-items: flex-start;
@@ -715,31 +676,65 @@ mark {
   margin-left: -46px;
 }
 
-@media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
-
+@media screen and (min-width: 690px) and (max-width: 1024px) and (orientation: landscape) {
   #content-inner {
     flex-wrap: wrap;
   }
-
   #content-inner-center, #embedded-model, #content-inner-left-text {
     display: none;
   }
+  #button-dropdown:hover #dropdown-svg, #button-dropdown:hover #dropdown-svg rect, .button-navigation-about:hover #dropdown-svg rect {
+    fill: var(--markColorB);
+  }
+  #button-dropdown:active #dropdown-svg rect, .button-navigation-about:active #dropdown-svg rect {
+    fill: var(--fontColor);
+  }
+
+  .button-navigation:focus, .button-navigation:hover {
+    box-shadow: inset -2px -2px #292929, inset 2px 2px #292929, inset -4px -4px rgb(158, 158, 158), inset 4px 4px #ffffff;
+  }
+  .button-navigation:active {
+    box-shadow: inset -2px -2px #292929, inset 2px 2px #292929, inset -4px -4px #ffffff, inset 4px 4px rgb(158, 158, 158);
+  }
+
+  .index-item {
+    width: calc(50% - var(--spacing));
+    overflow: hidden;
+    cursor: pointer;
+    margin: 1rem;
+}
 
 }
 
 @media screen and (max-width: 1024px) and (orientation: portrait) {
+  :root {
+    --spacing: 1rem;
+    --fontSize: 1.5rem;
+  }
+
+  #index {
+    margin-bottom: var(--spacing);
+  }
 
   #menu-title h1, #menu-title a, #menu-title a:visited {
-    font-size: 3rem;
+    font-size: var(--fontSize);
   }
 
   #content p, #content a, #content h1, #content h2 {
-    font-size: 3rem;
+    font-size: var(--fontSize);
     line-height: 150%;
   }
 
   #dropdown-svg {
-    width: 48px;
+    width: var(--fontSize);
+  }
+
+  #button-dropdown:hover #dropdown-svg, #button-dropdown:hover #dropdown-svg rect, .button-navigation-about:hover #dropdown-svg rect {
+    fill: var(--markColorB);
+  }
+
+  #button-dropdown:active #dropdown-svg rect, .button-navigation-about:active #dropdown-svg rect {
+    fill: var(--fontColor);
   }
 
   .link {
@@ -750,12 +745,7 @@ mark {
     height: auto;
     box-shadow: none;
     background-color: unset;
-    /*
-    border: 4px solid var(--fontColor);
-    box-shadow: 0 0 0 6px hsl(0deg 0% 75%),
-                0 0 0 10px var(--fontColor);
-    */
-    /*margin-bottom: calc(1*var(--spacing));*/
+    margin-bottom: var(--spacing);
   }
 
   .frame {
@@ -763,12 +753,13 @@ mark {
   }
 
   #menu-title {
-    height: 80px;
-    margin-bottom: 32px;
+    height: calc(var(--fontSize) * 2);
+    margin-bottom: var(--spacing);
   }
 
   #menu-title-left {
     box-shadow: none;
+    width: auto;
   }
 
   #menu-title-center {
@@ -798,10 +789,12 @@ mark {
 
   .index-item {
    width: 100%;
+   margin-bottom: 0;
   }
 
   #about, #content-inner {
     display: block;
+    margin-top: 0;
   }
 
   #about-left, #about-right {
@@ -819,8 +812,8 @@ mark {
   #button-dropdown {
     display: flex;
     visibility: visible;
-    width: 82px;
-    height: 80px;
+    width: calc(var(--fontSize) * 2);
+    height: calc(var(--fontSize) * 2);
     justify-content: center;
     align-items: center;
     margin-top: 0px;
@@ -833,20 +826,21 @@ mark {
 
   #language-switch {
     margin-top: 2px;
-    height: 80px;
+    height: calc(var(--fontSize) * 2);
   }
   
   #button-de {
     margin-right: -4px;
   }
 
-  .button-navigation {
-    box-shadow: inset -4px -4px #292929, inset 4px 4px #292929, inset -8px -8px rgb(158, 158, 158), inset 8px 8px #ffffff;
-    font-size: 48px;
+  .button-navigation, .button-navigation:focus, .button-navigation:hover {
+    box-shadow: inset -3px -3px #292929, inset 3px 3px #292929, inset -6px -6px rgb(158, 158, 158), inset 6px 6px #ffffff;
+    font-size: var(--fontSize);
     letter-spacing: 3px;
+    padding: 12px 16px;
   }
 
-  .button-navigation.button-highlighted, .button-navigation:hover {
-    box-shadow: inset -4px -4px #292929, inset 4px 4px #292929, inset -8px -8px #ffffff, inset 8px 8px rgb(158, 158, 158);
+  .button-navigation.button-highlighted, .button-navigation:active {
+    box-shadow: inset -3px -3px #292929, inset 3px 3px #292929, inset -6px -6px #ffffff, inset 6px 6px rgb(158, 158, 158);
   }
 }
