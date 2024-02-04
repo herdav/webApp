@@ -1,4 +1,4 @@
-// animations.js for davidherren.ch / 2024-02-03
+// animations.js for davidherren.ch / 2024-02-04
 
 { // Animate Words
   let isAnimating = false;
@@ -25,21 +25,6 @@
       isAnimating = false;
     }, 100 * words.length); // Adjust the timeout as needed
   }
-}
-
-function imgOnMousePointer() {
-  var div = document.createElement('div');
-
-  div.style.width = '50px';
-  div.style.height = '50px';
-  div.style.backgroundColor = 'red';
-  div.style.position = 'absolute';
-
-  document.body.appendChild(div);
-  document.addEventListener('mousemove', function(e) {
-    div.style.left = e.clientX + 'px';
-    div.style.top = e.clientY + 'px';
-  });
 }
 
 function applySvgTransformations(expand) {
@@ -178,11 +163,17 @@ function applySvgTransformations(expand) {
   observer.observe(document, { childList: true, subtree: true });
 }
 
+window.addEventListener('resize', function() {
+  dropDownMenu();
+});
+
 { // Controls the dropdown menu
   var currentOpenDropdownId = null;
   var currentOpenImgDivId = null;
   function dropDownMenu() {
-    var mediaQueryMobile = window.matchMedia("(max-width: 1024px)");
+    var mediaQueryMobile  = window.matchMedia("(max-width: 689px)");
+    var mediaQueryTablet = window.matchMedia("(min-width: 690px) and (max-width: 1024px)");
+    var mediaQueryDisplay = window.matchMedia("(min-width: 1025px)");
     var menuInner = document.getElementById('menu-inner');
     var menuTitle = document.getElementById('menu-title');
     var buttonId = "button-dropdown";
@@ -191,7 +182,12 @@ function applySvgTransformations(expand) {
 
     if (mediaQueryMobile.matches) {
       menuInner.style.height = isExpanded ? '0px' : 'auto';
-    } else {
+      menuTitle.style.height = 'calc(var(--fontSize) * 2)';
+    } else if (mediaQueryTablet.matches) {
+      menuInner.style.height = isExpanded ? '0px' : 'auto';
+      menuInner.style.margin = isExpanded ? '0rem' : '2rem';
+      menuTitle.style.height = isExpanded ? 'calc(2rem - 2px)' : '2rem';
+    } else if (mediaQueryDisplay.matches) {
       menuInner.style.height = isExpanded ? '0px' : 'auto';
       menu.style.width = isExpanded ? 'calc(33% - 2rem)' : 'auto';
       menuInner.style.margin = isExpanded ? '0rem' : '2rem';
