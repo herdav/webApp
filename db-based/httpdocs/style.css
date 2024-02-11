@@ -1,4 +1,4 @@
-/* style.css for davidherren.ch / 2024-02-04 */
+/* style.css for davidherren.ch / 2024-02-11*/
 
 @font-face {
   font-family: 'Roboto';
@@ -53,16 +53,13 @@
 :root {
   --spacing: 2rem;
 
-  --NeonMint:     rgb(128, 255, 204);
-
-  --markColorA:   #80ffcc;
-  --markColorB:   hsl(0, 0%, 20%);
-  --bgColor:      hsl(0, 0%, 50%);
-  --fontColor:    hsl(0, 0%, 100%);
-
-  --darkGray:     hsl(0, 0%, 26%);
-
-  --menuBackground: hsl(0, 0%, 85%);
+  --NeonMint:   rgb(128, 255, 204);
+  --markColorA: #80ffcc;
+  --markColorB: hsl(0, 0%, 20%);
+  --bgColor:    hsl(0, 0%, 50%);
+  --fontColor:  hsl(0, 0%, 100%);
+  --darkGray:   hsl(0, 0%, 26%);
+  --menuBg:     hsl(0, 0%, 85%);
 }
 
 ::selection {
@@ -285,7 +282,7 @@ mark {
 
 #menu {
   margin-bottom: calc(2*var(--spacing));
-  background-color: var(--menuBackground);
+  background-color: var(--menuBg);
   color: var(--darkGray);
   overflow: hidden;
   width: 100%;
@@ -356,11 +353,13 @@ mark {
 
 #menu-inner {
   overflow: hidden;
+  visibility: visible;
   height: auto;
   margin: 2rem;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+
 }
 
 #menu-works, #menu-about {
@@ -397,7 +396,7 @@ mark {
   width: 50%;
 }
 
-.button-navigation, .button-navigation-about {
+.button-navigation, .button-navigation, .button-navigation-about {
   font-family: 'RTAliasRough', sans-serif;
   border: none;
   background: hsl(0deg 0% 75%);
@@ -406,6 +405,14 @@ mark {
   letter-spacing: 0.1rem;
   padding: 0.5rem 1rem;
   text-wrap: nowrap;
+}
+
+.button-navigation.button-highlighted, .button-navigation-about.button-highlighted, .button-navigation:hover, .button-navigation-about:hover {
+  box-shadow: inset -2px -2px #292929, inset 2px 2px #292929, inset -4px -4px #ffffff, inset 4px 4px rgb(158, 158, 158);
+}
+
+#button-dropdown:hover #dropdown-svg, #button-dropdown:hover #dropdown-svg rect, .button-navigation-about:hover #dropdown-svg rect {
+  fill: var(--fontColor);
 }
 
 .button-navigation-about {
@@ -430,14 +437,9 @@ mark {
   margin-right: -2px;
 }
 
-.button-navigation.button-highlighted, .button-navigation:hover, .button-navigation-about.button-highlighted, .button-navigation-about:hover{
-  box-shadow: inset -2px -2px #292929, inset 2px 2px #292929, inset -4px -4px #ffffff, inset 4px 4px rgb(158, 158, 158);
-}
-
 .button-navigation.visible {
   opacity: 1;
   visibility: visible;
-  transition-delay: 0.1s;
 }
 
 #button-dropdown {
@@ -452,10 +454,6 @@ mark {
 
 #dropdown-svg {
   width: 16px;
-}
-
-#button-dropdown:hover #dropdown-svg, #button-dropdown:hover #dropdown-svg rect, .button-navigation-about:hover #dropdown-svg rect {
-  fill: var(--fontColor);
 }
 
 #dropdown-svg rect {
@@ -551,7 +549,7 @@ mark {
   min-height: calc(100vh - 2*var(--spacing));
   height: calc(35vw - 2*var(--spacing));
   background-color: var(--bgColor);
-  margin-top: 2rem;
+  margin-top: calc(2*var(--spacing));
 }
 
 .svg-arrow line, .svg-arrow path, .svg-arrow rect {
@@ -594,24 +592,13 @@ mark {
   margin-top: var(--spacing);
 }
 
+.abb-anchor {
+  height: 0;
+  margin: 0;
+}
+
 #work-video {
-  margin-top: var(--spacing);
-}
-
-.highlighter {
-  position: relative;
-}
-
-.highlighter::before {
-  background-color: var(--markColorB);
-  content: "";
-  position: absolute;
-  width: calc(100% + 0.8rem);
-  height: 80%;
-  left: -0.4rem;
-  bottom: 0;
-  z-index: -1;
-  transform: rotate(-3deg);
+  margin-top: calc(2*var(--spacing));
 }
 
 #pointer {
@@ -639,6 +626,14 @@ mark {
 
 .ftn {
   text-decoration: none;
+}
+
+#itemizations, #literature {
+  margin-top: 2rem;
+}
+
+#itemizations p, #literature p {
+  display: block;
 }
 
 #itemizations a {
@@ -676,40 +671,40 @@ mark {
   margin-left: -46px;
 }
 
-@media screen and (min-width: 690px) and (max-width: 1024px) and (orientation: landscape) {
-  #content-inner {
-    flex-wrap: wrap;
+@media screen and (max-width: 1024px) {
+  #content {
+    margin-top: calc(2*var(--spacing));
   }
-  #content-inner-center, #embedded-model, #content-inner-left-text {
-    display: none;
+
+  #content-inner-left {
+    margin-bottom: calc(2*var(--spacing));
   }
+
   #button-dropdown:hover #dropdown-svg, #button-dropdown:hover #dropdown-svg rect, .button-navigation-about:hover #dropdown-svg rect {
     fill: var(--markColorB);
   }
+
   #button-dropdown:active #dropdown-svg rect, .button-navigation-about:active #dropdown-svg rect {
     fill: var(--fontColor);
   }
 
-  .button-navigation:focus, .button-navigation:hover {
+  .button-navigation:hover {
     box-shadow: inset -2px -2px #292929, inset 2px 2px #292929, inset -4px -4px rgb(158, 158, 158), inset 4px 4px #ffffff;
   }
-  .button-navigation:active {
+
+  .button-navigation.button-highlighted, .button-navigation-about.button-highlighted, .button-navigation:active {
     box-shadow: inset -2px -2px #292929, inset 2px 2px #292929, inset -4px -4px #ffffff, inset 4px 4px rgb(158, 158, 158);
   }
 
-  .index-item {
-    width: calc(50% - var(--spacing));
-    overflow: hidden;
-    cursor: pointer;
-    margin: 1rem;
+  #content-inner-center, #embedded-model, #content-inner-left-text {
+    display: none;
+  }
 }
 
-}
-
-@media screen and (max-width: 1024px) and (orientation: portrait) {
+@media screen and (max-width: 1024px) {
   :root {
     --spacing: 1rem;
-    --fontSize: 1.5rem;
+    --fontSize: 1.2rem;
   }
 
   #index {
@@ -727,14 +722,6 @@ mark {
 
   #dropdown-svg {
     width: var(--fontSize);
-  }
-
-  #button-dropdown:hover #dropdown-svg, #button-dropdown:hover #dropdown-svg rect, .button-navigation-about:hover #dropdown-svg rect {
-    fill: var(--markColorB);
-  }
-
-  #button-dropdown:active #dropdown-svg rect, .button-navigation-about:active #dropdown-svg rect {
-    fill: var(--fontColor);
   }
 
   .link {
@@ -772,18 +759,19 @@ mark {
 
   #menu-works, #menu-about {
     display: flex;
-    gap: 16px;
+    gap: calc(var(--spacing) / 2);
     flex-wrap: wrap;
   }
 
   #menu-about {
-    margin-top: 16px;
+    margin-top: calc(var(--spacing) / 2);
+    margin-bottom: var(--spacing);
   }
 
   #menu-inner {
     display: block;
-    height: 0px;
-    transition: height 0.5s ease-in-out;
+    height: auto;
+    visibility: visible;
     margin: 0px;
   }  
 
@@ -800,15 +788,7 @@ mark {
   #about-left, #about-right {
     width: 100%;
   }
-
-  #content-inner-left {
-    margin-bottom: var(--spacing);
-  }
-
-  #content-inner-center, #embedded-model, #content-inner-left-text {
-    display: none;
-  }
-
+  
   #button-dropdown {
     display: flex;
     visibility: visible;
@@ -832,15 +812,19 @@ mark {
   #button-de {
     margin-right: -4px;
   }
+}
 
-  .button-navigation, .button-navigation:focus, .button-navigation:hover {
-    box-shadow: inset -3px -3px #292929, inset 3px 3px #292929, inset -6px -6px rgb(158, 158, 158), inset 6px 6px #ffffff;
-    font-size: var(--fontSize);
-    letter-spacing: 3px;
-    padding: 12px 16px;
+@media screen and (max-width: 1024px) and (orientation: landscape) {
+#index-inner {
+  gap: var(--spacing);
+  justify-content: center;
+}
+
+  #content-inner {
+    flex-wrap: wrap;
   }
-
-  .button-navigation.button-highlighted, .button-navigation:active {
-    box-shadow: inset -3px -3px #292929, inset 3px 3px #292929, inset -6px -6px #ffffff, inset 6px 6px rgb(158, 158, 158);
+  .index-item {
+    margin: 0;
+    width: calc(50% - 1.5 * var(--spacing));
   }
 }
