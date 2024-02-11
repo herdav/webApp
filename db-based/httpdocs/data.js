@@ -1,4 +1,4 @@
-// data.js for davidherren.ch / 2024-02-03
+// data.js for davidherren.ch / 2024-02-11
 
 // Initialization of global variables
 let currentLanguage = ''; // Sets the default language
@@ -55,7 +55,7 @@ function loadWorks(slug, popstate) {
     // Selects the appropriate description based on the current language
     let description = currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn;
     updateMetaDescription(description); // Updates the meta description
-    if (!popstate) { updateUrl(slug); }// Updates the URL, except popstate event
+    if (!popstate) { updateUrl(slug); } // Updates the URL, except popstate event
     updateHrefLangTags(slug); // Updates hreflang tags for SEO
     animateLetters('work-text-description');
   });
@@ -89,11 +89,12 @@ function loadIndex(popstate) {
     document.getElementById("index-inner").innerHTML = response.html;
     document.getElementById("content").innerHTML = '';
     updateDocumentTitle('David Herren');
-    if (!popstate) { updateUrl('') };
+    if (!popstate) { updateUrl('') };  // Updates the URL, except popstate event
     adjustHeight();
   }, (error) => {
     console.error('Error with the request:', error);
   });
+  highlightContentButton('');
 }
 
 // Function to update the URL in the browser's history
@@ -138,22 +139,6 @@ function highlightContentButton(buttonId) {
     button.classList.add('button-highlighted'); // Adds highlight to the selected button
   }
 }
-
-// Naviagtion button observer
-document.addEventListener("DOMContentLoaded", function() {
-  var observer = new IntersectionObserver(function(entries) {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && entry.intersectionRatio === 1) {
-        entry.target.classList.add('visible');
-      } else {
-        entry.target.classList.remove('visible');
-      }
-    });
-  }, { threshold: [0, 1.0] });
-
-  var buttons = document.querySelectorAll('.button-navigation');
-  buttons.forEach(button => observer.observe(button));
-});
 
 { // Adjust height of index items
   function adjustHeight() {
