@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<!--index.php for davidherren.ch / 2024-02-02-->
+<!--index.php for davidherren.ch / 2024-02-11-->
 <html lang="de">
   <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>David Herren</title>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <script src="/js/data.js" defer></script>
@@ -20,7 +21,7 @@
           <button id="button-dropdown" class="button-navigation" onclick="dropDownMenu()">
           <svg id="dropdown-svg" width="64px" height="32px" viewBox="0 0 64 32" xmlns="http://www.w3.org/2000/svg">
             <rect x="4"  y="24" id="svg-triangle-1" width="56" height="4"/>
-            <rect x="8"  y="20" id="svg-triangle-2"width="48"  height="4"/>
+            <rect x="8"  y="20" id="svg-triangle-2" width="48" height="4"/>
             <rect x="12" y="16" id="svg-triangle-3" width="40" height="4"/>
             <rect x="16" y="12" id="svg-triangle-4" width="32" height="4"/>
             <rect x="20" y="8"  id="svg-triangle-5" width="24" height="4"/>
