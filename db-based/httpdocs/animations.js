@@ -1,4 +1,4 @@
-// animations.js for davidherren.ch / 2024-02-04
+// animations.js for davidherren.ch / 2024-02-11
 
 { // Animate Words
   let isAnimating = false;
@@ -171,9 +171,7 @@ window.addEventListener('resize', function() {
   var currentOpenDropdownId = null;
   var currentOpenImgDivId = null;
   function dropDownMenu() {
-    var mediaQueryMobile  = window.matchMedia("(max-width: 689px)");
-    var mediaQueryTablet = window.matchMedia("(min-width: 690px) and (max-width: 1024px)");
-    var mediaQueryDisplay = window.matchMedia("(min-width: 1025px)");
+    var mediaQueryMobile  = window.matchMedia("(max-width: 1024px)");
     var menuInner = document.getElementById('menu-inner');
     var menuTitle = document.getElementById('menu-title');
     var buttonId = "button-dropdown";
@@ -182,13 +180,11 @@ window.addEventListener('resize', function() {
 
     if (mediaQueryMobile.matches) {
       menuInner.style.height = isExpanded ? '0px' : 'auto';
+      menuInner.style.visibility = isExpanded ? 'collapse' : 'visible';
       menuTitle.style.height = 'calc(var(--fontSize) * 2)';
-    } else if (mediaQueryTablet.matches) {
+    } else {
       menuInner.style.height = isExpanded ? '0px' : 'auto';
-      menuInner.style.margin = isExpanded ? '0rem' : '2rem';
-      menuTitle.style.height = isExpanded ? 'calc(2rem - 2px)' : '2rem';
-    } else if (mediaQueryDisplay.matches) {
-      menuInner.style.height = isExpanded ? '0px' : 'auto';
+      menuInner.style.visibility = isExpanded ? 'collapse' : 'visible';
       menu.style.width = isExpanded ? 'calc(33% - 2rem)' : 'auto';
       menuInner.style.margin = isExpanded ? '0rem' : '2rem';
       menuTitle.style.height = isExpanded ? 'calc(2rem - 2px)' : '2rem';
