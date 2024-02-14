@@ -1,4 +1,4 @@
-// animations.js for davidherren.ch / 2024-02-11
+// animations.js for davidherren.ch / 2024-02-14
 
 { // Animate Words
   let isAnimating = false;
@@ -163,10 +163,6 @@ function applySvgTransformations(expand) {
   observer.observe(document, { childList: true, subtree: true });
 }
 
-window.addEventListener('resize', function() {
-  dropDownMenu();
-});
-
 { // Controls the dropdown menu
   var currentOpenDropdownId = null;
   var currentOpenImgDivId = null;
@@ -178,17 +174,17 @@ window.addEventListener('resize', function() {
     var computedStyle = window.getComputedStyle(menuInner);
     var isExpanded = computedStyle.height !== '0px';
 
+    menuInner.style.height = isExpanded ? '0px' : 'auto';
+    menuInner.style.visibility = isExpanded ? 'collapse' : 'visible';
+    menuInner.style.margin = isExpanded ? '0rem' : '2rem';
+    menuTitle.style.height = isExpanded ? 'calc(2rem - 2px)' : '2rem';
+
     if (mediaQueryMobile.matches) {
-      menuInner.style.height = isExpanded ? '0px' : 'auto';
-      menuInner.style.visibility = isExpanded ? 'collapse' : 'visible';
-      menuTitle.style.height = 'calc(var(--fontSize) * 2)';
+      menu.style.width = isExpanded ? 'auto' : 'auto';
     } else {
-      menuInner.style.height = isExpanded ? '0px' : 'auto';
-      menuInner.style.visibility = isExpanded ? 'collapse' : 'visible';
       menu.style.width = isExpanded ? 'calc(33% - 2rem)' : 'auto';
-      menuInner.style.margin = isExpanded ? '0rem' : '2rem';
-      menuTitle.style.height = isExpanded ? 'calc(2rem - 2px)' : '2rem';
     }
+    
     toggleTriangles(buttonId, !isExpanded);
     isExpanded = !isExpanded;
   }
