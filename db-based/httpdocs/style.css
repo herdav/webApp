@@ -1,4 +1,4 @@
-/* style.css for davidherren.ch / 2024-02-11*/
+/* style.css for davidherren.ch / 2024-02-14*/
 
 @font-face {
   font-family: 'Roboto';
@@ -285,7 +285,7 @@ mark {
   background-color: var(--menuBg);
   color: var(--darkGray);
   overflow: hidden;
-  width: 100%;
+  width: auto;
 }
 
 #menu-title {
@@ -396,7 +396,7 @@ mark {
   width: 50%;
 }
 
-.button-navigation, .button-navigation, .button-navigation-about {
+.button-navigation {
   font-family: 'RTAliasRough', sans-serif;
   border: none;
   background: hsl(0deg 0% 75%);
@@ -407,15 +407,11 @@ mark {
   text-wrap: nowrap;
 }
 
-.button-navigation.button-highlighted, .button-navigation-about.button-highlighted, .button-navigation:hover, .button-navigation-about:hover {
+.button-navigation.button-highlighted, .button-navigation:active {
   box-shadow: inset -2px -2px #292929, inset 2px 2px #292929, inset -4px -4px #ffffff, inset 4px 4px rgb(158, 158, 158);
 }
 
-#button-dropdown:hover #dropdown-svg, #button-dropdown:hover #dropdown-svg rect, .button-navigation-about:hover #dropdown-svg rect {
-  fill: var(--fontColor);
-}
-
-.button-navigation-about {
+.button-navigation.exhibition {
   width: 34px;
   height: 34px;
   display: flex;
@@ -423,8 +419,12 @@ mark {
   align-items: center;
 }
 
-.button-navigation-about svg {
-  transform: rotate(180deg);
+.button-navigation:hover:not(.button-highlighted) {
+  color: var(--fontColor);
+}
+
+#button-dropdown:hover #dropdown-svg, #button-dropdown:hover #dropdown-svg rect, #dropdown-svg rect {
+  fill: var(--fontColor);
 }
 
 #button-de, #button-en {
@@ -680,22 +680,6 @@ mark {
     margin-bottom: calc(2*var(--spacing));
   }
 
-  #button-dropdown:hover #dropdown-svg, #button-dropdown:hover #dropdown-svg rect, .button-navigation-about:hover #dropdown-svg rect {
-    fill: var(--markColorB);
-  }
-
-  #button-dropdown:active #dropdown-svg rect, .button-navigation-about:active #dropdown-svg rect {
-    fill: var(--fontColor);
-  }
-
-  .button-navigation:hover {
-    box-shadow: inset -2px -2px #292929, inset 2px 2px #292929, inset -4px -4px rgb(158, 158, 158), inset 4px 4px #ffffff;
-  }
-
-  .button-navigation.button-highlighted, .button-navigation-about.button-highlighted, .button-navigation:active {
-    box-shadow: inset -2px -2px #292929, inset 2px 2px #292929, inset -4px -4px #ffffff, inset 4px 4px rgb(158, 158, 158);
-  }
-
   #content-inner-center, #embedded-model, #content-inner-left-text {
     display: none;
   }
@@ -719,98 +703,23 @@ mark {
     font-size: var(--fontSize);
     line-height: 150%;
   }
-
-  #dropdown-svg {
-    width: var(--fontSize);
-  }
-
-  .link {
-    word-wrap: break-word;
-  }
-
-  #menu {
-    height: auto;
-    box-shadow: none;
-    background-color: unset;
-    margin-bottom: var(--spacing);
-  }
-
-  .frame {
-    border: none;
-  }
-
-  #menu-title {
-    height: calc(var(--fontSize) * 2);
-    margin-bottom: var(--spacing);
-  }
-
-  #menu-title-left {
-    box-shadow: none;
-    width: auto;
-  }
-
-  #menu-title-center {
-    margin-right: -4px;
-  }
-
-  #menu-title-right {
-    left: -2px;
-  }
-
-  #menu-works, #menu-about {
-    display: flex;
-    gap: calc(var(--spacing) / 2);
-    flex-wrap: wrap;
-  }
-
-  #menu-about {
-    margin-top: calc(var(--spacing) / 2);
-    margin-bottom: var(--spacing);
-  }
-
-  #menu-inner {
-    display: block;
-    height: auto;
-    visibility: visible;
-    margin: 0px;
-  }  
-
+  
   .index-item {
-   width: 100%;
-   margin-bottom: 0;
-  }
-
-  #about, #content-inner {
-    display: block;
-    margin-top: 0;
-  }
-
-  #about-left, #about-right {
     width: 100%;
-  }
-  
-  #button-dropdown {
-    display: flex;
-    visibility: visible;
-    width: calc(var(--fontSize) * 2);
-    height: calc(var(--fontSize) * 2);
-    justify-content: center;
-    align-items: center;
-    margin-top: 0px;
-    margin-left: 0px;
-  }
+    margin-bottom: 0;
+   }
+ 
+   #about, #content-inner {
+     display: block;
+     margin-top: 0;
+   }
+ 
+   #about-left, #about-right {
+     width: 100%;
+   }
 
-  .button-navigation-about {
-    visibility: collapse;
-  }
-
-  #language-switch {
-    margin-top: 2px;
-    height: calc(var(--fontSize) * 2);
-  }
-  
-  #button-de {
-    margin-right: -4px;
+   #button-dropdown:hover #dropdown-svg rect {
+    fill: var(--markColorB);
   }
 }
 
