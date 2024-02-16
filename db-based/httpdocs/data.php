@@ -1,4 +1,4 @@
-<?php // data.php for davidherren.ch / 2024-02-14
+<?php // data.php for davidherren.ch / 2024-02-16
 
 include './php/db.php';
 include './php/fetchData.php';
@@ -163,12 +163,11 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
       HTML;
     }
 
-    // Code for Vimeo iframes
     function createVimeoIframe($vimeoId, $isLandscape = true) {
       $padding = $isLandscape ? '56.25%' : '177.78%';
       $iframe = <<<HTML
       <div style="padding:{$padding} 0 0 0;position:relative;">
-        <iframe src="https://player.vimeo.com/video/{$vimeoId}?title=0&byline=0&portrait=0&badge=0&app_id=58479" frameborder="0" allow="fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+        <iframe src="https://player.vimeo.com/video/{$vimeoId}?title=0&byline=0&portrait=0&badge=0&dnt=1&app_id=58479" frameborder="0" allow="fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
       </div>
       <script src="https://player.vimeo.com/api/player.js"></script>
       HTML;
@@ -181,6 +180,38 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     if (!empty($workData["vimeo_portrait"])) {
       $htmlOutput .= "<div id='work-video'>" . createVimeoIframe($workData["vimeo_portrait"], false) . "</div>";
     }
+    $htmlOutput .= "</div></div></div></div>";
+
+    $indexResult = $database->fetchAllItems($lang);
+    $htmlOutput .= "<div id='content-bottom'>";
+    if (count($indexResult) > 0) {
+      shuffle($indexResult); // Shuffle the array to randomize the order of items
+      $displayCount = 0;
+    
+      foreach ($indexResult as $row) {
+        $title = $row["title"];
+        $thisSlug = $row["slug"];
+        $year = $row["year"];
+        if ($thisSlug != $slug) {
+          $description = $lang === 'de' ? $row["description_de"] : $row["description_en"];
+          $htmlOutput .= "<a class='index-item work' onclick=\"loadWorks('" . htmlspecialchars($thisSlug) . "')\">";
+          $htmlOutput .= "<div class='index-item-inner'>";
+          $htmlOutput .= "<div class='index-item-inner-frame'></div>";
+          $htmlOutput .= "<div class='index-item-inner-text'>";
+          $htmlOutput .= "<h2>" . htmlspecialchars($title) . "</h2>";
+          $htmlOutput .= "</div>";
+          $htmlOutput .= "<img src='/img/prev/" . htmlspecialchars($thisSlug) . "-prev.jpg' alt='" . htmlspecialchars($title) . " - " . htmlspecialchars($year) . " © David Herren'>";
+          $htmlOutput .= "</div></a>";
+          
+          $displayCount++;
+          if ($displayCount >= 8) {
+            break;
+          }
+        }
+      }
+    } else {
+      $htmlOutput = "No works found!";
+    }    
     $htmlOutput .= "</div>";
 
     $response = [
