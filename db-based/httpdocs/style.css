@@ -1,37 +1,9 @@
-/* style.css for davidherren.ch / 2024-02-14*/
-
-@font-face {
-  font-family: 'Roboto';
-  src: url('/fonts/Roboto-Black.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Roboto';
-  src: url('/fonts/Roboto-Bold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-}
+/* style.css for davidherren.ch / 2024-02-16 */
 
 @font-face {
   font-family: 'Roboto';
   src: url('/fonts/Roboto-Medium.ttf') format('truetype');
   font-weight: 500;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Roboto';
-  src: url('/fonts/Roboto-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Roboto';
-  src: url('/fonts/Roboto-Light.ttf') format('truetype');
-  font-weight: 300;
   font-style: normal;
 }
 
@@ -52,9 +24,8 @@
 
 :root {
   --spacing: 2rem;
-
-  --NeonMint:   rgb(128, 255, 204);
-  --markColorA: #80ffcc;
+  
+  --markColorA: hsl(156, 100%, 75%);
   --markColorB: hsl(0, 0%, 20%);
   --bgColor:    hsl(0, 0%, 50%);
   --fontColor:  hsl(0, 0%, 100%);
@@ -178,6 +149,11 @@ mark {
   margin: 1rem;
 }
 
+.index-item.work {
+  width: calc(25%);
+  margin: 0rem;
+}
+
 .index-item-inner {
   height: 100%;
   display: flex;
@@ -211,7 +187,7 @@ mark {
 }
 
 .index-item-inner-text p {
-  padding: 2rem;
+  padding: var(--spacing);
   text-align: center;
   color: var(--fontColor);
   font-size: 1.5rem;
@@ -251,7 +227,7 @@ mark {
 .frame-title {
   display: flex;
   justify-content: center;
-  height: 2rem;
+  height: var(--spacing);
   align-items: center;
 }
 
@@ -290,7 +266,7 @@ mark {
 
 #menu-title {
   display: flex;
-  height: 2rem;
+  height: var(--spacing);
   flex-direction: row;
   position: relative;
   justify-content: space-between;
@@ -298,10 +274,10 @@ mark {
 }
 
 #menu-title-left {
-  width: 2rem;
+  width: var(--spacing);
   height: calc(100% - 2px);
   background-color: hsl(0deg 0% 75%) ;
-  box-shadow: 0px 0px 0px 2px var(--darkGray);
+  /*box-shadow: 0px 0px 0px 2px var(--darkGray);*/
   margin-bottom: 2px;
   z-index: 1;
 }
@@ -335,7 +311,7 @@ mark {
   background-color: var(--markColorB);
 }
 
-#menu-title-center:hover h1 {
+#menu-title-center:hover h1, #menu-title-center:hover h2 {
   color: var(--markColorA);
 }
 
@@ -344,22 +320,23 @@ mark {
   text-align: center;
 }
 
-#menu-title h1, #menu-title a, #menu-title a:visited {
+#menu-title h1, #menu-title h2, #menu-title a, #menu-title a:visited {
   font-family: 'RTAliasRough', sans-serif;
   color: var(--markColorB);
   font-size: 1rem;
   letter-spacing: 0.1rem;
+  margin-top: 0em;
+  margin-bottom: 0em;
 }
 
 #menu-inner {
   overflow: hidden;
   visibility: visible;
   height: auto;
-  margin: 2rem;
+  margin: var(--spacing);
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-
 }
 
 #menu-works, #menu-about {
@@ -400,7 +377,7 @@ mark {
   font-family: 'RTAliasRough', sans-serif;
   border: none;
   background: hsl(0deg 0% 75%);
-  box-shadow: inset -2px -2px var(--darkGray), inset 2px 2px var(--darkGray), inset -4px -4px rgb(158, 158, 158), inset 4px 4px #ffffff;
+  box-shadow: inset -2px -2px black, inset 2px 2px black, inset -4px -4px rgb(158, 158, 158), inset 4px 4px #ffffff;
   font-size: 1rem;
   letter-spacing: 0.1rem;
   padding: 0.5rem 1rem;
@@ -419,11 +396,16 @@ mark {
   align-items: center;
 }
 
+.button-navigation.exhibition svg {
+  rotate: 180deg;
+}
+
 .button-navigation:hover:not(.button-highlighted) {
   color: var(--fontColor);
 }
 
-#button-dropdown:hover #dropdown-svg, #button-dropdown:hover #dropdown-svg rect, #dropdown-svg rect {
+
+#button-dropdown:hover #dropdown-svg rect, .button-navigation.exhibition:hover #dropdown-svg rect {
   fill: var(--fontColor);
 }
 
@@ -445,7 +427,7 @@ mark {
 #button-dropdown {
   margin-top: -2px;
   margin-left: -2px;
-  width: 36px;
+  width: 34px;
   height: 34px;
   display: flex;
   flex-direction: column;
@@ -477,6 +459,17 @@ mark {
   gap: calc(1.5*var(--spacing));
 }
 
+#content-bottom {
+  max-height: calc(100vh - 5 * var(--spacing));
+  overflow: hidden;
+  margin-top: var(--spacing);
+  /*padding-top: calc(4 * var(--spacing));*/
+  /*background-color: #292929;*/
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
 #content p, #content a, #content h1, #content h2 {
   font-size: 1.5rem;
   line-height: 150%;
@@ -490,6 +483,7 @@ mark {
   overflow: hidden;
   position: sticky;
   top: var(--spacing);
+  line-height: 0;
 }
 
 .content-left-img-outer img {
@@ -526,7 +520,7 @@ mark {
 #work-text-description {
   font-weight: 500;
   color: var(--markColorA);
-  margin-bottom: 2rem;
+  margin-bottom: var(--spacing);
 }
 
 #work-infos {
@@ -606,6 +600,7 @@ mark {
   top: 4rem;
   cursor: pointer;
   transition: top 0.5s ease;
+  margin-bottom: var(--spacing);
 }
 
 .width-collapsed {
@@ -629,7 +624,7 @@ mark {
 }
 
 #itemizations, #literature {
-  margin-top: 2rem;
+  margin-top: var(--spacing);
 }
 
 #itemizations p, #literature p {
@@ -647,12 +642,12 @@ mark {
   flex-direction: row-reverse;
   align-items: flex-start;
   margin-left: calc((-1*100vw/8) + 12px);
-  gap: 2rem;
+  gap: var(--spacing);
 }
 
 .exhibition-img img, .exhibition-img p {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  margin-top: var(--spacing);
+  margin-bottom: var(--spacing);
 }
 
 .exhibition-img-expanded {
@@ -672,8 +667,17 @@ mark {
 }
 
 @media screen and (max-width: 1024px) {
+  :root {
+    --spacing: 1rem;
+    --fontSize: 1.var(--spacing);
+  }
+
   #content {
     margin-top: calc(2*var(--spacing));
+  }
+
+  #content-bottom {
+    display: none;
   }
 
   #content-inner-left {
@@ -683,19 +687,16 @@ mark {
   #content-inner-center, #embedded-model, #content-inner-left-text {
     display: none;
   }
-}
 
-@media screen and (max-width: 1024px) {
-  :root {
-    --spacing: 1rem;
-    --fontSize: 1.2rem;
+  #menu-inner {
+    margin: 1rem;
   }
 
   #index {
     margin-bottom: var(--spacing);
   }
 
-  #menu-title h1, #menu-title a, #menu-title a:visited {
+  #menu-title h1, #menu-title h2, #menu-title a, #menu-title a:visited {
     font-size: var(--fontSize);
   }
 
@@ -720,6 +721,14 @@ mark {
 
    #button-dropdown:hover #dropdown-svg rect {
     fill: var(--markColorB);
+  }
+
+  .button-navigation.exhibition {
+    visibility: collapse;
+  }
+
+  #menu-title {
+    height: 2rem;
   }
 }
 
