@@ -1,9 +1,10 @@
-// data.js for davidherren.ch / 2024-02-11
+// data.js for davidherren.ch / 2024-02-16
 
-// Initialization of global variables
 let currentLanguage = ''; // Sets the default language
 let currentSlug = ''; // Stores the current slug for content
 let lastStateLeftExpanded = true; // Stores the expanded/collapsed state of the left content
+let titleElement; // Change menu H1 title on subpages to H2
+let titleElementH1 = true;
 
 // Function to handle sending requests to the server
 const sendRequest = (url, successCallback, errorCallback) => {
@@ -15,7 +16,7 @@ const sendRequest = (url, successCallback, errorCallback) => {
       return response.json();
     })
     .then(data => successCallback(data))
-    .catch(error => errorCallback(error));
+    //.catch(error => errorCallback(error));
 };
 
 // Function to switch the current language of the page
@@ -44,22 +45,31 @@ function switchLanguage(lang) {
 
 // Function to load content for a specific work
 function loadWorks(slug, popstate) {
-  isLoadingWork = true; // Sets the loading flag
+  window.scrollTo(0, 0);
   currentSlug = slug; // Updates the currentSlug
-  // Constructs the URL for the request
-  let url = "/data.php?slug=" + encodeURIComponent(slug) + "&lang=" + currentLanguage + "&works=1";
+  let url = "/data.php?slug=" + encodeURIComponent(slug) + "&lang=" + currentLanguage + "&works=1"; // Constructs the URL for the request
   sendRequest(url, (response) => {
     document.getElementById("index-inner").innerHTML = ''; // Clears existing content
     document.getElementById("content").innerHTML = response.html; // Inserts new content
-    updateDocumentTitle(response.title); // Updates the document title
-    // Selects the appropriate description based on the current language
-    let description = currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn;
+    updateDocumentTitle(response.title + " | David Herren"); // Updates the document title
+    let description = currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn; // Selects the appropriate description based on the current language
     updateMetaDescription(description); // Updates the meta description
     if (!popstate) { updateUrl(slug); } // Updates the URL, except popstate event
     updateHrefLangTags(slug); // Updates hreflang tags for SEO
     animateLetters('work-text-description');
   });
   highlightContentButton('button-' + slug); // Highlights the active content button
+  changeMenuTitle(); // Change menu H1 title on subpages to H2
+}
+
+function changeMenuTitle() {
+  if (titleElement && titleElement.tagName === 'H1' && titleElementH1) {
+    var newTitleElement = document.createElement('h2');
+    titleElementH1 = false;
+    newTitleElement.id = titleElement.id;
+    newTitleElement.innerHTML = titleElement.innerHTML;
+    titleElement.parentNode.replaceChild(newTitleElement, titleElement);
+  }
 }
 
 // Function to load content about
@@ -69,16 +79,16 @@ function loadAbout(popstate) {
   sendRequest(url, (response) => {
     document.getElementById("index-inner").innerHTML = '';
     document.getElementById("content").innerHTML = response.html;
-    updateDocumentTitle('About');
-    // Selects the appropriate description based on the current language
+    updateDocumentTitle('About | David Herren');
     let description = currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn;
-    updateMetaDescription(description); // Updates the meta description
-    if (!popstate) { updateUrl('about'); } // Updates the url, except popstate event
-    updateHrefLangTags('about'); // Updates hreflang tags for SEO
+    updateMetaDescription(description);
+    if (!popstate) { updateUrl('about'); }
+    updateHrefLangTags('about');
   }, (error) => {
     console.error('Error with the request:', error);
   });
   highlightContentButton('button-about');
+  changeMenuTitle();
 }
 
 // Function to load content index
@@ -89,7 +99,7 @@ function loadIndex(popstate) {
     document.getElementById("index-inner").innerHTML = response.html;
     document.getElementById("content").innerHTML = '';
     updateDocumentTitle('David Herren');
-    if (!popstate) { updateUrl('') };  // Updates the URL, except popstate event
+    if (!popstate) { updateUrl('') }; // Updates the URL, except popstate event
     adjustHeight();
   }, (error) => {
     console.error('Error with the request:', error);
@@ -102,7 +112,6 @@ function updateUrl(slug) {
   let newUrl = '/' + currentLanguage + '/' + slug; // Constructs the new URL
   window.history.pushState({path: newUrl}, '', newUrl); // Pushes the new URL to the browser's history
 }
-
 
 window.addEventListener('popstate', function(event) {
   if (event.state && event.state.path) {
@@ -132,11 +141,11 @@ function highlightLanguageButton(lang) {
 // Function to highlight the active content button
 function highlightContentButton(buttonId) {
   document.querySelectorAll('#menu-works button, #menu-about button').forEach(btn => {
-    btn.classList.remove('button-highlighted'); // Removes highlight from all buttons
+    btn.classList.remove('button-highlighted');
   });
   const button = document.getElementById(buttonId);
   if (button) {
-    button.classList.add('button-highlighted'); // Adds highlight to the selected button
+    button.classList.add('button-highlighted');
   }
 }
 
@@ -233,6 +242,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Additional event listener for handling scroll events, for dynamically showing image titles based on scroll position
   window.addEventListener('scroll', handleScrollEvent);
+
+
+  titleElement = document.getElementById('title-text'); // Get H1 title from menu
 });
 
 // Function to handle scroll events, used for dynamically adjusting visibility of image titles based on viewport position
