@@ -1,4 +1,4 @@
-<?php // fetchData.php for davidherren.ch / 2024-02-02
+<?php // fetchData.php for davidherren.ch / 2024-02-15
 class fetchData {
   private $conn;
 
@@ -7,7 +7,6 @@ class fetchData {
   }
 
   public function fetchWorks($slug, $lang) {
-    // Retrieve all relevant fields, including the German versions
     $sql = "SELECT slug, title, year, edition, vimeo_landscape, vimeo_portrait, github, 3d, 
                     info_$lang, media_$lang, size_$lang, text_$lang, description_$lang,
                     info_de, media_de, size_de, text_de, description_de, img_alt 
@@ -18,7 +17,6 @@ class fetchData {
     $stmt->execute();
     $workData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Check and replace if the text in the chosen language is empty
     if (empty($workData["info_$lang"])) {
       $workData["info_$lang"] = $workData["info_de"];
     }
@@ -43,20 +41,23 @@ class fetchData {
     $stmtImages->bindParam(':slug', $slug, PDO::PARAM_STR);
     $stmtImages->execute();
     $images = $stmtImages->fetchAll(PDO::FETCH_ASSOC);
-
+  
     foreach ($images as $key => $image) {
         if (empty($image["text_$lang"])) {
             $images[$key]["text_$lang"] = $image["text_de"];
         }
+        if (preg_match('/-(\d+)$/', $image['name'], $matches)) {
+            $images[$key]['number'] = (int)$matches[1];
+        } else {
+            $images[$key]['number'] = null;
+        }
     }
-
-    // Custom sort function for image names
     usort($images, function($a, $b) {
         return strnatcmp($a['name'], $b['name']);
     });
     return $images;
   }
-
+  
   public function fetchWorkLinks($slug) {
     $sqlLinks = "SELECT links.address, links.description FROM works_links JOIN links ON works_links.link = links.id WHERE works_links.work = :slug";
     $stmtLinks = $this->conn->prepare($sqlLinks);
@@ -125,12 +126,20 @@ class fetchData {
     return $results;
   }
 
+  public function fetchAllItems($lang) {
+    $sql = "SELECT slug, title, year, description_de, description_en, nr FROM works";
+    $sql .= " ORDER BY nr DESC";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return $results;
+  }
+
   public function fetchAbout($lang) {
     $sql = "SELECT section, section_de, date, time, title, text_$lang, text_de FROM about ORDER BY section, date DESC";
     $stmt = $this->conn->prepare($sql);
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    // Check and replace if the text in the chosen language is empty
     foreach ($results as $key => $row) {
       if (empty($row["text_$lang"])) {
         $results[$key]["text_$lang"] = $row["text_de"];
