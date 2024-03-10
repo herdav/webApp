@@ -1,4 +1,4 @@
-<?php // fetchData.php for davidherren.ch / 2024-02-15
+<?php // fetchData.php for davidherren.ch / 2024-03-10
 class fetchData {
   private $conn;
 
@@ -80,7 +80,7 @@ class fetchData {
   }
 
   public function fetchExhibitions($lang) {
-    $sql = "SELECT title, institution, place_$lang, text_$lang, place_de, date_start, date_end, img FROM exhibitions ORDER BY date_start DESC";
+    $sql = "SELECT title, institution, place_$lang, text_$lang, place_de, date_start, date_end, img FROM exhibitions WHERE selected = 1 ORDER BY date_start DESC";
     $stmt = $this->conn->prepare($sql);
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
