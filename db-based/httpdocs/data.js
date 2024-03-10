@@ -1,4 +1,4 @@
-// data.js for davidherren.ch / 2024-02-16
+// data.js for davidherren.ch / 2024-03-10
 
 let currentLanguage = ''; // Sets the default language
 let currentSlug = ''; // Stores the current slug for content
@@ -224,17 +224,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // Highlight the button for the current language and switch the page content to that language
   highlightLanguageButton(currentLanguage);
   switchLanguage(currentLanguage); // This function updates the page to reflect the chosen language
-
+  
   // Load the index or specific content based on the URL, defaulting to the index if no specific path is provided
   if (pathParts.length > 1) {
     if (pathParts[1] === 'about') {
       loadAbout(false); // Load 'About' content if specified in the URL
     } else {
-      loadWorks(pathParts[1], 0); // Load specific work details based on the slug in the URL
+      attemptLoadWorks(pathParts[1], 0); // Try to load specific work details based on the slug in the URL
     }
   } else {
     // If no specific content is requested, load the index content
-    /*loadIndex("motionstudy"); // Adjust this call to pass the correct exclusion parameter if necessary*/
+    //loadIndex("motionstudy"); // Adjust this call to pass the correct exclusion parameter if necessary
   }
 
   // Update the page's hreflang tags based on the current language, for SEO purposes
@@ -243,11 +243,22 @@ document.addEventListener("DOMContentLoaded", () => {
   // Additional event listener for handling scroll events, for dynamically showing image titles based on scroll position
   window.addEventListener('scroll', handleScrollEvent);
 
-
   titleElement = document.getElementById('title-text'); // Get H1 title from menu
 });
 
-// Function to handle scroll events, used for dynamically adjusting visibility of image titles based on viewport position
+// Wrap loadWorks in a function that attempts to call it, and retries if it fails
+function attemptLoadWorks(slug, popstate, attempt = 1) {
+  if (typeof loadWorks === "function") {
+    loadWorks(slug, popstate);
+  } else if (attempt <= 3) { // Retry up to 3 times
+    setTimeout(() => {
+      attemptLoadWorks(slug, popstate, attempt + 1);
+    }, 1000); // Wait 1 second before retrying
+  } else {
+    console.error("Failed to load work details after 3 attempts.");
+  }
+}
+
 function handleScrollEvent() {
   let images = document.querySelectorAll('#content-inner-right img');
   let allTitleDivs = document.querySelectorAll('#content-inner-left .work-image-title');
@@ -259,8 +270,8 @@ function handleScrollEvent() {
   // Determine the currently visible image based on its viewport position
   images.forEach((img, index) => {
     let rect = img.getBoundingClientRect();
-    // Special handling for the first image or subsequent images based on their position in the viewport
-    if (rect.bottom > 0 && (index === 0 || rect.top < window.innerHeight / 2)) {
+    // Adjusted handling to treat all images equally based on their position in the viewport
+    if (rect.bottom > 0 && rect.top < window.innerHeight / 2) {
       currentVisibleImageIndex = index;
     }
   });
