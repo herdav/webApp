@@ -1,4 +1,4 @@
-// data.js for davidherren.ch / 2024-03-10
+// data.js for davidherren.ch / 2024-03-14
 
 let currentLanguage = ''; // Sets the default language
 let currentSlug = ''; // Stores the current slug for content
@@ -113,21 +113,27 @@ function updateUrl(slug) {
   window.history.pushState({path: newUrl}, '', newUrl); // Pushes the new URL to the browser's history
 }
 
+let isLoading = false;
 window.addEventListener('popstate', function(event) {
+  if (isLoading) return;
   if (event.state && event.state.path) {
+    isLoading = true;
     const pathParts = event.state.path.split('/').filter(Boolean);
     const slug = pathParts[1];
-    if (pathParts.length === 2 ) {
+
+    const onLoadComplete = () => isLoading = false;
+
+    if (pathParts.length === 2) {
       popstate = true;
       if (slug === 'about') {
-        loadAbout(true);
+        loadAbout(true).finally(onLoadComplete);
       } else {
-        loadWorks(slug, true);
+        loadWorks(slug, true).finally(onLoadComplete);
       }
     } else {
-      loadIndex(true);
+      loadIndex(true).finally(onLoadComplete);
+    }
   }
-}
 });
 
 // Function to highlight the active language button
