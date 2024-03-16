@@ -20,6 +20,7 @@ if (isset($_GET['index']) && isset($_GET['lang'])) {
       $year = $row["year"];
       $description = $lang === 'de' ? $row["description_de"] : $row["description_en"];
       $htmlOutput .= "<a class='index-item' onclick=\"loadWorks('" . htmlspecialchars($slug) . "')\">";
+      //$htmlOutput .= "<a class='index-item' href='/" . htmlspecialchars($lang) . "/" . htmlspecialchars($slug) . "'>";
       $htmlOutput .= "<div class='index-item-inner'>";
       $htmlOutput .= "<div class='index-item-inner-frame'></div>";
       $htmlOutput .= "<div class='index-item-inner-text'>";
@@ -194,7 +195,7 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
         $year = $row["year"];
         if ($thisSlug != $slug) {
           $description = $lang === 'de' ? $row["description_de"] : $row["description_en"];
-          $htmlOutput .= "<a class='index-item work' onclick=\"loadWorks('" . htmlspecialchars($thisSlug) . "')\">";
+          $htmlOutput .= "<a class='index-item work' href='/" . htmlspecialchars($lang) . "/" . htmlspecialchars($thisSlug) . "'>";
           $htmlOutput .= "<div class='index-item-inner'>";
           $htmlOutput .= "<div class='index-item-inner-frame'></div>";
           $htmlOutput .= "<div class='index-item-inner-text'>";
@@ -297,15 +298,12 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
       $htmlOutput .= "<div style='flex: 3;'><div class='exhibition-sub-main'>";
 
       $buttonId = "button-dropdown-" . $index;
-      $htmlOutput .= "<button id='" . $buttonId . "' class='button-navigation exhibition' onclick=\"expandImage('" . htmlspecialchars($exhibition['img']) . "', '" . $buttonId . "'); toggleTriangles('" . $buttonId . "');\">
-        <svg id='dropdown-svg' width='64px' height='32px' viewBox='0 0 64 32' xmlns='http://www.w3.org/2000/svg'>
-          <rect x='4'  y='24' id='svg-triangle-1' width='56' height='4'/>
-          <rect x='8'  y='20' id='svg-triangle-2' width='48'  height='4'/>
-          <rect x='12' y='16' id='svg-triangle-3' width='40' height='4'/>
-          <rect x='16' y='12' id='svg-triangle-4' width='32' height='4'/>
-          <rect x='20' y='8'  id='svg-triangle-5' width='24' height='4'/>
-          <rect x='24' y='4'  id='svg-triangle-6' width='16' height='4'/>
-          <rect x='28' y='0'  id='svg-triangle-7' width='8'  height='4'/>
+      $htmlOutput .= "<button aria-label='button-exhibition-open' id='" . $buttonId . "' class='button-navigation exhibition' onclick=\"expandImage('" . htmlspecialchars($exhibition['img']) . "', '" . $buttonId . "'); toggleTriangles('" . $buttonId . "');\">
+        <svg id='dropdown-svg' width='56px' height='32px' viewBox='0 0 56 32' xmlns='http://www.w3.org/2000/svg'>
+          <rect x='0'  y='24' width='56' id='svg-triangle-1' height='8'/>
+          <rect x='8'  y='16' width='40' id='svg-triangle-2' height='8'/>
+          <rect x='16' y='8'  width='24' id='svg-triangle-3' height='8'/>
+          <rect x='24' y='0'  width='8'  id='svg-triangle-4' height='8'/>
         </svg>
       </button>";
 
@@ -317,7 +315,7 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
       }
       $htmlOutput .= $exhibition['institution'] . ', ' . $exhibition["place_$lang"] . "</p></div>";
       
-      $htmlOutput .= "<div id='" . htmlspecialchars($exhibition['img']) . "' class='exhibition-img'><img src='/img/exhibitions/" . htmlspecialchars($exhibition['img']) . ".jpg'>";
+      $htmlOutput .= "<div id='" . htmlspecialchars($exhibition['img']) . "' class='exhibition-img'><img src='/img/exhibitions/" . htmlspecialchars($exhibition['img']) . ".jpg' alt='" . $exhibition['title'] . " - " . htmlspecialchars($yearStart) . "'>";
       $htmlOutput .= '<p>' . htmlspecialchars($exhibition["text_$lang"]) . '<br><br>';
       $dateObjectStart = new DateTime($exhibition["date_start"]);
       $dateObjectEnd = new DateTime($exhibition["date_end"]);
