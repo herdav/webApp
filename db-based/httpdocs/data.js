@@ -1,4 +1,4 @@
-// data.js for davidherren.ch / 2024-03-14
+// data.js for davidherren.ch / 2024-03-16
 
 let currentLanguage = ''; // Sets the default language
 let currentSlug = ''; // Stores the current slug for content
@@ -39,7 +39,7 @@ function switchLanguage(lang) {
     loadWorks(currentSlug, 0);
   } else {
     statement(currentLanguage);
-    loadIndex(false);
+    //initializePage();
   }
 }
 
@@ -113,28 +113,34 @@ function updateUrl(slug) {
   window.history.pushState({path: newUrl}, '', newUrl); // Pushes the new URL to the browser's history
 }
 
-let isLoading = false;
 window.addEventListener('popstate', function(event) {
   if (isLoading) return;
   if (event.state && event.state.path) {
-    isLoading = true;
     const pathParts = event.state.path.split('/').filter(Boolean);
-    const slug = pathParts[1];
-
+    isLoading = true;
     const onLoadComplete = () => isLoading = false;
 
-    if (pathParts.length === 2) {
+    if (pathParts.length === 1) {
+      loadIndex(true).finally(onLoadComplete);
+    } else if (pathParts.length >= 2) {
+      const slug = pathParts[1];
       popstate = true;
       if (slug === 'about') {
         loadAbout(true).finally(onLoadComplete);
       } else {
         loadWorks(slug, true).finally(onLoadComplete);
       }
-    } else {
-      loadIndex(true).finally(onLoadComplete);
     }
   }
 });
+
+function initializePage() {
+  const path = window.location.pathname.split('/').filter(Boolean);
+  if (path.length <= 1) {
+    loadIndex(true);
+  }
+}
+document.addEventListener('DOMContentLoaded', initializePage);
 
 // Function to highlight the active language button
 function highlightLanguageButton(lang) {
@@ -238,10 +244,9 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       attemptLoadWorks(pathParts[1], 0); // Try to load specific work details based on the slug in the URL
     }
-  } else {
-    // If no specific content is requested, load the index content
-    //loadIndex("motionstudy"); // Adjust this call to pass the correct exclusion parameter if necessary
-  }
+  } /*else {
+    // If no specific content is requested
+  }*/
 
   // Update the page's hreflang tags based on the current language, for SEO purposes
   updateHrefLangTags(pathParts.length > 1 ? pathParts[1] : '');
