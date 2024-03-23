@@ -1,6 +1,6 @@
-// data.js for davidherren.ch / 2024-03-16
+// data.js for davidherren.ch / 2024-03-23
 
-let currentLanguage = ''; // Sets the default language
+let currentLanguage = 'en'; // Sets the default language
 let currentSlug = ''; // Stores the current slug for content
 let lastStateLeftExpanded = true; // Stores the expanded/collapsed state of the left content
 let titleElement; // Change menu H1 title on subpages to H2
@@ -55,7 +55,8 @@ function loadWorks(slug, popstate) {
     let description = currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn; // Selects the appropriate description based on the current language
     updateMetaDescription(description); // Updates the meta description
     if (!popstate) { updateUrl(slug); } // Updates the URL, except popstate event
-    updateHrefLangTags(slug); // Updates hreflang tags for SEO
+    updateHrefLangTags(); // Updates hreflang tags for SEO
+    updatecCanonicalTags();
     animateLetters('work-text-description');
   });
   highlightContentButton('button-' + slug); // Highlights the active content button
@@ -83,7 +84,8 @@ function loadAbout(popstate) {
     let description = currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn;
     updateMetaDescription(description);
     if (!popstate) { updateUrl('about'); }
-    updateHrefLangTags('about');
+    updateHrefLangTags();
+    updatecCanonicalTags();
   }, (error) => {
     console.error('Error with the request:', error);
   });
@@ -101,6 +103,7 @@ function loadIndex(popstate) {
     updateDocumentTitle('David Herren');
     if (!popstate) { updateUrl('') }; // Updates the URL, except popstate event
     adjustHeight();
+    updatecCanonicalTags();
   }, (error) => {
     console.error('Error with the request:', error);
   });
@@ -114,21 +117,25 @@ function updateUrl(slug) {
 }
 
 window.addEventListener('popstate', function(event) {
-  if (isLoading) return;
+  //if (isLoading) return; // problem with history back?
   if (event.state && event.state.path) {
     const pathParts = event.state.path.split('/').filter(Boolean);
-    isLoading = true;
-    const onLoadComplete = () => isLoading = false;
+    
+    //isLoading = true;
+    //const onLoadComplete = () => isLoading = false;
 
     if (pathParts.length === 1) {
-      loadIndex(true).finally(onLoadComplete);
+      //loadIndex(true).finally(onLoadComplete);
+      loadIndex(true);
     } else if (pathParts.length >= 2) {
       const slug = pathParts[1];
       popstate = true;
       if (slug === 'about') {
-        loadAbout(true).finally(onLoadComplete);
+        //loadAbout(true).finally(onLoadComplete);
+        loadAbout(true);
       } else {
-        loadWorks(slug, true).finally(onLoadComplete);
+        //loadWorks(slug, true).finally(onLoadComplete);
+        loadWorks(slug, true);
       }
     }
   }
@@ -202,19 +209,26 @@ function updateDocumentTitle(title) {
   document.title = title; // Sets the document's title
 }
 
-// Function to update hreflang tags for SEO and accessibility
-function updateHrefLangTags(slug) {
-  document.querySelectorAll('link[rel="alternate"]').forEach(tag => tag.remove()); // Removes existing hreflang tags
+// Function to update canonical tags for SEO and accessibility
+function updatecCanonicalTags() {
+  document.querySelectorAll('link[rel="canonical"]').forEach(function(tag) {tag.remove();});
+  let canonicalTag = document.createElement('link');
+  canonicalTag.rel = 'canonical';
+  canonicalTag.href = 'https://davidherren.ch/' + currentLanguage + '/' + currentSlug;
+  document.head.appendChild(canonicalTag);
+}
 
+// Function to update hreflang tags for SEO and accessibility
+function updateHrefLangTags() {
+  document.querySelectorAll('link[rel="alternate"]').forEach(tag => tag.remove()); // Removes existing hreflang tags
   // Define available languages
   const availableLanguages = ['de', 'en'];
-
   // Iterate through available languages to create hreflang tags
   availableLanguages.forEach(lang => {
     let linkTag = document.createElement('link');
     linkTag.rel = 'alternate';
     linkTag.hreflang = lang;
-    linkTag.href = window.location.origin + '/' + lang + '/' + slug;
+    linkTag.href = window.location.origin + '/' + lang + '/' + currentSlug;
     document.head.appendChild(linkTag);
   });
 }
