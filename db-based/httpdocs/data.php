@@ -1,4 +1,4 @@
-<?php // data.php for davidherren.ch / 2024-02-16
+<?php // data.php for davidherren.ch / 2024-02-23
 
 include './php/db.php';
 include './php/fetchData.php';
@@ -18,9 +18,10 @@ if (isset($_GET['index']) && isset($_GET['lang'])) {
       $title = $row["title"];
       $slug = $row["slug"];
       $year = $row["year"];
-      $description = $lang === 'de' ? $row["description_de"] : $row["description_en"];
-      $htmlOutput .= "<a class='index-item' onclick=\"loadWorks('" . htmlspecialchars($slug) . "')\">";
-      //$htmlOutput .= "<a class='index-item' href='/" . htmlspecialchars($lang) . "/" . htmlspecialchars($slug) . "'>";
+      //$description = $lang === 'de' ? $row["description_de"] : $row["description_en"];
+      $description = $row["description_$lang"];
+      //$htmlOutput .= "<a class='index-item' onclick=\"loadWorks('" . htmlspecialchars($slug) . "')\">";
+      $htmlOutput .= "<a class='index-item' href='/" . htmlspecialchars($lang) . "/" . htmlspecialchars($slug) . "'>";
       $htmlOutput .= "<div class='index-item-inner'>";
       $htmlOutput .= "<div class='index-item-inner-frame'></div>";
       $htmlOutput .= "<div class='index-item-inner-text'>";
@@ -89,7 +90,7 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     $htmlOutput .= "</div></div>";
     $htmlOutput .= <<<HTML
     <div id="content-inner-center">
-      <a id="pointer" href="">
+      <a alt="Expand Pointer" id="pointer" href="">
         <svg width="72" height="56" viewBox="0 0 72 56" class="svg-arrow">
           <rect id="svg-arrow-0" x="0"  y="24" width="72" height="4"/>
           <rect id="svg-arrow-1" x="4"  y="28" width="4" height="4"/>
@@ -168,7 +169,7 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
       $padding = $isLandscape ? '56.25%' : '177.78%';
       $iframe = <<<HTML
       <div style="padding:{$padding} 0 0 0;position:relative;">
-        <iframe src="https://player.vimeo.com/video/{$vimeoId}?title=0&byline=0&portrait=0&badge=0&dnt=1&app_id=58479" frameborder="0" allow="fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+        <iframe title="Vimeo Player" src="https://player.vimeo.com/video/{$vimeoId}?title=0&byline=0&portrait=0&badge=0&dnt=1&app_id=58479" frameborder="0" allow="fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
       </div>
       <script src="https://player.vimeo.com/api/player.js"></script>
       HTML;
