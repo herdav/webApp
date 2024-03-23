@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!--Created 2016-2024 by David Herren-->
+<!--Latest Update 2024-03-23-->
 <html lang="de">
   <head>
     <meta charset="UTF-8">
@@ -7,16 +8,10 @@
     <title>David Herren</title>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="canonical" href="https://davidherren.ch"/>
     <script src="/js/data.js" defer></script>
     <script src="/js/animations.js" defer></script>
     <script type="module" src="https://unpkg.com/@google/model-viewer@latest"></script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114694374-1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() { dataLayer.push(arguments); }
-      gtag('js', new Date());
-      gtag('config', 'UA-114694374-1');
-    </script>
   </head>
   <body>
 <?php
@@ -26,19 +21,16 @@ $menuResult = $database->fetchMenuItems();
     <div id="menu" class="frame">
       <div id="menu-title">
         <div id="menu-title-left">
-          <button id="button-dropdown" class="button-navigation" onclick="dropDownMenu()">
-            <svg id="dropdown-svg" width="64px" height="32px" viewBox="0 0 64 32" xmlns="http://www.w3.org/2000/svg">
-              <rect x="4"  y="24" id="svg-triangle-1" width="56" height="4"/>
-              <rect x="8"  y="20" id="svg-triangle-2" width="48" height="4"/>
-              <rect x="12" y="16" id="svg-triangle-3" width="40" height="4"/>
-              <rect x="16" y="12" id="svg-triangle-4" width="32" height="4"/>
-              <rect x="20" y="8"  id="svg-triangle-5" width="24" height="4"/>
-              <rect x="24" y="4"  id="svg-triangle-6" width="16" height="4"/>
-              <rect x="28" y="0"  id="svg-triangle-7" width="8"  height="4"/>
+          <button aria-label="button-menu-dropdown" id="button-dropdown" class="button-navigation" onclick="dropDownMenu()">
+            <svg id="dropdown-svg" width="56px" height="32px" viewBox="0 0 56 32" xmlns="http://www.w3.org/2000/svg">
+              <rect x="0"  y="24" width="56" id="svg-triangle-1" height="8"/>
+              <rect x="8"  y="16" width="40" id="svg-triangle-2" height="8"/>
+              <rect x="16" y="8"  width="24" id="svg-triangle-3" height="8"/>
+              <rect x="24" y="0"  width="8"  id="svg-triangle-4" height="8"/>
             </svg>
           </button>
         </div>
-        <a href="./" id="menu-title-center">
+        <a href="/" id="menu-title-center">
           <div id="menu-title-center-inner">
             <h1 id="title-text">David Herren</h1>
           </div>
