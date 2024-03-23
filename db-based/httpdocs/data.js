@@ -1,10 +1,11 @@
 // data.js for davidherren.ch / 2024-03-23
 
-let currentLanguage = 'en'; // Sets the default language
+let currentLanguage = ''; // Sets the default language
 let currentSlug = ''; // Stores the current slug for content
 let lastStateLeftExpanded = true; // Stores the expanded/collapsed state of the left content
 let titleElement; // Change menu H1 title on subpages to H2
 let titleElementH1 = true;
+let indexIsLoaded = false;
 
 // Function to handle sending requests to the server
 const sendRequest = (url, successCallback, errorCallback) => {
@@ -39,7 +40,9 @@ function switchLanguage(lang) {
     loadWorks(currentSlug, 0);
   } else {
     statement(currentLanguage);
-    //initializePage();
+   if (indexIsLoaded) {
+    initializePage();
+    }
   }
 }
 
@@ -48,6 +51,7 @@ function loadWorks(slug, popstate) {
   window.scrollTo(0, 0);
   currentSlug = slug; // Updates the currentSlug
   let url = "/data.php?slug=" + encodeURIComponent(slug) + "&lang=" + currentLanguage + "&works=1"; // Constructs the URL for the request
+  indexIsLoaded = false;
   sendRequest(url, (response) => {
     document.getElementById("index-inner").innerHTML = ''; // Clears existing content
     document.getElementById("content").innerHTML = response.html; // Inserts new content
@@ -56,11 +60,50 @@ function loadWorks(slug, popstate) {
     updateMetaDescription(description); // Updates the meta description
     if (!popstate) { updateUrl(slug); } // Updates the URL, except popstate event
     updateHrefLangTags(); // Updates hreflang tags for SEO
-    updatecCanonicalTags();
+    updateCanonicalTags();
     animateLetters('work-text-description');
   });
   highlightContentButton('button-' + slug); // Highlights the active content button
   changeMenuTitle(); // Change menu H1 title on subpages to H2
+}
+
+// Function to load content about
+function loadAbout(popstate) {
+  currentSlug = 'about';
+  let url = "/data.php?lang=" + encodeURIComponent(currentLanguage) + "&about=1";
+  indexIsLoaded = false;
+  sendRequest(url, (response) => {
+    document.getElementById("index-inner").innerHTML = '';
+    document.getElementById("content").innerHTML = response.html;
+    updateDocumentTitle('About | David Herren');
+    let description = currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn;
+    updateMetaDescription(description);
+    if (!popstate) { updateUrl('about'); }
+    updateHrefLangTags();
+    updateCanonicalTags();
+  }, (error) => {
+    console.error('Error with the request:', error);
+  });
+  highlightContentButton('button-about');
+  changeMenuTitle();
+}
+
+// Function to load content index
+function loadIndex(popstate) {
+  currentSlug = '';
+  let url = "/data.php?lang=" + encodeURIComponent(currentLanguage) + "&index=1";
+  indexIsLoaded = true;
+  sendRequest(url, (response) => {
+    document.getElementById("index-inner").innerHTML = response.html;
+    document.getElementById("content").innerHTML = '';
+    updateDocumentTitle('David Herren');
+    if (!popstate) { updateUrl('') }; // Updates the URL, except popstate event
+    adjustHeight();
+    updateCanonicalTags();
+  }, (error) => {
+    console.error('Error with the request:', error);
+  });
+  highlightContentButton('');
 }
 
 function changeMenuTitle() {
@@ -73,43 +116,6 @@ function changeMenuTitle() {
   }
 }
 
-// Function to load content about
-function loadAbout(popstate) {
-  currentSlug = 'about';
-  let url = "/data.php?lang=" + encodeURIComponent(currentLanguage) + "&about=1";
-  sendRequest(url, (response) => {
-    document.getElementById("index-inner").innerHTML = '';
-    document.getElementById("content").innerHTML = response.html;
-    updateDocumentTitle('About | David Herren');
-    let description = currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn;
-    updateMetaDescription(description);
-    if (!popstate) { updateUrl('about'); }
-    updateHrefLangTags();
-    updatecCanonicalTags();
-  }, (error) => {
-    console.error('Error with the request:', error);
-  });
-  highlightContentButton('button-about');
-  changeMenuTitle();
-}
-
-// Function to load content index
-function loadIndex(popstate) {
-  currentSlug = '';
-  let url = "/data.php?lang=" + encodeURIComponent(currentLanguage) + "&index=1";
-  sendRequest(url, (response) => {
-    document.getElementById("index-inner").innerHTML = response.html;
-    document.getElementById("content").innerHTML = '';
-    updateDocumentTitle('David Herren');
-    if (!popstate) { updateUrl('') }; // Updates the URL, except popstate event
-    adjustHeight();
-    updatecCanonicalTags();
-  }, (error) => {
-    console.error('Error with the request:', error);
-  });
-  highlightContentButton('');
-}
-
 // Function to update the URL in the browser's history
 function updateUrl(slug) {
   let newUrl = '/' + currentLanguage + '/' + slug; // Constructs the new URL
@@ -117,24 +123,16 @@ function updateUrl(slug) {
 }
 
 window.addEventListener('popstate', function(event) {
-  //if (isLoading) return; // problem with history back?
   if (event.state && event.state.path) {
     const pathParts = event.state.path.split('/').filter(Boolean);
-    
-    //isLoading = true;
-    //const onLoadComplete = () => isLoading = false;
-
     if (pathParts.length === 1) {
-      //loadIndex(true).finally(onLoadComplete);
       loadIndex(true);
     } else if (pathParts.length >= 2) {
       const slug = pathParts[1];
       popstate = true;
       if (slug === 'about') {
-        //loadAbout(true).finally(onLoadComplete);
         loadAbout(true);
       } else {
-        //loadWorks(slug, true).finally(onLoadComplete);
         loadWorks(slug, true);
       }
     }
@@ -210,7 +208,7 @@ function updateDocumentTitle(title) {
 }
 
 // Function to update canonical tags for SEO and accessibility
-function updatecCanonicalTags() {
+function updateCanonicalTags() {
   document.querySelectorAll('link[rel="canonical"]').forEach(function(tag) {tag.remove();});
   let canonicalTag = document.createElement('link');
   canonicalTag.rel = 'canonical';
