@@ -1,4 +1,4 @@
-<?php // data.php for davidherren.ch / 2024-02-23
+<?php // data.php for davidherren.ch / 2024-02-28
 
 include './php/db.php';
 include './php/fetchData.php';
@@ -18,9 +18,7 @@ if (isset($_GET['index']) && isset($_GET['lang'])) {
       $title = $row["title"];
       $slug = $row["slug"];
       $year = $row["year"];
-      //$description = $lang === 'de' ? $row["description_de"] : $row["description_en"];
       $description = $row["description_$lang"];
-      //$htmlOutput .= "<a class='index-item' onclick=\"loadWorks('" . htmlspecialchars($slug) . "')\">";
       $htmlOutput .= "<a class='index-item' href='/" . htmlspecialchars($lang) . "/" . htmlspecialchars($slug) . "'>";
       $htmlOutput .= "<div class='index-item-inner'>";
       $htmlOutput .= "<div class='index-item-inner-frame'></div>";
@@ -28,7 +26,7 @@ if (isset($_GET['index']) && isset($_GET['lang'])) {
       $htmlOutput .= "<h2>" . htmlspecialchars($title) . "</h2>";
       $htmlOutput .= "<p>" . htmlspecialchars($description) . "</p>";
       $htmlOutput .= "</div>";
-      $htmlOutput .= "<img src='/img/prev/" . htmlspecialchars($slug) . "-prev.jpg' alt='" . htmlspecialchars($title) . " - " . htmlspecialchars($year) . " © David Herren'>";
+      $htmlOutput .= "<img src='/img/prev/" . htmlspecialchars($slug) . "-prev.jpg' loading='lazy' alt='" . htmlspecialchars($title) . " - " . htmlspecialchars($year) . " © David Herren'>";
       $htmlOutput .= "</div></a>";
     }
   } else {
@@ -90,7 +88,7 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     $htmlOutput .= "</div></div>";
     $htmlOutput .= <<<HTML
     <div id="content-inner-center">
-      <a alt="Expand Pointer" id="pointer" href="">
+      <a aria-label="Expand Pointer" id="pointer" href="">
         <svg width="72" height="56" viewBox="0 0 72 56" class="svg-arrow">
           <rect id="svg-arrow-0" x="0"  y="24" width="72" height="4"/>
           <rect id="svg-arrow-1" x="4"  y="28" width="4" height="4"/>
@@ -136,7 +134,7 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
       $htmlOutput .= "<a href='" . htmlspecialchars($workData["github"]) . "' target='_blank'>GitHub</a> ";
     }
 
-    $htmlOutput .= '</div>';
+    $htmlOutput .= '</div></div><div id="work-adds">';
 
     // Code for displaying additional images
     $htmlOutput .= "<div class='work-images'>";
