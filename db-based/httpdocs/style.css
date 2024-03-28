@@ -1,4 +1,4 @@
-/* style.css for davidherren.ch / 2024-02-16 */
+/* style.css for davidherren.ch / 2024-03-28 */
 
 @font-face {
   font-family: 'Roboto';
@@ -26,7 +26,7 @@
   --spacing: 2rem;
   
   --markColorA: hsl(156, 100%, 75%);
-  --markColorB: hsl(0, 0%, 20%);
+  --markColorB: black;
   --bgColor:    hsl(0, 0%, 50%);
   --fontColor:  hsl(0, 0%, 100%);
   --darkGray:   hsl(0, 0%, 26%);
@@ -39,16 +39,17 @@
 }
 
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 0px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--markColorA); 
+  background: var(--bgColor); 
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--markColorB);
+  background: var(--markColorA);
 }
+
 
 * {
   scroll-behavior: smooth;
@@ -123,6 +124,18 @@ mark {
   background-color: var(--bgColor);
   color: var(--markColorA);
   font-weight: 500;
+}
+
+#js-warning {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'RTAliasRough', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.1rem;
+  height: 2rem;
+  background-color: black;
+  color: red;
 }
 
 .intext-link {
@@ -218,7 +231,7 @@ mark {
 
 .frame {
   padding: 0px 0px 0px 0px;
-  border: 2px solid hsl(0, 0%, 16%);
+  border: 2px solid black;
   box-shadow: 4px 4px 20px 0px rgba(0, 0, 0, 0.3);
   background-color: hsla(0, 0%, 0%, 0.4);
   backdrop-filter: blur(10px);
@@ -274,10 +287,8 @@ mark {
 }
 
 #menu-title-left {
-  width: var(--spacing);
   height: calc(100% - 2px);
   background-color: hsl(0deg 0% 75%) ;
-  /*box-shadow: 0px 0px 0px 2px var(--darkGray);*/
   margin-bottom: 2px;
   z-index: 1;
 }
@@ -375,6 +386,8 @@ mark {
 
 .button-navigation {
   font-family: 'RTAliasRough', sans-serif;
+  color: black;
+  text-decoration: none;
   border: none;
   background: hsl(0deg 0% 75%);
   box-shadow: inset -2px -2px black, inset 2px 2px black, inset -4px -4px rgb(158, 158, 158), inset 4px 4px #ffffff;
@@ -385,7 +398,12 @@ mark {
 }
 
 .button-navigation.button-highlighted, .button-navigation:active {
-  box-shadow: inset -2px -2px #292929, inset 2px 2px #292929, inset -4px -4px #ffffff, inset 4px 4px rgb(158, 158, 158);
+  color: black;
+  box-shadow: inset -2px -2px black, inset 2px 2px black, inset -4px -4px #ffffff, inset 4px 4px rgb(158, 158, 158);
+}
+
+.button-navigation:visited {
+  color: black;
 }
 
 .button-navigation.exhibition {
@@ -443,12 +461,9 @@ mark {
 }
 
 .translateY-01 { transform: translateY(-24px); }
-.translateY-02 { transform: translateY(-16px); }
-.translateY-03 { transform: translateY(-8px); }
-.translateY-04 { transform: translateY(0px); }
-.translateY-05 { transform: translateY(8px); }
-.translateY-06 { transform: translateY(16px); }
-.translateY-07 { transform: translateY(24px); }
+.translateY-02 { transform: translateY(-8px); }
+.translateY-03 { transform: translateY(8px); }
+.translateY-04 { transform: translateY(24px); }
 
 #content {
   margin-top: var(--spacing);
@@ -463,8 +478,6 @@ mark {
   max-height: calc(100vh - 5 * var(--spacing));
   overflow: hidden;
   margin-top: var(--spacing);
-  /*padding-top: calc(4 * var(--spacing));*/
-  /*background-color: #292929;*/
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -512,9 +525,12 @@ mark {
 }
 
 #work-text {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  overflow-y: scroll;
+  padding-right: 2rem;
+}
+
+#work-text::-webkit-scrollbar {
+  width: 4px;
 }
 
 #work-text-description {
@@ -669,7 +685,7 @@ mark {
 @media screen and (max-width: 1024px) {
   :root {
     --spacing: 1rem;
-    --fontSize: 1.var(--spacing);
+    --fontSize: 1rem;
   }
 
   #content {
@@ -701,7 +717,7 @@ mark {
   }
 
   #content p, #content a, #content h1, #content h2 {
-    font-size: var(--fontSize);
+    font-size: 1.4rem;
     line-height: 150%;
   }
   
@@ -729,6 +745,12 @@ mark {
 
   #menu-title {
     height: 2rem;
+  }
+
+  #work-text {
+    overflow: inherit;
+    max-height: 100% !important;
+    padding-right: 0rem;
   }
 }
 
