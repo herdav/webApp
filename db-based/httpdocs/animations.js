@@ -1,30 +1,29 @@
-// animations.js for davidherren.ch / 2024-02-15
+// animations.js for davidherren.ch / 2024-03-28
 
-{ // Animate Words
-  let isAnimating = false;
-  function animateLetters(id) {
-    if (isAnimating) return;
-    isAnimating = true;
-    const title = document.getElementById(id);
-    const text = title.innerText;
-    title.innerHTML = '';
-    const words = text.split(' ');
-    words.forEach((word, index) => {
-      const span = document.createElement('span');
-      span.innerText = word;
-      span.style.opacity = 0;
-      title.appendChild(span);
-      if (index < words.length - 1) {
-        title.appendChild(document.createTextNode(' ')); // Add space between words
-      }
-      setTimeout(() => {
-        span.style.opacity = 1;
-      }, 100 * index); // Adjust the timeout as needed
-    });
+// Animate Words with each word appearing with an initial delay
+let isAnimating = false;
+function animateLetters(id) {
+  if (isAnimating) return;
+  isAnimating = true;
+  const title = document.getElementById(id);
+  const text = title.innerText;
+  title.innerHTML = '';
+  const words = text.split(' ');
+  words.forEach((word, index) => {
+    const span = document.createElement('span');
+    span.innerText = word;  
+    span.style.opacity = 0;
+    title.appendChild(span);
+    if (index < words.length - 1) {
+      title.appendChild(document.createTextNode(' ')); // Add space between words
+    }
     setTimeout(() => {
-      isAnimating = false;
-    }, 100 * words.length); // Adjust the timeout as needed
-  }
+      span.style.opacity = 1;
+    }, 500 + 100 * index); // Delay the appearance of each word by 1s + index
+  });
+  setTimeout(() => {
+    isAnimating = false;
+  }, 500 + 100 * words.length); // Reset the isAnimating flag after the last animation
 }
 
 function applySvgTransformations(expand) {
@@ -92,23 +91,40 @@ function applySvgTransformations(expand) {
       }
     }
 
-    // Event listener for click events on the pointer button
     if (pointerButton) {
       pointerButton.addEventListener('click', function(event) {
+        // Custom behavior for scrolling to the top
+        if (pointerButton.getAttribute('href') === '#top') {
+          event.preventDefault(); // Prevent default anchor behavior
+          // Smoothly scroll to the top
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+          // Wait for scrolling to complete before allowing other scripts to execute
+          const checkIfAtTop = setInterval(() => {
+            if (window.scrollY === 0) {
+              clearInterval(checkIfAtTop);
+              // Here you can trigger other scripts or functions that should run after scrolling to the top
+              // This is where you could add logic that needs to run after the scroll completes
+            }
+          }, 100); // Check every 100 milliseconds
+          return; // Early return to avoid executing the rest of the code in this event listener
+        }
+    
+        // The rest of your event listener's code for toggling layout, etc.
+        // This part of the code will run for clicks that don't match the '#top' condition
         const scrollHeight = document.documentElement.scrollHeight;
         const clientHeight = document.documentElement.clientHeight;
         const scrolledToBottom = window.scrollY + clientHeight >= scrollHeight;
-
-        // Check if scrolled to the bottom of the page
+    
         if (scrolledToBottom) {
           // Already at the bottom, so let the default anchor behavior take over
           return; // Exit the function without preventing the default behavior
         }
-
+    
         // Toggle collapse/expand based on current state
         isLeftExpanded = !isLeftExpanded;
         lastStateLeftExpanded = isLeftExpanded; // Update the global state
-
+    
         if (isLeftExpanded) { // Logic for expanding
           contentLeft.classList.remove('width-collapsed');
           contentRight.classList.remove('width-expanded');
@@ -122,7 +138,7 @@ function applySvgTransformations(expand) {
           contentRight.classList.add('width-expanded');
           applySvgTransformations(true);
         }
-
+    
         event.preventDefault(); // Prevent default only when not at the bottom
       });
 
