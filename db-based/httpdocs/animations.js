@@ -69,6 +69,26 @@ function applySvgTransformations(expand) {
   });
 }
 
+function workTextHeight() {
+  const workText = document.getElementById('work-text');
+  const menu = document.getElementById('menu');
+
+  if (workText && menu) {
+    // Get the viewport height in pixels
+    const viewportHeight = window.innerHeight;
+    // Calculate the new height, subtracting the menu's offsetHeight and an additional value
+    const height = viewportHeight - menu.offsetHeight - 128 + 'px';
+    // Apply the obtained height as min-height for the element
+    workText.style.maxHeight = height;
+  }
+}
+
+function scrollTopEvent() {
+  const workText = document.getElementById('work-text');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  workText.scrollTop = 0;
+}
+
 { // MutationObserver to observe DOM changes and adjust the layout accordingly
   const observer = new MutationObserver((mutations, obs) => {
     const pointerButton = document.getElementById('pointer');
@@ -84,10 +104,12 @@ function applySvgTransformations(expand) {
         contentLeft.classList.add('width-expanded');
         contentRight.classList.add('width-collapsed');
         applySvgTransformations(false);
+        workTextHeight();
       } else {
         contentLeft.classList.add('width-collapsed');
         contentRight.classList.add('width-expanded');
         applySvgTransformations(true);
+        workTextHeight();
       }
     }
 
@@ -96,21 +118,17 @@ function applySvgTransformations(expand) {
         // Custom behavior for scrolling to the top
         if (pointerButton.getAttribute('href') === '#top') {
           event.preventDefault(); // Prevent default anchor behavior
-          // Smoothly scroll to the top
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+          scrollTopEvent(); // Smoothly scroll to the top
+
           // Wait for scrolling to complete before allowing other scripts to execute
           const checkIfAtTop = setInterval(() => {
             if (window.scrollY === 0) {
               clearInterval(checkIfAtTop);
-              // Here you can trigger other scripts or functions that should run after scrolling to the top
-              // This is where you could add logic that needs to run after the scroll completes
             }
           }, 100); // Check every 100 milliseconds
           return; // Early return to avoid executing the rest of the code in this event listener
         }
-    
-        // The rest of your event listener's code for toggling layout, etc.
+        
         // This part of the code will run for clicks that don't match the '#top' condition
         const scrollHeight = document.documentElement.scrollHeight;
         const clientHeight = document.documentElement.clientHeight;
@@ -145,7 +163,6 @@ function applySvgTransformations(expand) {
       window.addEventListener('scroll', function() {
         const scrollHeight = document.documentElement.scrollHeight;
         const clientHeight = document.documentElement.clientHeight;
-        const scrolledToBottom = window.scrollY + clientHeight >= scrollHeight;
         const scrolledNearBottom = window.scrollY + clientHeight >= scrollHeight - clientHeight / 2;
       
         if (window.scrollY > 500) {
@@ -165,6 +182,9 @@ function applySvgTransformations(expand) {
         } else {
           svgArrow.style.transform = '';
           pointerButton.href = '';
+        }
+        if (window.scrollY === 0) {
+          scrollTopEvent();
         }
       });
 
