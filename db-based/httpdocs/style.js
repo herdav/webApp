@@ -1,29 +1,30 @@
-// animations.js for davidherren.ch / 2024-03-28
+// style.js for davidherren.ch / 2024-03-29
 
-// Animate Words with each word appearing with an initial delay
-let isAnimating = false;
-function animateLetters(id) {
-  if (isAnimating) return;
-  isAnimating = true;
-  const title = document.getElementById(id);
-  const text = title.innerText;
-  title.innerHTML = '';
-  const words = text.split(' ');
-  words.forEach((word, index) => {
-    const span = document.createElement('span');
-    span.innerText = word;  
-    span.style.opacity = 0;
-    title.appendChild(span);
-    if (index < words.length - 1) {
-      title.appendChild(document.createTextNode(' ')); // Add space between words
-    }
+{ // Animate Words with each word appearing with an initial delay
+  let isAnimating = false;
+  function animateLetters(id) {
+    if (isAnimating) return;
+    isAnimating = true;
+    const title = document.getElementById(id);
+    const text = title.innerText;
+    title.innerHTML = '';
+    const words = text.split(' ');
+    words.forEach((word, index) => {
+      const span = document.createElement('span');
+      span.innerText = word;  
+      span.style.opacity = 0;
+      title.appendChild(span);
+      if (index < words.length - 1) {
+        title.appendChild(document.createTextNode(' ')); // Add space between words
+      }
+      setTimeout(() => {
+        span.style.opacity = 1;
+      }, 500 + 100 * index); // Delay the appearance of each word by 1s + index
+    });
     setTimeout(() => {
-      span.style.opacity = 1;
-    }, 500 + 100 * index); // Delay the appearance of each word by 1s + index
-  });
-  setTimeout(() => {
-    isAnimating = false;
-  }, 500 + 100 * words.length); // Reset the isAnimating flag after the last animation
+      isAnimating = false;
+    }, 500 + 100 * words.length); // Reset the isAnimating flag after the last animation
+  }
 }
 
 function applySvgTransformations(expand) {
@@ -80,6 +81,7 @@ function workTextHeight() {
     const height = viewportHeight - menu.offsetHeight - 128 + 'px';
     // Apply the obtained height as min-height for the element
     workText.style.maxHeight = height;
+    workText.style.minHeight = height;
   }
 }
 
@@ -96,7 +98,7 @@ function scrollTopEvent() {
     const contentRight = document.getElementById('content-inner-right');
     const svgArrow = document.querySelector('.svg-arrow');
 
-    let isLeftExpanded = lastStateLeftExpanded;
+    let isLeftExpanded = config.lastStateLeftExpanded;
 
     // Set the initial state based on the last known state
     if (contentLeft) {
@@ -128,7 +130,7 @@ function scrollTopEvent() {
           }, 100); // Check every 100 milliseconds
           return; // Early return to avoid executing the rest of the code in this event listener
         }
-        
+
         // This part of the code will run for clicks that don't match the '#top' condition
         const scrollHeight = document.documentElement.scrollHeight;
         const clientHeight = document.documentElement.clientHeight;
@@ -141,7 +143,7 @@ function scrollTopEvent() {
     
         // Toggle collapse/expand based on current state
         isLeftExpanded = !isLeftExpanded;
-        lastStateLeftExpanded = isLeftExpanded; // Update the global state
+        config.lastStateLeftExpanded = isLeftExpanded; // Update the global state
     
         if (isLeftExpanded) { // Logic for expanding
           contentLeft.classList.remove('width-collapsed');
@@ -211,6 +213,9 @@ function scrollTopEvent() {
     }
   });
   observer.observe(document, { childList: true, subtree: true });
+  
+  // Additional event listener for handling scroll events, for dynamically showing image titles based on scroll position
+  window.addEventListener('scroll', handleScrollEvent);
 }
 
 { // Controls the dropdown menu
@@ -306,4 +311,38 @@ function toggleTriangles(buttonId) {
     });
     currentOpenDropdownId = buttonId;
   }
+}
+
+function handleScrollEvent() {
+  let images = document.querySelectorAll('#content-inner-right img');
+  let allTitleDivs = document.querySelectorAll('#content-inner-left .work-image-title');
+  
+  // Initially hide all title divs
+  allTitleDivs.forEach(div => div.style.display = 'none');
+  let currentVisibleImageIndex = -1;
+  
+  // Determine the currently visible image based on its viewport position
+  images.forEach((img, index) => {
+    let rect = img.getBoundingClientRect();
+    // Adjusted handling to treat all images equally based on their position in the viewport
+    if (rect.bottom > 0 && rect.top < window.innerHeight / 2) {
+      currentVisibleImageIndex = index;
+    }
+  });
+
+  // Display the title for the currently visible image, if any
+  if (currentVisibleImageIndex !== -1) {
+    allTitleDivs[currentVisibleImageIndex].style.display = 'flex';
+  }
+}
+
+{ // Adjust height of index items
+  const adjustHeight = () => {
+    document.querySelectorAll('.index-item').forEach(item => {
+      const width = item.offsetWidth;
+      const height = width * 0.667;
+      item.style.height = `${height}px`;
+    });
+  };
+  window.addEventListener('resize', adjustHeight);
 }
