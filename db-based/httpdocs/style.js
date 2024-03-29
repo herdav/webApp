@@ -91,8 +91,6 @@ function scrollTopEvent() {
   workText.scrollTop = 0;
 }
 
-// Using two spaces for indentation as per user instruction
-
 // MutationObserver to observe DOM changes and adjust the layout accordingly
 const observer = new MutationObserver((mutations, obs) => {
   const pointerButton = document.getElementById('pointer');
@@ -111,6 +109,7 @@ const observer = new MutationObserver((mutations, obs) => {
     contentLeft.classList[rightClassAction]('width-collapsed');
     contentRight.classList[leftClassAction]('width-collapsed');
     applySvgTransformations(!expandLeft);
+    workTextHeight(); // Ensuring workTextHeight is called after layout adjustments
   }
 
   if (contentLeft) {
