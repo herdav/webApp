@@ -91,131 +91,105 @@ function scrollTopEvent() {
   workText.scrollTop = 0;
 }
 
-{ // MutationObserver to observe DOM changes and adjust the layout accordingly
-  const observer = new MutationObserver((mutations, obs) => {
-    const pointerButton = document.getElementById('pointer');
-    const contentLeft = document.getElementById('content-inner-left');
-    const contentRight = document.getElementById('content-inner-right');
-    const svgArrow = document.querySelector('.svg-arrow');
+// Using two spaces for indentation as per user instruction
 
-    let isLeftExpanded = config.lastStateLeftExpanded;
+// MutationObserver to observe DOM changes and adjust the layout accordingly
+const observer = new MutationObserver((mutations, obs) => {
+  const pointerButton = document.getElementById('pointer');
+  const contentLeft = document.getElementById('content-inner-left');
+  const contentRight = document.getElementById('content-inner-right');
+  const svgArrow = document.querySelector('.svg-arrow');
 
-    // Set the initial state based on the last known state
-    if (contentLeft) {
-      if (isLeftExpanded) {
-        contentLeft.classList.add('width-expanded');
-        contentRight.classList.add('width-collapsed');
-        applySvgTransformations(false);
-        workTextHeight();
-      } else {
-        contentLeft.classList.add('width-collapsed');
-        contentRight.classList.add('width-expanded');
-        applySvgTransformations(true);
-        workTextHeight();
+  let isLeftExpanded = config.lastStateLeftExpanded;
+
+  // Toggle class helper function
+  function toggleClasses(expandLeft) {
+    const leftClassAction = expandLeft ? 'add' : 'remove';
+    const rightClassAction = expandLeft ? 'remove' : 'add';
+    contentLeft.classList[leftClassAction]('width-expanded');
+    contentRight.classList[rightClassAction]('width-expanded');
+    contentLeft.classList[rightClassAction]('width-collapsed');
+    contentRight.classList[leftClassAction]('width-collapsed');
+    applySvgTransformations(!expandLeft);
+  }
+
+  if (contentLeft) {
+    toggleClasses(isLeftExpanded); // Apply initial state
+  }
+
+  if (pointerButton) {
+    pointerButton.addEventListener('click', function(event) {
+      event.preventDefault(); // Prevent default behavior for all clicks
+      if (pointerButton.getAttribute('href') === '#top') {
+        scrollTopEvent(); // Smoothly scroll to the top
+        return; // Exit the function early
       }
-    }
 
-    if (pointerButton) {
-      pointerButton.addEventListener('click', function(event) {
-        // Custom behavior for scrolling to the top
-        if (pointerButton.getAttribute('href') === '#top') {
-          event.preventDefault(); // Prevent default anchor behavior
-          scrollTopEvent(); // Smoothly scroll to the top
+      // Handling for clicks not targeting '#top'
+      isLeftExpanded = !isLeftExpanded;
+      config.lastStateLeftExpanded = isLeftExpanded; // Update global state
+      toggleClasses(isLeftExpanded);
+    });
 
-          // Wait for scrolling to complete before allowing other scripts to execute
-          const checkIfAtTop = setInterval(() => {
-            if (window.scrollY === 0) {
-              clearInterval(checkIfAtTop);
-            }
-          }, 100); // Check every 100 milliseconds
-          return; // Early return to avoid executing the rest of the code in this event listener
-        }
-
-        // This part of the code will run for clicks that don't match the '#top' condition
-        const scrollHeight = document.documentElement.scrollHeight;
-        const clientHeight = document.documentElement.clientHeight;
-        const scrolledToBottom = window.scrollY + clientHeight >= scrollHeight;
-    
-        if (scrolledToBottom) {
-          // Already at the bottom, so let the default anchor behavior take over
-          return; // Exit the function without preventing the default behavior
-        }
-    
-        // Toggle collapse/expand based on current state
-        isLeftExpanded = !isLeftExpanded;
-        config.lastStateLeftExpanded = isLeftExpanded; // Update the global state
-    
-        if (isLeftExpanded) { // Logic for expanding
-          contentLeft.classList.remove('width-collapsed');
-          contentRight.classList.remove('width-expanded');
-          contentLeft.classList.add('width-expanded');
-          contentRight.classList.add('width-collapsed');
-          applySvgTransformations(false);
-        } else { // Logic for collapsing
-          contentLeft.classList.remove('width-expanded');
-          contentRight.classList.remove('width-collapsed');
-          contentLeft.classList.add('width-collapsed');
-          contentRight.classList.add('width-expanded');
-          applySvgTransformations(true);
-        }
-    
-        event.preventDefault(); // Prevent default only when not at the bottom
-      });
-
-      window.addEventListener('scroll', function() {
-        const scrollHeight = document.documentElement.scrollHeight;
-        const clientHeight = document.documentElement.clientHeight;
-        const scrolledNearBottom = window.scrollY + clientHeight >= scrollHeight - clientHeight / 2;
-      
-        if (window.scrollY > 500) {
-          pointerButton.style.top = '50vh';
-        } else {
-          pointerButton.style.top = '4rem';
-        }
-      
-        if (scrolledNearBottom) {
-          svgArrow.style.transition = 'transform 0.5s ease-in-out';
-          if (isLeftExpanded) {
-            svgArrow.style.transform = 'rotate(90deg)';
-          } else {
-            svgArrow.style.transform = 'rotate(-90deg)';
-          }
-          pointerButton.href = '#top';
-        } else {
-          svgArrow.style.transform = '';
-          pointerButton.href = '';
-        }
-        if (window.scrollY === 0) {
-          scrollTopEvent();
-        }
-      });
+    window.addEventListener('scroll', function() {
+      handleScrollLogic(pointerButton, svgArrow, isLeftExpanded);
+      handleScrollImageTitles();
+    });
 
     // Apply hover event listeners to all .frame-title-left elements
-    const frameTitleLeftElements = document.querySelectorAll('.frame-title-left');
-
-    frameTitleLeftElements.forEach(frameTitleLeft => {
-      frameTitleLeft.addEventListener('mouseenter', function() {
-        svgArrow.style.transition = 'transform 0.5s ease-in-out'; // Smooth transition for rotation
-        // Rotate the svgArrow based on isLeftExpanded flag on hover
-        if (isLeftExpanded) {
-          svgArrow.style.transform = 'rotate(90deg)';
-        } else {
-          svgArrow.style.transform = 'rotate(-90deg)';
-        }
-      });
-
-      frameTitleLeft.addEventListener('mouseleave', function() {
-        // Reset the rotation on mouse leave, adjust as needed
-        svgArrow.style.transform = '';
-      });
+    document.querySelectorAll('.frame-title-left').forEach(frameTitleLeft => {
+      frameTitleLeft.addEventListener('mouseenter', () => svgArrowRotation(svgArrow, isLeftExpanded, true));
+      frameTitleLeft.addEventListener('mouseleave', () => svgArrowRotation(svgArrow, isLeftExpanded, false));
     });
-      // obs.disconnect(); // Uncomment to stop the observer once the element is found
+  }
+});
+observer.observe(document, { childList: true, subtree: true });
+
+function svgArrowRotation(svgArrow, isLeftExpanded, isEntering) {
+  svgArrow.style.transition = 'transform 0.5s ease-in-out';
+  if (isEntering) {
+    svgArrow.style.transform = isLeftExpanded ? 'rotate(90deg)' : 'rotate(-90deg)';
+  } else {
+    svgArrow.style.transform = '';
+  }
+}
+
+function handleScrollLogic(pointerButton, svgArrow, isLeftExpanded) {
+  const scrollHeight = document.documentElement.scrollHeight;
+  const clientHeight = document.documentElement.clientHeight;
+  const scrolledNearBottom = window.scrollY + clientHeight >= scrollHeight - clientHeight / 2;
+  pointerButton.style.top = window.scrollY > 500 ? '50vh' : '4rem';
+
+  if (scrolledNearBottom) {
+    svgArrow.style.transition = 'transform 0.5s ease-in-out';
+    svgArrow.style.transform = isLeftExpanded ? 'rotate(90deg)' : 'rotate(-90deg)';
+    pointerButton.href = '#top';
+  } else {
+    svgArrow.style.transform = '';
+    pointerButton.href = '';
+  }
+  if (window.scrollY === 0) {
+    scrollTopEvent();
+  }
+}
+
+function handleScrollImageTitles() {
+  // Dynamically showing image titles based on scroll position
+  const images = document.querySelectorAll('#content-inner-right img');
+  const allTitleDivs = document.querySelectorAll('#content-inner-left .work-image-title');
+  allTitleDivs.forEach(div => div.style.display = 'none'); // Initially hide all title divs
+  let currentVisibleImageIndex = -1;
+
+  images.forEach((img, index) => {
+    const rect = img.getBoundingClientRect();
+    if (rect.bottom > 0 && rect.top < window.innerHeight / 2) {
+      currentVisibleImageIndex = index;
     }
   });
-  observer.observe(document, { childList: true, subtree: true });
-  
-  // Additional event listener for handling scroll events, for dynamically showing image titles based on scroll position
-  window.addEventListener('scroll', handleScrollEvent);
+
+  if (currentVisibleImageIndex !== -1) {
+    allTitleDivs[currentVisibleImageIndex].style.display = 'flex';
+  }
 }
 
 { // Controls the dropdown menu
@@ -310,29 +284,6 @@ function toggleTriangles(buttonId) {
       triangle.classList.toggle(`translateY-0${index + 1}`, true);
     });
     currentOpenDropdownId = buttonId;
-  }
-}
-
-function handleScrollEvent() {
-  let images = document.querySelectorAll('#content-inner-right img');
-  let allTitleDivs = document.querySelectorAll('#content-inner-left .work-image-title');
-  
-  // Initially hide all title divs
-  allTitleDivs.forEach(div => div.style.display = 'none');
-  let currentVisibleImageIndex = -1;
-  
-  // Determine the currently visible image based on its viewport position
-  images.forEach((img, index) => {
-    let rect = img.getBoundingClientRect();
-    // Adjusted handling to treat all images equally based on their position in the viewport
-    if (rect.bottom > 0 && rect.top < window.innerHeight / 2) {
-      currentVisibleImageIndex = index;
-    }
-  });
-
-  // Display the title for the currently visible image, if any
-  if (currentVisibleImageIndex !== -1) {
-    allTitleDivs[currentVisibleImageIndex].style.display = 'flex';
   }
 }
 
