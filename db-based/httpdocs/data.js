@@ -1,131 +1,134 @@
-// data.js for davidherren.ch / 2024-03-23
+// data.js for davidherren.ch / 2024-03-29
 
-let currentLanguage = ''; // Sets the default language
-let currentSlug = ''; // Stores the current slug for content
-let lastStateLeftExpanded = true; // Stores the expanded/collapsed state of the left content
-let titleElement; // Change menu H1 title on subpages to H2
-let titleElementH1 = true;
-let indexIsLoaded = false;
+const config = {
+  currentLanguage: '', // Sets the default language
+  currentSlug: '', // Stores the current slug for content
+  lastStateLeftExpanded: true, // Stores the expanded/collapsed state of the left content
+  titleElement: null, // Change menu H1 title on subpages to H2
+  titleElementH1: true,
+  indexIsLoaded: false
+};
 
-// Function to handle sending requests to the server
-const sendRequest = (url, successCallback, errorCallback) => {
-  fetch(url)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok.');
-      }
-      return response.json();
-    })
-    .then(data => successCallback(data))
-    //.catch(error => errorCallback(error));
+// Function to handle sending requests to the server using async/await
+const sendRequest = async (url, successCallback, errorCallback) => {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Network response was not ok.');
+    }
+    const data = await response.json();
+    successCallback(data);
+  } catch (error) {
+    if (errorCallback) errorCallback(error);
+    else console.error('Request failed:', error);
+  }
 };
 
 // Function to switch the current language of the page
 function switchLanguage(lang) {
   document.documentElement.lang = lang; // Sets the language of the document
-  currentLanguage = lang; // Updates the currentLanguage variable
+  config.currentLanguage = lang; // Updates the config.currentLanguage variable
   highlightLanguageButton(lang); // Highlights the selected language button
 
   // Constructs a new path for the URL based on the selected language
-  let newPath = '/' + currentLanguage + '/';
-  if (currentSlug) {
-    newPath += currentSlug;
+  let newPath = '/' + config.currentLanguage + '/';
+  if (config.currentSlug) {
+    newPath += config.currentSlug;
   }
   history.pushState(null, null, newPath); // Updates the browser's history
 
-  // Loads the appropriate content based on the currentSlug
-  if (currentSlug === 'about') {
+  // Loads the appropriate content based on the config.currentSlug
+  if (config.currentSlug === 'about') {
     loadAbout(false);
-  } else if (currentSlug) {
-    loadWorks(currentSlug, 0);
+  } else if (config.currentSlug) {
+    loadWorks(config.currentSlug, 0);
   } else {
-    statement(currentLanguage);
-   if (indexIsLoaded) {
+    statement(config.currentLanguage);
+   if (config.indexIsLoaded) {
     initializePage();
     }
   }
 }
 
-// Function to load content for a specific work
-function loadWorks(slug, popstate) {
-  window.scrollTo(0, 0);
-  currentSlug = slug; // Updates the currentSlug
-  let url = "/data.php?slug=" + encodeURIComponent(slug) + "&lang=" + currentLanguage + "&works=1"; // Constructs the URL for the request
-  indexIsLoaded = false;
-  sendRequest(url, (response) => {
-    document.getElementById("index-inner").innerHTML = ''; // Clears existing content
-    document.getElementById("content").innerHTML = response.html; // Inserts new content
-    updateDocumentTitle(response.title + " | David Herren"); // Updates the document title
-    let description = currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn; // Selects the appropriate description based on the current language
-    updateMetaDescription(description); // Updates the meta description
-    if (!popstate) { updateUrl(slug); } // Updates the URL, except popstate event
-    updateHrefLangTags(); // Updates hreflang tags for SEO
-    updateCanonicalTags();
-    animateLetters('work-text-description');
-  });
-  highlightContentButton('button-' + slug); // Highlights the active content button
-  changeMenuTitle(); // Change menu H1 title on subpages to H2
-}
+// Refactored to use a common function for loading content, with adjustments to not update meta description for index
+const loadContent = (slug, popstate, contentType) => {
+  window.scrollTo(0, 0); // Scrolls to the top of the page
+  config.currentSlug = slug; // Updates the current slug in config
 
-// Function to load content about
-function loadAbout(popstate) {
-  currentSlug = 'about';
-  let url = "/data.php?lang=" + encodeURIComponent(currentLanguage) + "&about=1";
-  indexIsLoaded = false;
+  let url = `/data.php?slug=${encodeURIComponent(slug)}&lang=${config.currentLanguage}`;
+  if (contentType === 'index') {
+    url += "&index=1";
+    config.indexIsLoaded = true;
+  } else if (contentType === 'about') {
+    url += "&about=1";
+  } else {
+    url += "&works=1";
+  }
+
   sendRequest(url, (response) => {
-    document.getElementById("index-inner").innerHTML = '';
-    document.getElementById("content").innerHTML = response.html;
-    updateDocumentTitle('About | David Herren');
-    let description = currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn;
-    updateMetaDescription(description);
-    if (!popstate) { updateUrl('about'); }
+    const indexInnerElement = document.getElementById("index-inner");
+    const contentElement = document.getElementById("content");
+    if (contentType === 'index') {
+      indexInnerElement.innerHTML = response.html;
+      contentElement.innerHTML = '';
+    } else {
+      indexInnerElement.innerHTML = '';
+      contentElement.innerHTML = response.html;
+    }
+
+    const pageTitle = response.title ? `${response.title} | David Herren` : 'David Herren';
+    updateDocumentTitle(pageTitle);
+
+    // Update meta description only if contentType is not 'index'
+    if (contentType !== 'index') {
+      let description = config.currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn;
+      updateMetaDescription(description);
+    }
+
+    if (!popstate) { updateUrl(slug); }
     updateHrefLangTags();
     updateCanonicalTags();
   }, (error) => {
-    console.error('Error with the request:', error);
+    console.error(`Error with the request for ${contentType}:`, error);
   });
-  highlightContentButton('button-about');
+
+  if(contentType !== 'index') highlightContentButton(`button-${slug}`);
   changeMenuTitle();
 }
 
-// Function to load content index
+// Functions for loading specific types of content
+function loadWorks(slug, popstate) {
+  loadContent(slug, popstate, 'works');
+}
+
+function loadAbout(popstate) {
+  loadContent('about', popstate, 'about');
+}
+
 function loadIndex(popstate) {
-  currentSlug = '';
-  let url = "/data.php?lang=" + encodeURIComponent(currentLanguage) + "&index=1";
-  indexIsLoaded = true;
-  sendRequest(url, (response) => {
-    document.getElementById("index-inner").innerHTML = response.html;
-    document.getElementById("content").innerHTML = '';
-    updateDocumentTitle('David Herren');
-    if (!popstate) { updateUrl('') }; // Updates the URL, except popstate event
-    adjustHeight();
-    updateCanonicalTags();
-  }, (error) => {
-    console.error('Error with the request:', error);
-  });
-  highlightContentButton('');
+  loadContent('', popstate, 'index');
 }
 
 function changeMenuTitle() {
-  if (titleElement && titleElement.tagName === 'H1' && titleElementH1) {
+  if (config.titleElement && config.titleElement.tagName === 'H1' && config.titleElementH1) {
     var newTitleElement = document.createElement('h2');
-    titleElementH1 = false;
-    newTitleElement.id = titleElement.id;
-    newTitleElement.innerHTML = titleElement.innerHTML;
-    titleElement.parentNode.replaceChild(newTitleElement, titleElement);
+    config.titleElementH1 = false;
+    newTitleElement.id = config.titleElement.id;
+    newTitleElement.innerHTML = config.titleElement.innerHTML;
+    config.titleElement.parentNode.replaceChild(newTitleElement, config.titleElement);
   }
 }
 
 // Function to update the URL in the browser's history
 function updateUrl(slug) {
-  let newUrl = '/' + currentLanguage + '/' + slug; // Constructs the new URL
+  let newUrl = '/' + config.currentLanguage + '/' + slug; // Constructs the new URL
   window.history.pushState({path: newUrl}, '', newUrl); // Pushes the new URL to the browser's history
 }
 
 window.addEventListener('popstate', function(event) {
   if (event.state && event.state.path) {
     const pathParts = event.state.path.split('/').filter(Boolean);
-    if (pathParts.length === 1) {
+    if (pathParts.length <= 1) {
       loadIndex(true);
     } else if (pathParts.length >= 2) {
       const slug = pathParts[1];
@@ -166,18 +169,6 @@ function highlightContentButton(buttonId) {
   }
 }
 
-{ // Adjust height of index items
-  function adjustHeight() {
-    var items = document.querySelectorAll('.index-item');
-    items.forEach(function(item) {
-      var width = item.offsetWidth;
-      var height = width * 0.75;
-      item.style.height = height + 'px';
-    });
-  }
-  window.onresize = adjustHeight;
-}
-
 { // Function to update the meta description tag of the document
   function updateMetaDescription(description) {
     let metaDescription = document.querySelector('meta[name="description"]');
@@ -212,7 +203,7 @@ function updateCanonicalTags() {
   document.querySelectorAll('link[rel="canonical"]').forEach(function(tag) {tag.remove();});
   let canonicalTag = document.createElement('link');
   canonicalTag.rel = 'canonical';
-  canonicalTag.href = 'https://davidherren.ch/' + currentLanguage + '/' + currentSlug;
+  canonicalTag.href = 'https://davidherren.ch/' + config.currentLanguage + '/' + config.currentSlug;
   document.head.appendChild(canonicalTag);
 }
 
@@ -226,7 +217,7 @@ function updateHrefLangTags() {
     let linkTag = document.createElement('link');
     linkTag.rel = 'alternate';
     linkTag.hreflang = lang;
-    linkTag.href = window.location.origin + '/' + lang + '/' + currentSlug;
+    linkTag.href = window.location.origin + '/' + lang + '/' + config.currentSlug;
     document.head.appendChild(linkTag);
   });
 }
@@ -238,16 +229,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Check the URL for a language code, using it if present, otherwise default to the browser's language preference
   if (pathParts.length > 0 && (pathParts[0] === 'de' || pathParts[0] === 'en')) {
-    currentLanguage = pathParts[0]; // Set the page language based on the URL
+    config.currentLanguage = pathParts[0]; // Set the page language based on the URL
   } else {
     // Default to the browser's language, or English if the browser's language is not explicitly supported
     let browserLanguage = navigator.language || navigator.userLanguage;
-    currentLanguage = browserLanguage.startsWith('de') ? 'de' : 'en';
+    config.currentLanguage = browserLanguage.startsWith('de') ? 'de' : 'en';
   }
 
   // Highlight the button for the current language and switch the page content to that language
-  highlightLanguageButton(currentLanguage);
-  switchLanguage(currentLanguage); // This function updates the page to reflect the chosen language
+  highlightLanguageButton(config.currentLanguage);
+  switchLanguage(config.currentLanguage); // This function updates the page to reflect the chosen language
   
   // Load the index or specific content based on the URL, defaulting to the index if no specific path is provided
   if (pathParts.length > 1) {
@@ -263,10 +254,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Update the page's hreflang tags based on the current language, for SEO purposes
   updateHrefLangTags(pathParts.length > 1 ? pathParts[1] : '');
 
-  // Additional event listener for handling scroll events, for dynamically showing image titles based on scroll position
-  window.addEventListener('scroll', handleScrollEvent);
-
-  titleElement = document.getElementById('title-text'); // Get H1 title from menu
+  config.titleElement = document.getElementById('title-text'); // Get H1 title from menu
 });
 
 // Wrap loadWorks in a function that attempts to call it, and retries if it fails
@@ -279,28 +267,5 @@ function attemptLoadWorks(slug, popstate, attempt = 1) {
     }, 1000); // Wait 1 second before retrying
   } else {
     console.error("Failed to load work details after 3 attempts.");
-  }
-}
-
-function handleScrollEvent() {
-  let images = document.querySelectorAll('#content-inner-right img');
-  let allTitleDivs = document.querySelectorAll('#content-inner-left .work-image-title');
-  
-  // Initially hide all title divs
-  allTitleDivs.forEach(div => div.style.display = 'none');
-  let currentVisibleImageIndex = -1;
-  
-  // Determine the currently visible image based on its viewport position
-  images.forEach((img, index) => {
-    let rect = img.getBoundingClientRect();
-    // Adjusted handling to treat all images equally based on their position in the viewport
-    if (rect.bottom > 0 && rect.top < window.innerHeight / 2) {
-      currentVisibleImageIndex = index;
-    }
-  });
-
-  // Display the title for the currently visible image, if any
-  if (currentVisibleImageIndex !== -1) {
-    allTitleDivs[currentVisibleImageIndex].style.display = 'flex';
   }
 }
