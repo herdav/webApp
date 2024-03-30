@@ -1,4 +1,4 @@
-<?php // data.php for davidherren.ch / 2024-02-28
+<?php // data.php for davidherren.ch / 2024-02-30
 
 include './php/db.php';
 include './php/fetchData.php';
@@ -84,6 +84,43 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
       }
     }
 
+    if (!empty($workData["vimeo_landscape"]) || !empty($workData["vimeo_portrait"])) {
+      if (!empty($workData["vimeo_landscape"])) {$vimeoId = $workData["vimeo_landscape"];}
+      if (!empty($workData["vimeo_portrait"])) {$vimeoId = $workData["vimeo_portrait"];}
+      $htmlOutput .= <<<HTML
+      <div class="work-video-title">
+        <div class="frame">
+          <div class="frame-title">
+            <a href="#top" class="frame-title-left button-navigation"></a>
+            <h3 class="frame-title-center">$workTitle</h3>
+          </div>
+          <div class="frame-title-text">
+          <p>Video @ <a href="https://vimeo.com/{$vimeoId}" target="_blank">Vimeo</a></p>
+          </div>
+        </div></div>
+      HTML;
+    }
+
+    if (!empty($workData["3d"]) && $workData["3d"] == 1) {
+      if ($lang === 'de') {
+        $modelText = "3D Modell für die Integration auf der Website erstellt mit <a href='https://blender.org' target='_blank'>Blender</a>.";
+      } else {
+        $modelText = "3D model for integration on the website created with <a href='https://blender.org' target='_blank'>Blender</a>.";
+      }
+      $htmlOutput .= <<<HTML
+      <div class="work-model-title">
+        <div class="frame">
+          <div class="frame-title">
+            <a href="#top" class="frame-title-left button-navigation"></a>
+            <h3 class="frame-title-center">$workTitle</h3>
+          </div>
+          <div class="frame-title-text">
+          <p>$modelText</p>
+          </div>
+        </div></div>
+      HTML;
+    }
+
     // Closing the left content div
     $htmlOutput .= "</div></div>";
     $htmlOutput .= <<<HTML
@@ -155,14 +192,8 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     }
 
     $htmlOutput .= "</div>";
-    
-    // Code for 3D model viewer
-    if (!empty($workData["3d"]) && $workData["3d"] == 1) {
-      $htmlOutput .= <<<HTML
-      <model-viewer id="embedded-model" src="/3d/{$slug}.gltf" alt="Ein 3D-Modell" camera-controls touch-action="pan-y" tone-mapping="agx" exposure="0.5" autoplay ar ar-modes="webxr scene-viewer" shadow-intensity="0" shadow-softness="1.5"></model-viewer>
-      HTML;
-    }
 
+    // Code for vimeo video
     function createVimeoIframe($vimeoId, $isLandscape = true) {
       $padding = $isLandscape ? '56.25%' : '177.78%';
       $iframe = <<<HTML
@@ -173,13 +204,20 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
       HTML;
       return $iframe;
     }
-
     if (!empty($workData["vimeo_landscape"])) {
       $htmlOutput .= "<div id='work-video'>" . createVimeoIframe($workData["vimeo_landscape"]) . "</div>";
     }
     if (!empty($workData["vimeo_portrait"])) {
       $htmlOutput .= "<div id='work-video'>" . createVimeoIframe($workData["vimeo_portrait"], false) . "</div>";
     }
+
+    // Code for 3D model viewer
+    if (!empty($workData["3d"]) && $workData["3d"] == 1) {
+      $htmlOutput .= <<<HTML
+      <model-viewer id="embedded-model" src="/3d/{$slug}.gltf" alt="3D Model of {$workTitle} - $workData[year] © by David Herren" camera-controls touch-action="pan-y" tone-mapping="agx" exposure="0.5" autoplay ar ar-modes="webxr scene-viewer" shadow-intensity="0" shadow-softness="1.5"></model-viewer>
+      HTML;
+    }
+
     $htmlOutput .= "</div></div></div></div>";
 
     $indexResult = $database->fetchAllItems($lang);
