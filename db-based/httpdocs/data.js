@@ -130,6 +130,8 @@ function updateUrl(slug) {
 window.addEventListener('popstate', function(event) {
   const hostname = window.location.hostname;
   const isTargetDomain = hostname === 'localhost' || hostname === 'davidherren.ch';
+  const hash = window.location.hash;
+  const hasHash = hash.length > 0;
   if (isTargetDomain) {
     if (event.state && event.state.path) {
       const pathParts = event.state.path.split('/').filter(Boolean);
@@ -142,7 +144,7 @@ window.addEventListener('popstate', function(event) {
           loadWorks(slug, true);
         }
       }
-    } else {
+    } else if (!hasHash) {
       loadIndex(true);
     }
   }
