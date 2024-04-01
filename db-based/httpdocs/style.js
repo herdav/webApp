@@ -1,4 +1,4 @@
-// style.js for davidherren.ch / 2024-03-30
+// style.js for davidherren.ch / 2024-04-01
 
 { // Animate Words with each word appearing with an initial delay
   let isAnimating = false;
@@ -131,8 +131,10 @@ function scrollTopEvent() {
       });
 
       window.addEventListener('scroll', function() {
-        handleScrollLogic(pointerButton, svgArrow, isLeftExpanded);
-        handleScrollElementTitles();
+        if (config.currentSlug !== "about") {
+          handleScrollLogic(pointerButton, svgArrow, isLeftExpanded);
+          handleScrollElementTitles();
+        }
       });
 
       // Apply hover event listeners to all .frame-title-left elements
