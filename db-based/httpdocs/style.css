@@ -1,4 +1,4 @@
-/* style.css for davidherren.ch / 2024-03-30 */
+/* style.css for davidherren.ch / 2024-04-01 */
 
 @font-face {
   font-family: 'Roboto';
@@ -43,7 +43,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bgColor); 
+  background: none;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -61,7 +61,14 @@ html {
 }
 
 body {
-  background-color: var(--bgColor);
+  background-position: 0 0;
+  background-attachment: fixed;
+  background-image: 
+    linear-gradient(45deg, var(--bgColor) 25%, transparent 25%, transparent 75%, var(--bgColor) 75%, var(--bgColor)),
+    linear-gradient(45deg, var(--bgColor) 25%, transparent 25%, transparent 75%, var(--bgColor) 75%, var(--bgColor));
+  background-position: 0 0, 8px 8px;
+  background-size: 16px 16px;
+  background-color: hsl(0, 0%, 45%);
   margin: var(--spacing);
   color: var(--fontColor);
 }
@@ -91,7 +98,7 @@ h1 {
 
 
 h2 {
-  margin-top: 4rem;
+  margin-top: 0;
   font-weight: 500;
   color: var(--markColorA);
 }
@@ -368,9 +375,10 @@ mark {
 }
 
 #about {
-  margin-top: -5rem;
+  margin-top: 2rem;
   display: flex;
   gap: var(--spacing);
+  background: hsl(0, 0%, 47%);
 }
 
 .about-items sup {
@@ -384,6 +392,18 @@ mark {
 
 #about-left, #about-right {
   width: 50%;
+}
+
+.about-title {
+  margin-top: 2rem;
+}
+
+#about-left .about-title:first-of-type, #about-right .about-title:first-of-type {
+  margin-top: 0;
+}
+
+#about-left #exhibitions {
+  margin-top: 2rem;
 }
 
 .button-navigation {
@@ -529,6 +549,7 @@ mark {
 #work-text {
   overflow-y: scroll;
   padding-right: 2rem;
+  background: hsl(0, 0%, 47%);
 }
 
 #work-text::-webkit-scrollbar {
@@ -548,7 +569,6 @@ mark {
 
 #work-links {
   margin-top: var(--spacing);
-  margin-bottom: var(--spacing);
 }
 
 #work-links a {
@@ -573,7 +593,7 @@ mark {
 }
 
 .svg-arrow:hover rect {
-  fill: var(--markColorB);
+  fill: var(--fontColor);
 }
 
 .translate-00 { transform: translateX(0px); }
@@ -735,6 +755,10 @@ mark {
  
    #about-left, #about-right {
      width: 100%;
+   }
+
+   #about-right {
+    margin-top: 2rem;
    }
 
    #button-dropdown:hover #dropdown-svg rect {
