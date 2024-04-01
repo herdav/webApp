@@ -1,4 +1,4 @@
-// data.js for davidherren.ch / 2024-03-30
+// data.js for davidherren.ch / 2024-04-01
 
 const config = {
   currentLanguage: '', // Sets the default language
@@ -64,6 +64,7 @@ const loadContent = (slug, popstate, contentType) => {
     url += "&about=1";
   } else {
     url += "&works=1";
+    
   }
 
   sendRequest(url, (response) => {
@@ -89,6 +90,11 @@ const loadContent = (slug, popstate, contentType) => {
     if (!popstate) { updateUrl(slug); }
     updateHrefLangTags();
     updateCanonicalTags();
+
+    if (contentType === 'works') { 
+      animateLetters('work-text-description');
+    }
+    
   }, (error) => {
     console.error(`Error with the request for ${contentType}:`, error);
   });
