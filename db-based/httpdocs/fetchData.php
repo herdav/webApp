@@ -1,4 +1,4 @@
-<?php // fetchData.php for davidherren.ch / 2024-03-10
+<?php // fetchData.php for davidherren.ch / 2024-07-18
 class fetchData {
   private $conn;
 
@@ -9,9 +9,9 @@ class fetchData {
   public function fetchWorks($slug, $lang) {
     $sql = "SELECT slug, title, year, edition, vimeo_landscape, vimeo_portrait, github, 3d, 
                     info_$lang, media_$lang, size_$lang, text_$lang, description_$lang,
-                    info_de, media_de, size_de, text_de, description_de, img_alt 
+                    info_de, media_de, size_de, text_de, description_de, img_alt, publish
             FROM works 
-            WHERE slug = :slug";
+            WHERE slug = :slug AND publish = 1";
     $stmt = $this->conn->prepare($sql);
     $stmt->bindParam(':slug', $slug, PDO::PARAM_STR);
     $stmt->execute();
@@ -36,7 +36,9 @@ class fetchData {
   }
 
   public function fetchWorkImages($slug, $lang) {
-    $sqlImages = "SELECT name, datatype, text_$lang, text_de, alt, foto, copyright FROM images WHERE slug = :slug";
+    $sqlImages = "SELECT name, datatype, text_$lang, text_de, alt, created, year, copyright
+                  FROM images
+                  WHERE slug = :slug";
     $stmtImages = $this->conn->prepare($sqlImages);
     $stmtImages->bindParam(':slug', $slug, PDO::PARAM_STR);
     $stmtImages->execute();
@@ -59,7 +61,10 @@ class fetchData {
   }
   
   public function fetchWorkLinks($slug) {
-    $sqlLinks = "SELECT links.address, links.description FROM works_links JOIN links ON works_links.link = links.id WHERE works_links.work = :slug";
+    $sqlLinks = "SELECT links.address, links.description
+                 FROM works_links
+                 JOIN links ON works_links.link = links.id
+                 WHERE works_links.work = :slug";
     $stmtLinks = $this->conn->prepare($sqlLinks);
     $stmtLinks->bindParam(':slug', $slug, PDO::PARAM_STR);
     $stmtLinks->execute();
@@ -67,7 +72,11 @@ class fetchData {
   }
 
   public function fetchMediaLink($mediaId) {
-    $sql = "SELECT links.address FROM media_links JOIN links ON media_links.link = links.id WHERE media_links.media = :mediaId LIMIT 1";
+    $sql = "SELECT links.address
+            FROM media_links
+            JOIN links ON media_links.link = links.id
+            WHERE media_links.media = :mediaId
+            LIMIT 1";
     $stmt = $this->conn->prepare($sql);
     $stmt->bindParam(':mediaId', $mediaId, PDO::PARAM_STR);
     $stmt->execute();
@@ -80,7 +89,10 @@ class fetchData {
   }
 
   public function fetchExhibitions($lang) {
-    $sql = "SELECT title, institution, place_$lang, text_$lang, place_de, date_start, date_end, img FROM exhibitions WHERE selected = 1 ORDER BY date_start DESC";
+    $sql = "SELECT title, institution, place_$lang, text_$lang, place_de, date_start, date_end, img
+            FROM exhibitions
+            WHERE selected = 1
+            ORDER BY date_start DESC";
     $stmt = $this->conn->prepare($sql);
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -111,15 +123,20 @@ class fetchData {
   }
 
   public function fetchMenuItems() {
-    $sql = "SELECT slug, title FROM works ORDER BY nr DESC";
+    $sql = "SELECT slug, title, publish
+            FROM works
+            WHERE publish = 1
+            ORDER BY nr DESC";
     $stmt = $this->conn->prepare($sql);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
   public function fetchIndexItems($lang) {
-    $sql = "SELECT slug, title, year, description_de, description_en, nr, landingpage FROM works WHERE landingpage = 1";
-    $sql .= " ORDER BY nr DESC";
+    $sql = "SELECT slug, title, year, description_de, description_en, nr, landingpage, publish
+            FROM works
+            WHERE landingpage = 1 AND publish = 1
+            ORDER BY nr DESC";
     $stmt = $this->conn->prepare($sql);
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -127,8 +144,9 @@ class fetchData {
   }
 
   public function fetchAllItems($lang) {
-    $sql = "SELECT slug, title, year, description_de, description_en, nr FROM works";
-    $sql .= " ORDER BY nr DESC";
+    $sql = "SELECT slug, title, year, description_de, description_en, nr
+            FROM works
+            ORDER BY nr DESC";
     $stmt = $this->conn->prepare($sql);
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -136,7 +154,9 @@ class fetchData {
   }
 
   public function fetchAbout($lang) {
-    $sql = "SELECT section, section_de, date, time, title, text_$lang, text_de FROM about ORDER BY section, date DESC";
+    $sql = "SELECT section, section_de, date, time, title, text_$lang, text_de
+            FROM about
+            ORDER BY section, date DESC";
     $stmt = $this->conn->prepare($sql);
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -149,7 +169,10 @@ class fetchData {
   }
 
   public function fetchAboutStatement($lang) {
-    $sql = "SELECT text_$lang FROM about WHERE section = 'about' ORDER BY section, date DESC";
+    $sql = "SELECT text_$lang
+            FROM about
+            WHERE section = 'about'
+            ORDER BY section, date DESC";
     $stmt = $this->conn->prepare($sql);
     $stmt->execute();
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -157,7 +180,10 @@ class fetchData {
   }
 
   public function fetchAboutImprint($lang) {
-    $sql = "SELECT text_$lang FROM about WHERE section = 'imprint' ORDER BY section, date DESC";
+    $sql = "SELECT text_$lang
+            FROM about
+            WHERE section = 'imprint'
+            ORDER BY section, date DESC";
     $stmt = $this->conn->prepare($sql);
     $stmt->execute();
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
