@@ -1,4 +1,4 @@
-<?php // fetchData.php for davidherren.ch / 2024-07-18
+<?php // fetchData.php for davidherren.ch / 2024-07-20
 class fetchData {
   private $conn;
 
@@ -144,8 +144,9 @@ class fetchData {
   }
 
   public function fetchAllItems($lang) {
-    $sql = "SELECT slug, title, year, description_de, description_en, nr
+    $sql = "SELECT slug, title, year, description_de, description_en, nr, publish
             FROM works
+            WHERE publish = 1
             ORDER BY nr DESC";
     $stmt = $this->conn->prepare($sql);
     $stmt->execute();
