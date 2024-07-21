@@ -1,4 +1,4 @@
-// data.js for davidherren.ch / 2024-04-01
+// data.js for davidherren.ch / 2024-07-24
 
 const config = {
   currentLanguage: '', // Sets the default language
@@ -64,7 +64,6 @@ const loadContent = (slug, popstate, contentType) => {
     url += "&about=1";
   } else {
     url += "&works=1";
-    
   }
 
   sendRequest(url, (response) => {
@@ -78,13 +77,16 @@ const loadContent = (slug, popstate, contentType) => {
       contentElement.innerHTML = response.html;
     }
 
-    const pageTitle = response.title ? `${response.title} | David Herren` : 'David Herren';
-    updateDocumentTitle(pageTitle);
-
     // Update meta description only if contentType is not 'index'
     if (contentType !== 'index') {
-      let description = config.currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn;
+      const description = config.currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn;
       updateMetaDescription(description);
+      if (contentType !== 'about') {
+        const pageTitle = response.title ? `${response.title} | David Herren` : 'David Herren';
+        updateDocumentTitle(pageTitle);
+      } else if (contentType === 'about') {
+        updateDocumentTitle('About | David Herren');
+      }
     }
 
     if (!popstate) { updateUrl(slug); }
@@ -99,7 +101,7 @@ const loadContent = (slug, popstate, contentType) => {
     console.error(`Error with the request for ${contentType}:`, error);
   });
 
-  if(contentType !== 'index') highlightContentButton(`button-${slug}`);
+  highlightContentButton(`button-${slug}`, contentType);
   changeMenuTitle();
 }
 
@@ -209,13 +211,15 @@ function highlightLanguageButton(lang) {
 }
 
 // Function to highlight the active content button
-function highlightContentButton(buttonId) {
+function highlightContentButton(buttonId, contentType) {
   document.querySelectorAll('#menu-works button, #menu-about button').forEach(btn => {
     btn.classList.remove('button-highlighted');
   });
-  const button = document.getElementById(buttonId);
-  if (button) {
-    button.classList.add('button-highlighted');
+  if (contentType !== 'index') {
+    const button = document.getElementById(buttonId);
+    if (button) {
+      button.classList.add('button-highlighted');
+    }
   }
 }
 
