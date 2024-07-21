@@ -1,18 +1,4 @@
-/* style.css for davidherren.ch / 2024-04-01 */
-
-@font-face {
-  font-family: 'Roboto';
-  src: url('/fonts/Roboto-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Roboto';
-  src: url('/fonts/Roboto-Thin.ttf') format('truetype');
-  font-weight: 100;
-  font-style: normal;
-}
+/* style.css for davidherren.ch / 2024-07-20 */
 
 @font-face {
   font-family: 'RTAliasRough';
@@ -22,20 +8,42 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'UniversNextPro';
+  src: url('/fonts/UniversNextProRegular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'UniversNextPro';
+  src: url('/fonts/UniversNextProItalic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'UniversNextPro';
+  src: url('/fonts/UniversNextProBold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
 :root {
   --spacing: 2rem;
-  
-  --markColorA: hsl(156, 100%, 75%);
-  --markColorB: black;
-  --bgColor:    hsl(0, 0%, 50%);
-  --fontColor:  hsl(0, 0%, 100%);
-  --darkGray:   hsl(0, 0%, 26%);
-  --menuBg:     hsl(0, 0%, 85%);
+  --markColorA:    hsl(0, 0%, 100%);
+  --markColorB:    hsl(0, 0%, 20%);   
+  --bgColor:       hsl(0, 0%, 95%);
+  --fontColor:     hsl(0, 0%, 10%);
+  --darkGray:      hsl(0, 0%, 25%);
+  --menuBg:        hsl(0, 0%, 92%);
+  --buttonBg:      hsl(0, 0%, 84%);
+  --contrastColor: hsl(160, 100%, 50%);
 }
 
 ::selection {
-  background-color: var(--markColorA);
-  color: var(--markColorB);
+  background-color: var(--contrastColor);
+  color: var(--markColorA);
 }
 
 ::-webkit-scrollbar {
@@ -47,28 +55,26 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--markColorA);
+  background: var(--markColorB);
 }
-
 
 * {
   scroll-behavior: smooth;
 }
 
 html {
-  font-family: 'Roboto', sans-serif;
-  font-weight: 100;
+  font-family: 'UniversNextPro', sans-serif;
 }
 
 body {
-  background-position: 0 0;
-  background-attachment: fixed;
+  background-color: hsl(0, 0%, 98%);
   background-image: 
-    linear-gradient(45deg, var(--bgColor) 25%, transparent 25%, transparent 75%, var(--bgColor) 75%, var(--bgColor)),
-    linear-gradient(45deg, var(--bgColor) 25%, transparent 25%, transparent 75%, var(--bgColor) 75%, var(--bgColor));
-  background-position: 0 0, 8px 8px;
-  background-size: 16px 16px;
-  background-color: hsl(0, 0%, 45%);
+    linear-gradient(45deg, hsl(0, 0%, 100%) 25%, transparent 25%, transparent 75%, #ffffff 75%, #ffffff),
+    linear-gradient(45deg, #ffffff 25%, transparent 25%, transparent 75%, #ffffff 75%, #ffffff);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+  background-attachment: fixed;
+  /*background-color: var(--bgColor);*/
   margin: var(--spacing);
   color: var(--fontColor);
 }
@@ -76,31 +82,27 @@ body {
 a {
   text-decoration-thickness: 4px;
   line-height: 100%;
-  color: var(--markColorA);
+  color: var(--markColorB);
 }
 
 a:hover {
-  color: var(--fontColor) !important;
+  color: var(--contrastColor) !important;
   text-decoration: none;
 }
 
 a:visited {
-  color: var(--markColorA);
+  color: var(--fontColor);
 }
 
 h1 {
   font-size: 1rem;
-  font-weight: normal;
   margin: 0em;
-  color: var(--markColorA);
-  font-weight: 500;
+  color: var(--fontColor);
+  font-weight: bold;
 }
-
 
 h2 {
   margin-top: 0;
-  font-weight: 500;
-  color: var(--markColorA);
 }
 
 h3 {
@@ -141,12 +143,12 @@ mark {
   font-size: 1rem;
   letter-spacing: 0.1rem;
   height: 2rem;
-  background-color: black;
+  background-color: var(--markColorB);
   color: red;
 }
 
 .intext-link {
-  color: var(--markColorA);
+  color: var(--markColorB);
   cursor: pointer;
   text-decoration: underline;
   text-decoration-thickness: 4px;
@@ -182,12 +184,12 @@ mark {
   justify-content: center;
 }
 
-.index-item-inner-frame {
+/*.index-item-inner-frame {
   position: absolute;
   width: calc(100% - 8px);
   height: calc(100% - 8px);
   z-index: 2;
-}
+}*/
 
 .index-item-inner-text {
   position: absolute;
@@ -196,8 +198,8 @@ mark {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: hsla(0, 0%, 0%, 0.4);
-  backdrop-filter: blur(10px);
+  background-color: var(--contrastColor);
+  /*backdrop-filter: blur(200px);*/
   visibility: collapse;
   flex-direction: column;
 }
@@ -209,25 +211,36 @@ mark {
 .index-item-inner-text p {
   padding: var(--spacing);
   text-align: center;
-  color: var(--fontColor);
-  font-size: 1.5rem;
+  color: var(--markColorA);
+  font-size: 1.2rem;
   line-height: 150%;
 }
 
 .index-item-inner-text h2 {
+  color: var(--markColorA);
   margin-top: 0;
   margin-bottom: 0;
 }
 
-.index-item-inner-frame:hover ~.index-item-inner-text {
+.index-item-inner img:hover ~ .index-item-inner-text {
   visibility: visible;
 }
 
+.index-item-inner:hover .index-item-inner-text {
+  visibility: visible;
+}
+
+.index-item-inner-text {
+  visibility: hidden;
+}
+
+/*
 .index-item-inner-frame:hover {
   border: var(--markColorA);
   border-style: solid;
   border-width: 4px;
 }
+*/
 
 .index-item-inner img {
   height: 100%;
@@ -238,10 +251,9 @@ mark {
 
 .frame {
   padding: 0px 0px 0px 0px;
-  border: 2px solid black;
-  box-shadow: 4px 4px 20px 0px rgba(0, 0, 0, 0.3);
-  background-color: hsla(0, 0%, 0%, 0.4);
-  backdrop-filter: blur(10px);
+  border: 2px solid var(--markColorB);
+  box-shadow: 4px 4px 0px 0px var(--markColorB);
+  background-color: var(--bgColor);
 }
 
 .frame-title {
@@ -328,7 +340,7 @@ mark {
 }
 
 #menu-title-center:hover {
-  background-color: var(--markColorB);
+  background-color: var(--contrastColor);
 }
 
 #menu-title-center:hover h1, #menu-title-center:hover h2 {
@@ -342,7 +354,7 @@ mark {
 
 #menu-title h1, #menu-title h2, #menu-title a, #menu-title a:visited {
   font-family: 'RTAliasRough', sans-serif;
-  color: var(--markColorB);
+  color: var(--fontColor);
   font-size: 1rem;
   letter-spacing: 0.1rem;
   margin-top: 0em;
@@ -375,10 +387,10 @@ mark {
 }
 
 #about {
+  margin: 1rem;
   margin-top: 2rem;
   display: flex;
-  gap: var(--spacing);
-  background: hsl(0, 0%, 47%);
+  gap: calc(4*var(--spacing));
 }
 
 .about-items sup {
@@ -408,11 +420,11 @@ mark {
 
 .button-navigation {
   font-family: 'RTAliasRough', sans-serif;
-  color: black;
+  color: var(--fontColor);
   text-decoration: none;
   border: none;
-  background: hsl(0deg 0% 75%);
-  box-shadow: inset -2px -2px black, inset 2px 2px black, inset -4px -4px rgb(158, 158, 158), inset 4px 4px #ffffff;
+  background: var(--buttonBg);
+  box-shadow: inset -2px -2px var(--markColorB), inset 2px 2px var(--markColorB), inset -4px -4px rgb(158, 158, 158), inset 4px 4px #ffffff;
   font-size: 1rem;
   letter-spacing: 0.1rem;
   padding: 0.5rem 1rem;
@@ -420,12 +432,12 @@ mark {
 }
 
 .button-navigation.button-highlighted, .button-navigation:active {
-  color: black;
-  box-shadow: inset -2px -2px black, inset 2px 2px black, inset -4px -4px #ffffff, inset 4px 4px rgb(158, 158, 158);
+  color: var(--fontColor);
+  box-shadow: inset -2px -2px var(--markColorB), inset 2px 2px var(--markColorB), inset -4px -4px #ffffff, inset 4px 4px rgb(158, 158, 158);
 }
 
 .button-navigation:visited {
-  color: black;
+  color: var(--fontColor);
 }
 
 .button-navigation.exhibition {
@@ -434,6 +446,7 @@ mark {
   display: flex;
   flex-direction: column;
   align-items: center;
+  /*margin-right: var(--spacing);*/
 }
 
 .button-navigation.exhibition svg {
@@ -441,12 +454,11 @@ mark {
 }
 
 .button-navigation:hover:not(.button-highlighted) {
-  color: var(--fontColor);
+  color: var(--markColorA);
 }
 
-
 #button-dropdown:hover #dropdown-svg rect, .button-navigation.exhibition:hover #dropdown-svg rect {
-  fill: var(--fontColor);
+  fill: var(--markColorA);
 }
 
 #button-de, #button-en {
@@ -506,7 +518,7 @@ mark {
 }
 
 #content p, #content a, #content h1, #content h2 {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   line-height: 150%;
 }
 
@@ -542,6 +554,20 @@ mark {
   margin-right: 4rem;
 }
 
+.work-title-sub {
+  position: fixed;
+  top: calc(50% - 2rem);
+  margin-left: 6rem;
+}
+
+@-moz-document url-prefix() {
+  .work-title-sub {
+    position: relative;
+    top: auto;
+    margin-left: auto;
+  }
+}
+
 #content-inner-right-text {
   min-height: calc(100vh - 2*var(--spacing));
 }
@@ -549,7 +575,6 @@ mark {
 #work-text {
   overflow-y: scroll;
   padding-right: 2rem;
-  background: hsl(0, 0%, 47%);
 }
 
 #work-text::-webkit-scrollbar {
@@ -557,8 +582,7 @@ mark {
 }
 
 #work-text-description {
-  font-weight: 500;
-  color: var(--markColorA);
+  font-weight: bold;
   margin-bottom: var(--spacing);
 }
 
@@ -589,11 +613,11 @@ mark {
 }
 
 .svg-arrow rect {
-  fill: var(--markColorA);
+  fill: var(--markColorB);
 }
 
 .svg-arrow:hover rect {
-  fill: var(--fontColor);
+  fill: var(--contrastColor);
 }
 
 .translate-00 { transform: translateX(0px); }
@@ -679,7 +703,9 @@ mark {
   overflow: hidden;
   flex-direction: row-reverse;
   align-items: flex-start;
-  margin-left: calc((-1*100vw/8) + 12px);
+  /*margin-left: calc((-1*100vw/8) + 12px);*/
+  margin-left: calc((-1*100vw/10) + 12px);
+  padding-left: 0.5rem;
   gap: var(--spacing);
 }
 
@@ -698,10 +724,11 @@ mark {
 }
 
 .exhibition-sub-main {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-left: -46px;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-left: -46px;
+    justify-content: space-between;
 }
 
 @media screen and (max-width: 1024px) {
@@ -748,18 +775,22 @@ mark {
     margin-bottom: 0;
    }
  
-   #about, #content-inner {
-     display: block;
-     margin-top: 0;
-   }
- 
-   #about-left, #about-right {
-     width: 100%;
-   }
+  #about, #content-inner {
+    display: block;
+    margin-top: 0;
+  }
 
-   #about-right {
-    margin-top: 2rem;
-   }
+  #about {
+    margin: 0;
+  }
+
+  #about-left, #about-right {
+    width: 100%;
+  }
+
+  #about-right {
+  margin-top: 2rem;
+  }
 
    #button-dropdown:hover #dropdown-svg rect {
     fill: var(--markColorB);
@@ -778,6 +809,14 @@ mark {
     max-height: 100% !important;
     padding-right: 0rem;
   }
+
+  .exhibition-sub-main {
+    display: flex;
+    align-items: center;
+    gap: 0rem;
+    margin-left: 0px;
+    justify-content: space-between;
+}
 }
 
 @media screen and (max-width: 1024px) and (orientation: landscape) {
