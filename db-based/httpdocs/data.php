@@ -1,4 +1,4 @@
-<?php // data.php for davidherren.ch / 2024-07-20
+<?php // data.php for davidherren.ch / 2024-08-11
 
 include './php/db.php';
 include './php/fetchData.php';
@@ -84,9 +84,9 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
       }
     }
 
-    if (!empty($workData["vimeo_landscape"]) || !empty($workData["vimeo_portrait"])) {
-      if (!empty($workData["vimeo_landscape"])) {$vimeoId = $workData["vimeo_landscape"];}
-      if (!empty($workData["vimeo_portrait"])) {$vimeoId = $workData["vimeo_portrait"];}
+    if (!empty($workData["vimeo_id"])) {
+      $vimeoId = $workData["vimeo_id"];
+      $vimeoRatio = $workData["vimeo_ratio"];
       $htmlOutput .= <<<HTML
       <div class="work-video-title">
         <div class="frame work-title-sub">
@@ -197,23 +197,18 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     }
 
     $htmlOutput .= "</div>";
-
+   
     // Code for vimeo video
-    function createVimeoIframe($vimeoId, $isLandscape = true) {
-      $padding = $isLandscape ? '56.25%' : '177.78%';
-      $iframe = <<<HTML
-      <div style="padding:{$padding} 0 0 0;position:relative;">
-        <iframe title="Vimeo Player" src="https://player.vimeo.com/video/{$vimeoId}?title=0&byline=0&portrait=0&badge=0&dnt=1&app_id=58479" frameborder="0" allow="fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+    if (!empty($workData["vimeo_id"])) {
+      $padding = 10000 / $workData['vimeo_ratio'];
+      $htmlOutput .= <<<HTML
+      <div id='work-video'>
+        <div style="padding:{$padding}% 0 0 0;position:relative;">
+          <iframe title="Vimeo Player" src="https://player.vimeo.com/video/{$workData['vimeo_id']}?title=0&byline=0&portrait=0&badge=0&dnt=1&app_id=58479" frameborder="0" allow="fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+        </div>
+        <script src="https://player.vimeo.com/api/player.js"></script>
       </div>
-      <script src="https://player.vimeo.com/api/player.js"></script>
       HTML;
-      return $iframe;
-    }
-    if (!empty($workData["vimeo_landscape"])) {
-      $htmlOutput .= "<div id='work-video'>" . createVimeoIframe($workData["vimeo_landscape"]) . "</div>";
-    }
-    if (!empty($workData["vimeo_portrait"])) {
-      $htmlOutput .= "<div id='work-video'>" . createVimeoIframe($workData["vimeo_portrait"], false) . "</div>";
     }
 
     // Code for 3D model viewer
