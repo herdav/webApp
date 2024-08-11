@@ -1,4 +1,4 @@
-<?php // fetchData.php for davidherren.ch / 2024-07-20
+<?php // fetchData.php for davidherren.ch / 2024-08-11
 class fetchData {
   private $conn;
 
@@ -7,7 +7,7 @@ class fetchData {
   }
 
   public function fetchWorks($slug, $lang) {
-    $sql = "SELECT slug, title, year, edition, vimeo_landscape, vimeo_portrait, github, 3d, 
+    $sql = "SELECT slug, title, year, edition, vimeo_id, vimeo_ratio, github, 3d, 
                     info_$lang, media_$lang, size_$lang, text_$lang, description_$lang,
                     info_de, media_de, size_de, text_de, description_de, img_alt, publish
             FROM works 
