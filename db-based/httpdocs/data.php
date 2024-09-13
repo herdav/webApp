@@ -1,4 +1,4 @@
-<?php // data.php for davidherren.ch / 2024-08-11
+<?php // data.php for davidherren.ch / 2024-09-13
 
 include './php/db.php';
 include './php/fetchData.php';
@@ -14,17 +14,26 @@ if (isset($_GET['index']) && isset($_GET['lang'])) {
   $indexResult = $database->fetchIndexItems($lang);
   $htmlOutput = '';
 
+  if ($lang === 'de') {
+    $progText = 'Projekt in Arbeit';
+  } else {
+    $progText = 'Work in Proress';
+  }
+
   if (count($indexResult) > 0) {
+    shuffle($indexResult); // Shuffle the array to randomize the order of items
     foreach ($indexResult as $index => $row) {
       $title = $row["title"];
       $slug = $row["slug"];
       $year = $row["year"];
+      $prog = $row["in_progress"];
       $description = $row["description_$lang"];
       $htmlOutput .= "<a class='index-item' href='/" . htmlspecialchars($lang) . "/" . htmlspecialchars($slug) . "'>";
       $htmlOutput .= "<div class='index-item-inner'>";
+      if ($prog == 1) { $htmlOutput .= "<div class='work-in-progress'><p class='frame'>$progText</p></div>"; }
       $htmlOutput .= "<div class='index-item-inner-text'>";
       $htmlOutput .= "<h2>" . htmlspecialchars($title) . "</h2>";
-      $htmlOutput .= "<p>" . htmlspecialchars($description) . "</p>";
+      $htmlOutput .= "<p>" . htmlspecialchars($year) . "<br><i>" . htmlspecialchars($description) . "</i></p>";
       $htmlOutput .= "</div>";
       $htmlOutput .= "<img src='/img/prev/" . htmlspecialchars($slug) . "-prev.jpg' loading='lazy' alt='" . htmlspecialchars($title) . " - " . htmlspecialchars($year) . " © David Herren'>";
       $htmlOutput .= "</div></a>";
@@ -51,18 +60,29 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     $htmlOutput = <<<HTML
     <div id='content-inner'>
       <div id='content-inner-left'>
-        <div class="content-left-img-outer"><img src='/img/{$workData["slug"]}-0.jpg' alt='$workData[title] - $workData[year] © $workData[img_alt]'></div>
+        <div class="content-left-img-outer">
+    HTML;
+    if ($workData["in_progress"] == 1) {
+      if($lang === 'de') {
+        $progText = 'Projekt in Arbeit';
+      } else {
+        $progText = 'Work in Proress';
+      }
+      $htmlOutput .= "<div class='work-in-progress'><p class='frame'>$progText</p></div>";
+    }
+    $htmlOutput .= <<<HTML
+          <img src='/img/{$workData["slug"]}-0.jpg' alt='$workData[title] - $workData[year] © $workData[img_alt]'>
+        </div>
         <div id='content-inner-left-text'>
     HTML;
 
-    // Inserting the titles of the images here
     foreach ($workimages as $image) {
       $imageText = $image["text_$lang"];
       $workTitle = $workData["title"];
       $imageCreated = $image["created"];
       $htmlOutput .= <<<HTML
       <div class="work-image-title">
-        <div class="frame work-title-sub">
+        <div class="frame work-title-sub pattern">
           <div class="frame-title">
             <a href="#top" class="frame-title-left button-navigation"></a>
             <h3 class="frame-title-center">$workTitle</h3>
@@ -87,29 +107,37 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     if (!empty($workData["vimeo_id"])) {
       $vimeoId = $workData["vimeo_id"];
       $vimeoRatio = $workData["vimeo_ratio"];
+      if (!empty($workData["vimeo_$lang"])) {
+        $vimeoText = $workData["vimeo_$lang"];
+      } else {
+        $vimeoText = 'Video @ <a href="https://vimeo.com/{$vimeoId}" target="_blank">Vimeo</a>';
+      }
       $htmlOutput .= <<<HTML
       <div class="work-video-title">
-        <div class="frame work-title-sub">
+        <div class="frame work-title-sub pattern">
           <div class="frame-title">
             <a href="#top" class="frame-title-left button-navigation"></a>
             <h3 class="frame-title-center">$workTitle</h3>
           </div>
           <div class="frame-title-text">
-          <p>Video @ <a href="https://vimeo.com/{$vimeoId}" target="_blank">Vimeo</a></p>
+          <p>$vimeoText</p>
           </div>
         </div></div>
       HTML;
     }
 
     if (!empty($workData["3d"]) && $workData["3d"] == 1) {
-      if ($lang === 'de') {
-        $modelText = "3D Modell für die Integration auf der Website erstellt mit <a href='https://blender.org' target='_blank'>Blender</a>.";
+      if(!empty($workData["3d_$lang"])) {
+        $modelText = $workData["3d_$lang"];
+      } else if ($lang === "de") {
+        $modelText = "3D-Modell der Arbeit, die Integration für die Website ist mit <a href='https://blender.org' target='_blank'>Blender</a> erstellt.";
       } else {
-        $modelText = "3D model for integration on the website created with <a href='https://blender.org' target='_blank'>Blender</a>.";
-      }
+        $modelText = "3D model of the work, the integration for the website is created with <a href='https://blender.org' target='_blank'>Blender</a>.";
+      }  
+      
       $htmlOutput .= <<<HTML
       <div class="work-model-title">
-        <div class="frame work-title-sub">
+        <div class="frame work-title-sub pattern">
           <div class="frame-title">
             <a href="#top" class="frame-title-left button-navigation"></a>
             <h3 class="frame-title-center">$workTitle</h3>
@@ -233,13 +261,13 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
           $description = $lang === 'de' ? $row["description_de"] : $row["description_en"];
           $htmlOutput .= "<a class='index-item work' href='/" . htmlspecialchars($lang) . "/" . htmlspecialchars($thisSlug) . "'>";
           $htmlOutput .= "<div class='index-item-inner'>";
-          /*$htmlOutput .= "<div class='index-item-inner-frame'></div>";*/
           $htmlOutput .= "<div class='index-item-inner-text'>";
           $htmlOutput .= "<h2>" . htmlspecialchars($title) . "</h2>";
+          $htmlOutput .= "<p>" . htmlspecialchars($year) . "<br><i>" . htmlspecialchars($description) . "</i></p>";
           $htmlOutput .= "</div>";
           $htmlOutput .= "<img src='/img/prev/" . htmlspecialchars($thisSlug) . "-prev.jpg' alt='" . htmlspecialchars($title) . " - " . htmlspecialchars($year) . " © David Herren'>";
           $htmlOutput .= "</div></a>";
-          
+
           $displayCount++;
           if ($displayCount >= 8) {
             break;
