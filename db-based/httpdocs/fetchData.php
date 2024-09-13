@@ -1,4 +1,4 @@
-<?php // fetchData.php for davidherren.ch / 2024-08-11
+<?php // fetchData.php for davidherren.ch / 2024-09-10
 class fetchData {
   private $conn;
 
@@ -7,9 +7,10 @@ class fetchData {
   }
 
   public function fetchWorks($slug, $lang) {
-    $sql = "SELECT slug, title, year, edition, vimeo_id, vimeo_ratio, github, 3d, 
+    $sql = "SELECT slug, title, year, edition,
+                    vimeo_id, vimeo_ratio, vimeo_de, vimeo_en, 3d, 3d_de, 3d_en, github,
                     info_$lang, media_$lang, size_$lang, text_$lang, description_$lang,
-                    info_de, media_de, size_de, text_de, description_de, img_alt, publish
+                    info_de, media_de, size_de, text_de, description_de, img_alt, publish, in_progress
             FROM works 
             WHERE slug = :slug AND publish = 1";
     $stmt = $this->conn->prepare($sql);
@@ -133,7 +134,7 @@ class fetchData {
   }
 
   public function fetchIndexItems($lang) {
-    $sql = "SELECT slug, title, year, description_de, description_en, nr, landingpage, publish
+    $sql = "SELECT slug, title, year, description_de, description_en, nr, landingpage, publish, in_progress
             FROM works
             WHERE landingpage = 1 AND publish = 1
             ORDER BY nr DESC";
@@ -157,6 +158,7 @@ class fetchData {
   public function fetchAbout($lang) {
     $sql = "SELECT section, section_de, date, time, title, text_$lang, text_de
             FROM about
+            WHERE selected = 1
             ORDER BY section, date DESC";
     $stmt = $this->conn->prepare($sql);
     $stmt->execute();
