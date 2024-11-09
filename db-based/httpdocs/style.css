@@ -1,4 +1,4 @@
-/* style.css for davidherren.ch / 2024-09-11 */
+/* style.css for davidherren.ch / 2024-11-06 */
 
 @font-face {
   font-family: 'RTAliasRough';
@@ -275,7 +275,7 @@ mark {
 .frame-title {
   display: flex;
   justify-content: center;
-  height: var(--spacing);
+  height: 2rem;
   align-items: center;
 }
 
@@ -316,7 +316,7 @@ mark {
 
 #menu-title {
   display: flex;
-  height: var(--spacing);
+  height: 2rem;
   flex-direction: row;
   position: relative;
   justify-content: space-between;
@@ -422,6 +422,12 @@ mark {
   width: 50%;
 }
 
+#about-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
 .about-title {
   margin-top: 2rem;
 }
@@ -431,6 +437,10 @@ mark {
 }
 
 #about-left #exhibitions {
+  margin-top: 2rem;
+}
+
+#about-imprint, #about-media {
   margin-top: 2rem;
 }
 
@@ -547,8 +557,13 @@ mark {
   top: var(--spacing);
   line-height: 0;
   display: flex;
-  align-items: center;
   justify-content: center;
+  flex-direction: column;
+}
+
+.content-left-img-outer p {
+  margin-top: 1rem;
+
 }
 
 .content-left-img-outer img {
@@ -721,15 +736,15 @@ mark {
   overflow: hidden;
   flex-direction: row-reverse;
   align-items: flex-start;
-  /*margin-left: calc((-1*100vw/8) + 12px);*/
   margin-left: calc((-1*100vw/10) + 12px);
-  padding-left: 0.5rem;
+  padding-left: 10px;
   gap: var(--spacing);
 }
 
 .exhibition-img img, .exhibition-img p {
   margin-top: var(--spacing);
   margin-bottom: var(--spacing);
+  width: 100%;
 }
 
 .exhibition-img-expanded {
@@ -739,6 +754,7 @@ mark {
 .exhibition-img img {
   height: auto;
   min-width: 50%;
+  max-width: 50%;
 }
 
 .exhibition-sub-main {
@@ -767,7 +783,17 @@ mark {
     margin-bottom: calc(2*var(--spacing));
   }
 
-  #content-inner-center, #embedded-model, #content-inner-left-text {
+  @-moz-document url-prefix() {
+    #content-inner-left-text {
+      display: none;
+    }
+
+    .work-images {
+      margin-bottom: 0vh !important;
+    }
+  }
+
+  #content-inner-center, #embedded-model {
     display: none;
   }
 
@@ -810,7 +836,11 @@ mark {
   margin-top: 2rem;
   }
 
-   #button-dropdown:hover #dropdown-svg rect {
+  #about-media {
+    display: none;
+  }
+
+  #button-dropdown:hover #dropdown-svg rect {
     fill: var(--markColorB);
   }
 
@@ -826,6 +856,22 @@ mark {
     overflow: inherit;
     max-height: 100% !important;
     padding-right: 0rem;
+  }
+
+  .work-title-sub {
+    position: fixed;
+    bottom: var(--spacing);
+    top: unset;
+    margin-left: calc(2*var(--spacing));
+    margin-right: calc(2*var(--spacing));
+  }
+
+  .work-image-title {
+    justify-content: center;
+  }
+
+  .work-images {
+    margin-bottom: 50vh;
   }
 
   .exhibition-sub-main {
