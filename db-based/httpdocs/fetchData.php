@@ -1,4 +1,4 @@
-<?php // fetchData.php for davidherren.ch / 2024-09-10
+<?php // fetchData.php for davidherren.ch / 2024-10-24
 class fetchData {
   private $conn;
 
@@ -90,7 +90,7 @@ class fetchData {
   }
 
   public function fetchExhibitions($lang) {
-    $sql = "SELECT title, institution, place_$lang, text_$lang, place_de, date_start, date_end, img
+    $sql = "SELECT title, institution, place_$lang, sup_$lang, text_$lang, place_de, sup_de, sup_en, date_start, date_end, img
             FROM exhibitions
             WHERE selected = 1
             ORDER BY date_start DESC";
@@ -98,12 +98,15 @@ class fetchData {
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     foreach ($results as $key => $row) {
-      if (empty($row["place_$lang"])) {
-        $results[$key]["place_$lang"] = $row["place_de"];
-      }
+        if (empty($row["place_$lang"])) {
+            $results[$key]["place_$lang"] = $row["place_de"];
+        }
+        if (empty($row["sup_$lang"])) {
+            $results[$key]["sup_$lang"] = $row["sup_en"];
+        }
     }
     return $results;
-  }
+}
 
   public function fetchExhibitionMainLink($exhibitionTitle) {
     $sql = "SELECT links.address FROM exhibitions_links
