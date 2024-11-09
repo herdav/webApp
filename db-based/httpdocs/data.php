@@ -1,4 +1,4 @@
-<?php // data.php for davidherren.ch / 2024-09-13
+<?php // data.php for davidherren.ch / 2024-11-06
 
 include './php/db.php';
 include './php/fetchData.php';
@@ -21,7 +21,7 @@ if (isset($_GET['index']) && isset($_GET['lang'])) {
   }
 
   if (count($indexResult) > 0) {
-    shuffle($indexResult); // Shuffle the array to randomize the order of items
+    /*shuffle($indexResult);*/
     foreach ($indexResult as $index => $row) {
       $title = $row["title"];
       $slug = $row["slug"];
@@ -68,14 +68,33 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
       } else {
         $progText = 'Work in Proress';
       }
-      $htmlOutput .= "<div class='work-in-progress'><p class='frame'>$progText</p></div>";
+      $htmlOutput .= "<div class='work-in-progress'><p class='frame'>$progText</p>";
+      $htmlOutput .= "";
+      $htmlOutput .= "</div>";
     }
-    $htmlOutput .= <<<HTML
-          <img src='/img/{$workData["slug"]}-0.jpg' alt='$workData[title] - $workData[year] © $workData[img_alt]'>
-        </div>
-        <div id='content-inner-left-text'>
-    HTML;
 
+    if($workimages[0]['alt']) {
+      if ($workimages[0]['created']) {
+        $htmlOutput .= <<<HTML
+        <img src="/img/{$workData['slug']}-0.jpg" alt="{$workimages[0]['alt']}, {$workimages[0]['year']} - Foto: {$workimages[0]['created']}">
+    HTML;
+      }
+     } else {
+        $htmlOutput .= <<<HTML
+        <img src="/img/{$workData['slug']}-0.jpg" alt="{$workData['title']} © {$workimages[0]['year']} {$workimages[0]['copyright']}">
+    HTML;
+      }
+
+    $htmlOutput .= "<p>{$workimages[0]["text_$lang"]}, {$workimages[0]["year"]}";
+
+    if($workimages[0]['created']) {
+      $htmlOutput .= ". Foto: {$workimages[0]['created']}</p>";
+    } else {
+      $htmlOutput .= ".</p>";
+      }
+      $htmlOutput .= '</div><div id="content-inner-left-text">';
+
+    $workimages = array_slice($workimages, 1);
     foreach ($workimages as $image) {
       $imageText = $image["text_$lang"];
       $workTitle = $workData["title"];
@@ -203,6 +222,7 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
 
     // Code for displaying additional images
     $htmlOutput .= "<div class='work-images'>";
+    /*$workimages = array_slice($workimages, 1);*/
     foreach ($workimages as $image) {
       $workTitle      = htmlspecialchars($workData["title"]);
       $imageName      = htmlspecialchars($image["name"]);
@@ -304,42 +324,111 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
   $htmlOutput .= "<div id='about'>";
   $htmlOutput .= "<div id='about-left'>";
 
-    // Processing aboutData for 'about'
-    if ($aboutData) {
-      foreach ($aboutData as $about) {
-        if ($about['section'] === 'about') {
-          // Adding section titles
-          if (!isset($lastSection) || $lastSection !== $about['section']) {
-            if ($lang === 'de') {
-              $titleSection = htmlspecialchars(ucfirst($about['section_de']));
-            } else {
-              $titleSection = htmlspecialchars(ucfirst($about['section']));
-            }
-            $htmlOutput .= "<h2 class='about-title'>" . $titleSection . "</h2>";
-            $lastSection = $about['section'];
+  // Processing aboutData for 'about'
+  if ($aboutData) {
+
+    foreach ($aboutData as $about) {
+      // Processing aboutData for 'about'
+      if ($about['section'] === 'about') {
+        // Adding section titles
+        if (!isset($lastSection) || $lastSection !== $about['section']) {
+          if ($lang === 'de') {
+            $titleSection = htmlspecialchars(ucfirst($about['section_de']));
+          } else {
+            $titleSection = htmlspecialchars(ucfirst($about['section']));
           }
-          // Displaying about-items
-          $htmlOutput .= "<div class='about-items' style='display: flex;'>";
-          if ($about['time']) {
-            $htmlOutput .= "<div style='flex: 1;'><p>" . htmlspecialchars($about['time']) . "</p></div>";
-          }
-          if ($about['title']) {
-            $htmlOutput .= "<div style='flex: 3;'>";
-            $htmlOutput .= "<p>" . htmlspecialchars($about['title']);
-  
-          } else if (!$about['title'] && $about["text_$lang"]) {
-            $htmlOutput .= "<div style='flex: 3;'>";
-            $htmlOutput .= "<p>" . htmlspecialchars($about["text_$lang"]);
-  
-          } else if ($about["text_$lang"]) {
-            $htmlOutput .= "<div style='flex: 3;'>";
-            $htmlOutput .= "<p>" . htmlspecialchars($about["text_$lang"]);
-          }
-  
-          $htmlOutput .= "</p>" . "</div></div>";
+          $htmlOutput .= "<h2 class='about-title'>" . $titleSection . "</h2>";
+          $lastSection = $about['section'];
         }
+        
+        // Displaying about-items
+        $htmlOutput .= "<div class='about-items' style='display: flex;'>";
+        
+        if ($about['time']) {
+          $htmlOutput .= "<div style='flex: 1;'><p>" . htmlspecialchars($about['time']) . "</p></div>";
+        }
+        if ($about['title']) {
+          $htmlOutput .= "<div style='flex: 3;'>";
+          $htmlOutput .= "<p>" . htmlspecialchars($about['title']);
+
+        } else if (!$about['title'] && $about["text_$lang"]) {
+          $htmlOutput .= "<div style='flex: 3;'>";
+          $htmlOutput .= "<p>" . strip_tags($about["text_$lang"], '<br><a>');;
+
+        } else if ($about["text_$lang"]) {
+          $htmlOutput .= "<div style='flex: 3;'>";
+          $htmlOutput .= "<p>" . strip_tags($about["text_$lang"], '<br><a>');;
+        }
+        $htmlOutput .= "</p>" . "</div></div>";
+      }
+
+      // Processing aboutData for 'education'
+      if ($about['section'] === 'education') {
+        // Adding section titles
+        if (!isset($lastSection) || $lastSection !== $about['section']) {
+          if ($lang === 'de') {
+            $titleSection = htmlspecialchars(ucfirst($about['section_de']));
+          } else {
+            $titleSection = htmlspecialchars(ucfirst($about['section']));
+          }
+          $htmlOutput .= "<h2 class='about-title'>" . $titleSection . "</h2>";
+          $lastSection = $about['section'];
+        }
+        // Displaying about-items
+        $htmlOutput .= "<div class='about-items' style='display: flex;'>";
+        if ($about['time']) {
+          $htmlOutput .= "<div style='flex: 1;'><p>" . htmlspecialchars($about['time']) . "</p></div>";
+        }
+        if ($about['title']) {
+          $htmlOutput .= "<div style='flex: 4;'>";
+          $htmlOutput .= "<p>" . htmlspecialchars($about['title']);
+        } else if (!$about['title'] && $about["text_$lang"]) { // education
+          $htmlOutput .= "<div style='flex: 4;'>";
+          $htmlOutput .= "<p>" . strip_tags($about["text_$lang"], '<br><a>');
+
+        } else if ($about["text_$lang"]) {
+          $htmlOutput .= "<div style='flex: 4;'>";
+          $htmlOutput .= "<p>" . strip_tags($about["text_$lang"], '<br><a>');;
+        }
+
+        $htmlOutput .= "</p>" . "</div></div>";
+      }
+
+      // Processing aboutData for 'media'
+      if ($about['section'] === 'media') {
+        // Adding section titles
+        if (!isset($lastSection) || $lastSection !== $about['section']) {
+          if ($lang === 'de') {
+            $titleSection = htmlspecialchars(ucfirst($about['section_de']));
+          } else {
+            $titleSection = htmlspecialchars(ucfirst($about['section']));
+          }
+          $htmlOutput .= "<div id='about-media'><h2 class='about-title'>" . $titleSection . "</h2>";
+          $lastSection = $about['section'];
+        }
+        // Displaying about-items
+        $htmlOutput .= "<div class='about-items' style='display: flex;'>";
+        if ($about['time']) {
+          $htmlOutput .= "<div style='flex: 1;'><p>" . htmlspecialchars($about['time']) . "</p></div>";
+        }
+        if ($about['title']) {
+          $htmlOutput .= "<div style='flex: 3;'>";
+          $firstLink = $database->fetchMediaLink(htmlspecialchars($about['title']));
+          if ($firstLink) {
+              $htmlOutput .= "<p>" . "<a target='_blank' href='" . htmlspecialchars($firstLink) . "'>" . htmlspecialchars($about['title']) . "</a>";
+          } else {
+              $htmlOutput .= "<p>"  . htmlspecialchars($about['title']);
+          }
+        }
+        if ($about["text_$lang"]) {
+          $htmlOutput .= ", " . $about["text_$lang"] . "</p>";
+        }
+        $htmlOutput .= "</div></div>";
       }
     }
+
+    $htmlOutput .= "</div></div>"; // End of about-left
+    $htmlOutput .= "<div id='about-right'>"; // Start of about-right
 
     // Processing exhibitionData for 'exhibition'
     if ($exhibitionData) {
@@ -360,15 +449,19 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
           $htmlOutput .= "<div style='flex: 1;'></div>";
         }
         $htmlOutput .= "<div style='flex: 4;'><div class='exhibition-sub-main'>";
-  
+
         $firstLink = $database->fetchExhibitionMainLink($exhibition['title']);
         if ($firstLink) {
             $htmlOutput .= "<p>" . "<a target='_blank' href='" . $firstLink . "'>" . htmlspecialchars($exhibition['title']) . "</a>" . ", ";
         } else {
             $htmlOutput .= "<p>"  . $exhibition['title'] . ", ";
         }
-        $htmlOutput .= $exhibition['institution'] . ', ' . $exhibition["place_$lang"] . "</p>";
-  
+        $htmlOutput .= $exhibition['institution'] . ', ' . $exhibition["place_$lang"];
+        if ($exhibition["sup_$lang"]) {
+          $htmlOutput .= ' <sup>' . $exhibition["sup_$lang"] . '</sup>';
+        }
+        $htmlOutput .= '</p>';
+
         $buttonId = "button-dropdown-" . $index;
         $htmlOutput .= "<button aria-label='button-exhibition-open' id='" . $buttonId . "' class='button-navigation exhibition' onclick=\"expandImage('" . htmlspecialchars($exhibition['img']) . "', '" . $buttonId . "'); toggleTriangles('" . $buttonId . "');\">
           <svg id='dropdown-svg' width='56px' height='32px' viewBox='0 0 56 32' xmlns='http://www.w3.org/2000/svg'>
@@ -383,90 +476,20 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
         $htmlOutput .= '<p>' . htmlspecialchars($exhibition["text_$lang"]) . '<br><br>';
         $dateObjectStart = new DateTime($exhibition["date_start"]);
         $dateObjectEnd = new DateTime($exhibition["date_end"]);
-        $formattedDateStart = $dateObjectStart->format('d.m.');
+        if ($dateObjectEnd->format('Y') != $dateObjectStart->format('Y')) {
+          $formattedDateStart = $dateObjectStart->format('d.m.Y');
+        } else {
+          $formattedDateStart = $dateObjectStart->format('d.m.');
+        }
         $formattedDateEnd = $dateObjectEnd->format('d.m.Y');
-        $htmlOutput .= htmlspecialchars($formattedDateStart) . ' &mdash; ';
+        $htmlOutput .= htmlspecialchars($formattedDateStart) . '—';
         $htmlOutput .= htmlspecialchars($formattedDateEnd) . '</p>';
         $htmlOutput .= "</div></div></div>";
       }
       $htmlOutput .= "</div>"; // End of Exhibition section
     }
 
-  $htmlOutput .= "</div>"; // End of about-left
-
-  $htmlOutput .= "<div id='about-right'>";
-
-    // Processing aboutData for 'about' and 'education'
-    if ($aboutData) {
-      foreach ($aboutData as $about) {
-        if ($about['section'] === 'education') {
-          // Adding section titles
-          if (!isset($lastSection) || $lastSection !== $about['section']) {
-            if ($lang === 'de') {
-              $titleSection = htmlspecialchars(ucfirst($about['section_de']));
-            } else {
-              $titleSection = htmlspecialchars(ucfirst($about['section']));
-            }
-            $htmlOutput .= "<h2 class='about-title'>" . $titleSection . "</h2>";
-            $lastSection = $about['section'];
-          }
-          // Displaying about-items
-          $htmlOutput .= "<div class='about-items' style='display: flex;'>";
-          if ($about['time']) {
-            $htmlOutput .= "<div style='flex: 1;'><p>" . htmlspecialchars($about['time']) . "</p></div>";
-          }
-          if ($about['title']) {
-            $htmlOutput .= "<div style='flex: 3;'>";
-            $htmlOutput .= "<p>" . htmlspecialchars($about['title']);
-
-          } else if (!$about['title'] && $about["text_$lang"]) {
-            $htmlOutput .= "<div style='flex: 3;'>";
-            $htmlOutput .= "<p>" . htmlspecialchars($about["text_$lang"]);
-
-          } else if ($about["text_$lang"]) {
-            $htmlOutput .= "<div style='flex: 3;'>";
-            $htmlOutput .= "<p>" . htmlspecialchars($about["text_$lang"]);
-          }
-
-          $htmlOutput .= "</p>" . "</div></div>";
-        }
-      }
-    }
-  
-  // Processing aboutData for 'media'
-  if ($aboutData) {
-    foreach ($aboutData as $about) {
-      if ($about['section'] === 'media') {
-        // Adding section titles
-        if (!isset($lastSection) || $lastSection !== $about['section']) {
-          if ($lang === 'de') {
-            $titleSection = htmlspecialchars(ucfirst($about['section_de']));
-          } else {
-            $titleSection = htmlspecialchars(ucfirst($about['section']));
-          }
-          $htmlOutput .= "<h2 class='about-title'>" . $titleSection . "</h2>";
-          $lastSection = $about['section'];
-        }
-        // Displaying about-items
-        $htmlOutput .= "<div class='about-items' style='display: flex;'>";
-        if ($about['time']) {
-          $htmlOutput .= "<div style='flex: 1;'><p>" . htmlspecialchars($about['time']) . "</p></div>";
-        }
-        if ($about['title']) {
-          $htmlOutput .= "<div style='flex: 3;'>";
-          $firstLink = $database->fetchMediaLink(htmlspecialchars($about['title']));
-          if ($firstLink) {
-              $htmlOutput .= "<p>" . "<a target='_blank' href='" . htmlspecialchars($firstLink) . "'>" . htmlspecialchars($about['title']) . "</a>";
-          } else {
-              $htmlOutput .= "<p>"  . htmlspecialchars($about['title']);
-          }
-        }
-        if ($about["text_$lang"]) {
-          $htmlOutput .= ", " . htmlspecialchars($about["text_$lang"]) . "</p>";
-        }
-        $htmlOutput .= "</div></div>";
-      }
-    }
+    // Processing aboutData for 'imprint'
     if ($about['section'] === 'imprint') {
       if (!isset($lastSection) || $lastSection !== $about['section']) {
         if ($lang === 'de') {
@@ -474,14 +497,14 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
         } else {
           $titleSection = htmlspecialchars(ucfirst($about['section']));
         }
-        $htmlOutput .= "<h2 class='about-title'>" . $titleSection . "</h2>";
-        $htmlOutput .= "<p>" . $about["text_$lang"] . "</p>";
+        $htmlOutput .= "<div id='about-imprint'><div><h2 class='about-title'>" . $titleSection . "</h2>";
+        $htmlOutput .= "<p>" . strip_tags($about["text_$lang"], '<br><a>') . "</p></div></div>";
       }
     }
   }
 
   $htmlOutput .= "</div>"; // End of about-right
-  $htmlOutput .= "</div>"; // End of left
+  $htmlOutput .= "</div>";
 
   // Send response
   $response = [
