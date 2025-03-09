@@ -1,4 +1,4 @@
-<?php // data.php for davidherren.ch / 2024-11-06
+<?php // data.php for davidherren.ch / 2025-03-09
 
 include './php/db.php';
 include './php/fetchData.php';
@@ -21,7 +21,9 @@ if (isset($_GET['index']) && isset($_GET['lang'])) {
   }
 
   if (count($indexResult) > 0) {
-    /*shuffle($indexResult);*/
+
+  #shuffle($indexResult);
+
     foreach ($indexResult as $index => $row) {
       $title = $row["title"];
       $slug = $row["slug"];
@@ -30,7 +32,9 @@ if (isset($_GET['index']) && isset($_GET['lang'])) {
       $description = $row["description_$lang"];
       $htmlOutput .= "<a class='index-item' href='/" . htmlspecialchars($lang) . "/" . htmlspecialchars($slug) . "'>";
       $htmlOutput .= "<div class='index-item-inner'>";
-      if ($prog == 1) { $htmlOutput .= "<div class='work-in-progress'><p class='frame'>$progText</p></div>"; }
+      if ($prog == 1) {
+        $htmlOutput .= "<div class='work-in-progress'><p class='frame'>$progText</p></div>";
+      }
       $htmlOutput .= "<div class='index-item-inner-text'>";
       $htmlOutput .= "<h2>" . htmlspecialchars($title) . "</h2>";
       $htmlOutput .= "<p>" . htmlspecialchars($year) . "<br><i>" . htmlspecialchars($description) . "</i></p>";
@@ -63,7 +67,7 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
         <div class="content-left-img-outer">
     HTML;
     if ($workData["in_progress"] == 1) {
-      if($lang === 'de') {
+      if ($lang === 'de') {
         $progText = 'Projekt in Arbeit';
       } else {
         $progText = 'Work in Proress';
@@ -73,26 +77,26 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
       $htmlOutput .= "</div>";
     }
 
-    if($workimages[0]['alt']) {
+    if ($workimages[0]['alt']) {
       if ($workimages[0]['created']) {
         $htmlOutput .= <<<HTML
-        <img src="/img/{$workData['slug']}-0.jpg" alt="{$workimages[0]['alt']}, {$workimages[0]['year']} - Foto: {$workimages[0]['created']}">
-    HTML;
+        <img src="/img/{$workData['slug']}-0.{$workimages[0]['datatype']}" alt="{$workimages[0]['alt']}, {$workimages[0]['year']} - Foto: {$workimages[0]['created']}">
+        HTML;
       }
-     } else {
-        $htmlOutput .= <<<HTML
-        <img src="/img/{$workData['slug']}-0.jpg" alt="{$workData['title']} © {$workimages[0]['year']} {$workimages[0]['copyright']}">
+    } else {
+      $htmlOutput .= <<<HTML
+        <img src="/img/{$workData['slug']}-0.{$workimages[0]['datatype']}" alt="{$workData['title']} © {$workimages[0]['year']} {$workimages[0]['copyright']}">
     HTML;
-      }
+    }
 
     $htmlOutput .= "<p>{$workimages[0]["text_$lang"]}, {$workimages[0]["year"]}";
 
-    if($workimages[0]['created']) {
+    if ($workimages[0]['created']) {
       $htmlOutput .= ". Foto: {$workimages[0]['created']}</p>";
     } else {
       $htmlOutput .= ".</p>";
-      }
-      $htmlOutput .= '</div><div id="content-inner-left-text">';
+    }
+    $htmlOutput .= '</div><div id="content-inner-left-text">';
 
     $workimages = array_slice($workimages, 1);
     foreach ($workimages as $image) {
@@ -109,8 +113,8 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
           <div class="frame-title-text">
           <p>$imageText</p>
       HTML;
-        if ($imageCreated) {
-          $htmlOutput .= <<<HTML
+      if ($imageCreated) {
+        $htmlOutput .= <<<HTML
             <p>Foto: $imageCreated</p>
           </div>
         </div></div>
@@ -146,14 +150,14 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     }
 
     if (!empty($workData["3d"]) && $workData["3d"] == 1) {
-      if(!empty($workData["3d_$lang"])) {
+      if (!empty($workData["3d_$lang"])) {
         $modelText = $workData["3d_$lang"];
       } else if ($lang === "de") {
-        $modelText = "3D-Modell der Arbeit, die Integration für die Website ist mit <a href='https://blender.org' target='_blank'>Blender</a> erstellt.";
+        $modelText = "3D-Modell der Arbeit.";
       } else {
-        $modelText = "3D model of the work, the integration for the website is created with <a href='https://blender.org' target='_blank'>Blender</a>.";
-      }  
-      
+        $modelText = "3D model of the work.";
+      }
+
       $htmlOutput .= <<<HTML
       <div class="work-model-title">
         <div class="frame work-title-sub pattern">
@@ -174,19 +178,37 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     <div id="content-inner-center">
       <a aria-label="Expand Pointer" id="pointer" href="">
         <svg width="72" height="56" viewBox="0 0 72 56" class="svg-arrow">
-          <rect id="svg-arrow-0" x="0"  y="24" width="72" height="4"/>
-          <rect id="svg-arrow-1" x="4"  y="28" width="4" height="4"/>
-          <rect id="svg-arrow-2" x="8"  y="32" width="4" height="4"/>
-          <rect id="svg-arrow-3" x="12" y="36" width="4" height="4"/>
-          <rect id="svg-arrow-4" x="16" y="40" width="4" height="4"/>
-          <rect id="svg-arrow-5" x="20" y="44" width="4" height="4"/>
-          <rect id="svg-arrow-6" x="24" y="48" width="4" height="4"/>
-          <rect id="svg-arrow-7" x="4"  y="20" width="4" height="4"/>
-          <rect id="svg-arrow-8" x="8"  y="16" width="4" height="4"/>
-          <rect id="svg-arrow-9" x="12" y="12" width="4" height="4"/>
-          <rect id="svg-arrow-10" x="16" y="8"  width="4" height="4"/>
-          <rect id="svg-arrow-11" x="20" y="4"  width="4" height="4"/>
-          <rect id="svg-arrow-12" x="24" y="0"  width="4" height="4"/>
+            <rect id="svg-arrow-0" x="0"  y="24" width="4" height="4"/>
+            <rect id="svg-arrow-1" x="4"  y="28" width="4" height="4"/>
+            <rect id="svg-arrow-2" x="8"  y="32" width="4" height="4"/>
+            <rect id="svg-arrow-3" x="12" y="36" width="4" height="4"/>
+            <rect id="svg-arrow-4" x="16" y="40" width="4" height="4"/>
+            <rect id="svg-arrow-5" x="20" y="44" width="4" height="4"/>
+            <rect id="svg-arrow-6" x="24" y="48" width="4" height="4"/>
+            <rect id="svg-arrow-7" x="4"  y="20" width="4" height="4"/>
+            <rect id="svg-arrow-8" x="8"  y="16" width="4" height="4"/>
+            <rect id="svg-arrow-9" x="12" y="12" width="4" height="4"/>
+            <rect id="svg-arrow-10" x="16" y="8"  width="4" height="4"/>
+            <rect id="svg-arrow-11" x="20" y="4"  width="4" height="4"/>
+            <rect id="svg-arrow-12" x="24" y="0"  width="4" height="4"/>
+            <rect id="svg-arrow-13" x="0" y="24"  width="4" height="4"/>
+            <rect id="svg-arrow-14" x="4" y="24"  width="4" height="4"/>
+            <rect id="svg-arrow-15" x="8" y="24"  width="4" height="4"/>
+            <rect id="svg-arrow-16" x="12" y="24"  width="4" height="4"/>
+            <rect id="svg-arrow-17" x="16" y="24"  width="4" height="4"/>
+            <rect id="svg-arrow-18" x="20" y="24"  width="4" height="4"/>
+            <rect id="svg-arrow-19" x="24" y="24"  width="4" height="4"/>
+            <rect id="svg-arrow-20" x="28" y="24"  width="4" height="4"/>
+            <rect id="svg-arrow-21" x="32" y="24"  width="4" height="4"/>
+            <rect id="svg-arrow-22" x="36" y="24"  width="4" height="4"/>
+            <rect id="svg-arrow-23" x="40" y="24"  width="4" height="4"/>
+            <rect id="svg-arrow-24" x="44" y="24"  width="4" height="4"/>
+            <rect id="svg-arrow-25" x="48" y="24"  width="4" height="4"/>
+            <rect id="svg-arrow-26" x="52" y="24"  width="4" height="4"/>
+            <rect id="svg-arrow-27" x="56" y="24"  width="4" height="4"/>
+            <rect id="svg-arrow-28" x="60" y="24"  width="4" height="4"/>
+            <rect id="svg-arrow-29" x="64" y="24"  width="4" height="4"/>
+            <rect id="svg-arrow-30" x="68" y="24"  width="4" height="4"/>
         </svg>
       </a>
     </div>
@@ -199,13 +221,13 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
 
     // Check if info_$lang is not empty and use it, otherwise use year, media, size
     if (!empty($workData["info_$lang"])) {
-        $htmlOutput .= "<p>{$workData["year"]}, {$workData["info_$lang"]}</p>";
+      $htmlOutput .= "<p>{$workData["year"]}, {$workData["info_$lang"]}</p>";
     } else {
-        $htmlOutput .= "<p>{$workData["year"]}, {$workData["media_$lang"]}, {$workData["size_$lang"]}";
-        if (!empty($workData["edition"])) {
-            $htmlOutput .= ", " . htmlspecialchars($workData["edition"]);
-        }
-        $htmlOutput .= "</p>";
+      $htmlOutput .= "<p>{$workData["year"]}, {$workData["media_$lang"]}, {$workData["size_$lang"]}";
+      if (!empty($workData["edition"])) {
+        $htmlOutput .= ", " . htmlspecialchars($workData["edition"]);
+      }
+      $htmlOutput .= "</p>";
     }
 
     $htmlOutput .= "</div>"; // Closing tag for work-infos div
@@ -222,7 +244,6 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
 
     // Code for displaying additional images
     $htmlOutput .= "<div class='work-images'>";
-    /*$workimages = array_slice($workimages, 1);*/
     foreach ($workimages as $image) {
       $workTitle      = htmlspecialchars($workData["title"]);
       $imageName      = htmlspecialchars($image["name"]);
@@ -237,6 +258,12 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
         if ($imageCreated) {
           $htmlOutput .= "<div class='abb-anchor' id='_abb{$imageNumber}'></div><img src='/img/{$imageName}.{$imageType}' alt='$imageAlt, $imageYear - Foto: $imageCreated'>";
         }
+        else if ($imageCopyright && !$imageCreated) {
+          $htmlOutput .= "<div class='abb-anchor' id='_abb{$imageNumber}'></div><img src='/img/{$imageName}.{$imageType}' alt='$imageAlt © $imageYear $imageCopyright'>";
+        }
+        else {
+          $htmlOutput .= "<div class='abb-anchor' id='_abb{$imageNumber}'></div><img src='/img/{$imageName}.{$imageType}' alt='$imageAlt'>";
+        }
       } else if ($imageCreated) {
         $htmlOutput .= "<div class='abb-anchor' id='_abb{$imageNumber}'></div><img src='/img/{$imageName}.{$imageType}' alt='$workTitle - Foto: $imageCreated'>";
       } else {
@@ -245,7 +272,7 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     }
 
     $htmlOutput .= "</div>";
-   
+
     // Code for vimeo video
     if (!empty($workData["vimeo_id"])) {
       $padding = 10000 / $workData['vimeo_ratio'];
@@ -296,7 +323,7 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
       }
     } else {
       $htmlOutput = "No works found!";
-    }    
+    }
     $htmlOutput .= "</div>";
 
     $response = [
@@ -307,7 +334,9 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     ];
 
     echo json_encode($response);
-  } else { echo "No Data found!"; }
+  } else {
+    echo "No Data found!";
+  }
   $conn = null;
 }
 
@@ -340,21 +369,19 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
           $htmlOutput .= "<h2 class='about-title'>" . $titleSection . "</h2>";
           $lastSection = $about['section'];
         }
-        
+
         // Displaying about-items
         $htmlOutput .= "<div class='about-items' style='display: flex;'>";
-        
+
         if ($about['time']) {
           $htmlOutput .= "<div style='flex: 1;'><p>" . htmlspecialchars($about['time']) . "</p></div>";
         }
         if ($about['title']) {
           $htmlOutput .= "<div style='flex: 3;'>";
           $htmlOutput .= "<p>" . htmlspecialchars($about['title']);
-
         } else if (!$about['title'] && $about["text_$lang"]) {
           $htmlOutput .= "<div style='flex: 3;'>";
           $htmlOutput .= "<p>" . strip_tags($about["text_$lang"], '<br><a>');;
-
         } else if ($about["text_$lang"]) {
           $htmlOutput .= "<div style='flex: 3;'>";
           $htmlOutput .= "<p>" . strip_tags($about["text_$lang"], '<br><a>');;
@@ -385,7 +412,6 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
         } else if (!$about['title'] && $about["text_$lang"]) { // education
           $htmlOutput .= "<div style='flex: 4;'>";
           $htmlOutput .= "<p>" . strip_tags($about["text_$lang"], '<br><a>');
-
         } else if ($about["text_$lang"]) {
           $htmlOutput .= "<div style='flex: 4;'>";
           $htmlOutput .= "<p>" . strip_tags($about["text_$lang"], '<br><a>');;
@@ -415,9 +441,9 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
           $htmlOutput .= "<div style='flex: 3;'>";
           $firstLink = $database->fetchMediaLink(htmlspecialchars($about['title']));
           if ($firstLink) {
-              $htmlOutput .= "<p>" . "<a target='_blank' href='" . htmlspecialchars($firstLink) . "'>" . htmlspecialchars($about['title']) . "</a>";
+            $htmlOutput .= "<p>" . "<a target='_blank' href='" . htmlspecialchars($firstLink) . "'>" . htmlspecialchars($about['title']) . "</a>";
           } else {
-              $htmlOutput .= "<p>"  . htmlspecialchars($about['title']);
+            $htmlOutput .= "<p>"  . htmlspecialchars($about['title']);
           }
         }
         if ($about["text_$lang"]) {
@@ -452,9 +478,9 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
 
         $firstLink = $database->fetchExhibitionMainLink($exhibition['title']);
         if ($firstLink) {
-            $htmlOutput .= "<p>" . "<a target='_blank' href='" . $firstLink . "'>" . htmlspecialchars($exhibition['title']) . "</a>" . ", ";
+          $htmlOutput .= "<p>" . "<a target='_blank' href='" . $firstLink . "'>" . htmlspecialchars($exhibition['title']) . "</a>" . ", ";
         } else {
-            $htmlOutput .= "<p>"  . $exhibition['title'] . ", ";
+          $htmlOutput .= "<p>"  . $exhibition['title'] . ", ";
         }
         $htmlOutput .= $exhibition['institution'] . ', ' . $exhibition["place_$lang"];
         if ($exhibition["sup_$lang"]) {
@@ -471,7 +497,7 @@ if (isset($_GET['about']) && isset($_GET['lang'])) {
             <rect x='24' y='0'  width='8'  id='svg-triangle-4' height='8'/>
           </svg>
         </button></div>";
-        
+
         $htmlOutput .= "<div id='" . htmlspecialchars($exhibition['img']) . "' class='exhibition-img'><img src='/img/exhibitions/" . htmlspecialchars($exhibition['img']) . ".jpg' alt='" . $exhibition['title'] . " - " . htmlspecialchars($yearStart) . "'>";
         $htmlOutput .= '<p>' . htmlspecialchars($exhibition["text_$lang"]) . '<br><br>';
         $dateObjectStart = new DateTime($exhibition["date_start"]);
@@ -524,4 +550,3 @@ if (isset($_GET['statement'])) {
   $lang = validateLanguage($lang);
   echo json_encode(['description' => $database->fetchAboutStatement($lang)]);
 }
-?>
