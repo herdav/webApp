@@ -1,7 +1,7 @@
-// data.js for davidherren.ch / 2024-07-24
+// data.js for davidherren.ch / 2025-03-12
 
 const config = {
-  currentLanguage: '', // Sets the default language
+  currentLanguage: '', // Default language
   currentSlug: '', // Stores the current slug for content
   lastStateLeftExpanded: true, // Stores the expanded/collapsed state of the left content, also used in style.js
   titleElement: null, // Change menu H1 title on subpages to H2
@@ -19,7 +19,9 @@ const sendRequest = async (url, successCallback, errorCallback) => {
     const data = await response.json();
     successCallback(data);
   } catch (error) {
-    const errorMessage = error.response ? `Server returned status code ${error.response.status}` : 'Request failed due to network error';
+    const errorMessage = error.response
+      ? `Server returned status code ${error.response.status}`
+      : 'Request failed due to network error';
     if (errorCallback) errorCallback(new Error(errorMessage));
     else console.error(errorMessage);
   }
@@ -27,34 +29,34 @@ const sendRequest = async (url, successCallback, errorCallback) => {
 
 // Function to switch the current language of the page
 function switchLanguage(lang) {
-  document.documentElement.lang = lang; // Sets the language of the document
-  config.currentLanguage = lang; // Updates the config.currentLanguage variable
-  highlightLanguageButton(lang); // Highlights the selected language button
+  document.documentElement.lang = lang; // Set document language
+  config.currentLanguage = lang; // Update config
+  highlightLanguageButton(lang); // Highlight the selected language button
 
-  // Constructs a new path for the URL based on the selected language
-  let newPath = '/' + config.currentLanguage + '/';
+  // Construct new path based on selected language and current slug
+  let newPath = `/${config.currentLanguage}/`;
   if (config.currentSlug) {
     newPath += config.currentSlug;
   }
-  history.pushState(null, null, newPath); // Updates the browser's history
+  history.pushState(null, null, newPath); // Update browser history
 
-  // Loads the appropriate content based on the config.currentSlug
+  // Load appropriate content based on the current slug
   if (config.currentSlug === 'about') {
     loadAbout(false);
   } else if (config.currentSlug) {
     loadWorks(config.currentSlug, 0);
   } else {
     statement(config.currentLanguage);
-  if (config.indexIsLoaded) {
-    initializePage();
+    if (config.indexIsLoaded) {
+      initializePage();
     }
   }
 }
 
-// Refactored to use a common function for loading content, with adjustments to not update meta description for index
+// Refactored common function for loading content; does not update meta description for index
 const loadContent = (slug, popstate, contentType) => {
-  window.scrollTo(0, 0); // Scrolls to the top of the page
-  config.currentSlug = slug; // Updates the current slug in config
+  window.scrollTo(0, 0); // Scroll to top of page
+  config.currentSlug = slug; // Update current slug
 
   let url = `/data.php?slug=${encodeURIComponent(slug)}&lang=${config.currentLanguage}`;
   if (contentType === 'index') {
@@ -77,14 +79,14 @@ const loadContent = (slug, popstate, contentType) => {
       contentElement.innerHTML = response.html;
     }
 
-    // Update meta description only if contentType is not 'index'
+    // Update meta description only if not index
     if (contentType !== 'index') {
       const description = config.currentLanguage === 'de' ? response.descriptionDe : response.descriptionEn;
       updateMetaDescription(description);
       if (contentType !== 'about') {
         const pageTitle = response.title ? `${response.title} | David Herren` : 'David Herren';
         updateDocumentTitle(pageTitle);
-      } else if (contentType === 'about') {
+      } else {
         updateDocumentTitle('About | David Herren');
       }
     }
@@ -103,24 +105,16 @@ const loadContent = (slug, popstate, contentType) => {
 
   highlightContentButton(`button-${slug}`, contentType);
   changeMenuTitle();
-}
+};
 
 // Functions for loading specific types of content
-function loadWorks(slug, popstate) {
-  loadContent(slug, popstate, 'works');
-}
-
-function loadAbout(popstate) {
-  loadContent('about', popstate, 'about');
-}
-
-function loadIndex(popstate) {
-  loadContent('', popstate, 'index');
-}
+const loadWorks = (slug, popstate) => loadContent(slug, popstate, 'works');
+const loadAbout = (popstate) => loadContent('about', popstate, 'about');
+const loadIndex = (popstate) => loadContent('', popstate, 'index');
 
 function changeMenuTitle() {
   if (config.titleElement && config.titleElement.tagName === 'H1' && config.titleElementH1) {
-    let newTitleElement = document.createElement('h2');
+    const newTitleElement = document.createElement('h2');
     config.titleElementH1 = false;
     newTitleElement.id = config.titleElement.id;
     newTitleElement.innerHTML = config.titleElement.innerHTML;
@@ -130,12 +124,12 @@ function changeMenuTitle() {
 
 // Function to update the URL in the browser's history
 function updateUrl(slug) {
-  let newUrl = '/' + config.currentLanguage + '/' + slug; // Constructs the new URL
-  window.history.pushState({path: newUrl}, '', newUrl); // Pushes the new URL to the browser's history
+  const newUrl = `/${config.currentLanguage}/${slug}`; // Construct new URL
+  window.history.pushState({ path: newUrl }, '', newUrl);
 }
 
-// Function to handle history popstate event
-window.addEventListener('popstate', function(event) {
+// Handle history popstate event
+window.addEventListener('popstate', (event) => {
   const hostname = window.location.hostname;
   const isTargetDomain = hostname === 'localhost' || hostname === 'davidherren.ch';
   const hash = window.location.hash;
@@ -145,11 +139,11 @@ window.addEventListener('popstate', function(event) {
       const pathParts = event.state.path.split('/').filter(Boolean);
       if (pathParts.length >= 2) {
         const slug = pathParts[1];
-        popstate = true;
+        const popstate = true;
         if (slug === 'about') {
-          loadAbout(true);
+          loadAbout(popstate);
         } else {
-          loadWorks(slug, true);
+          loadWorks(slug, popstate);
         }
       }
     } else if (!hasHash) {
@@ -159,55 +153,48 @@ window.addEventListener('popstate', function(event) {
 });
 
 function initializePage() {
-  let path = window.location.pathname.split('/').filter(Boolean);
+  const path = window.location.pathname.split('/').filter(Boolean);
   if (path.length <= 1) {
     loadIndex(true);
   }
 }
 
-// Event listener for the DOMContentLoaded event to ensure the page is fully loaded before executing any scripts
+// DOMContentLoaded event to ensure scripts run after page is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
-  // Extract parts of the URL path and filter out any empty elements
-  let pathParts = window.location.pathname.split('/').filter(Boolean);
+  const pathParts = window.location.pathname.split('/').filter(Boolean);
   
   initializePage();
 
-  // Check the URL for a language code, using it if present, otherwise default to the browser's language preference
+  // Check URL for language code; if not present, default to browser language (de or en)
   if (pathParts.length > 0 && (pathParts[0] === 'de' || pathParts[0] === 'en')) {
-    config.currentLanguage = pathParts[0]; // Set the page language based on the URL
+    config.currentLanguage = pathParts[0];
   } else {
-    // Default to the browser's language, or English if the browser's language is not explicitly supported
-    let browserLanguage = navigator.language || navigator.userLanguage;
+    const browserLanguage = navigator.language || navigator.userLanguage;
     config.currentLanguage = browserLanguage.startsWith('de') ? 'de' : 'en';
   }
 
-  // Highlight the button for the current language and switch the page content to that language
   highlightLanguageButton(config.currentLanguage);
-  switchLanguage(config.currentLanguage); // This function updates the page to reflect the chosen language
+  switchLanguage(config.currentLanguage); // Updates page to chosen language
   
-  // Load the index or specific content based on the URL, defaulting to the index if no specific path is provided
+  // Load specific content based on URL; default to index if no content requested
   if (pathParts.length > 1) {
     if (pathParts[1] === 'about') {
-      loadAbout(false); // Load 'About' content if specified in the URL
+      loadAbout(false);
     } else {
-      attemptLoadWorks(pathParts[1], 0); // Try to load specific work details based on the slug in the URL
+      attemptLoadWorks(pathParts[1], 0);
     }
-  } /*else {
-    // If no specific content is requested
-  }*/
+  }
 
-  // Update the page's hreflang tags based on the current language, for SEO purposes
-  updateHrefLangTags(pathParts.length > 1 ? pathParts[1] : '');
-
+  updateHrefLangTags();
   config.titleElement = document.getElementById('title-text'); // Get H1 title from menu
 });
 
 // Function to highlight the active language button
 function highlightLanguageButton(lang) {
   document.querySelectorAll('#language-switch button').forEach(button => {
-    button.classList.remove('button-highlighted'); // Removes highlight from all buttons
+    button.classList.remove('button-highlighted');
   });
-  document.querySelector('#button-' + lang).classList.add('button-highlighted'); // Adds highlight to the selected button
+  document.querySelector(`#button-${lang}`).classList.add('button-highlighted');
 }
 
 // Function to highlight the active content button
@@ -217,71 +204,66 @@ function highlightContentButton(buttonId, contentType) {
   });
   if (contentType !== 'index') {
     const button = document.getElementById(buttonId);
-    if (button) {
-      button.classList.add('button-highlighted');
-    }
+    if (button) button.classList.add('button-highlighted');
   }
 }
 
-{ // Function to update the meta description tag of the document
+{ // Functions to update meta description and handle statement requests
   function updateMetaDescription(description) {
     let metaDescription = document.querySelector('meta[name="description"]');
     if (!metaDescription) {
-      metaDescription = document.createElement('meta'); // Creates a new meta tag if it doesn't exist
+      metaDescription = document.createElement('meta');
       metaDescription.name = 'description';
-      document.head.appendChild(metaDescription); // Appends the meta tag to the document head
+      document.head.appendChild(metaDescription);
     }
-    metaDescription.content = description; // Updates the content of the meta tag
+    metaDescription.content = description;
   }
 
   function statement(lang) {
-    let url = "/data.php?statement=" + encodeURIComponent(lang);
-    sendRequest(url, 
-      response => {
-        updateMetaDescription(response.description); 
-      },
-      error => {
-        console.error('Error fetching statement:', error);
-      }
-    );
+    const url = `/data.php?statement=${encodeURIComponent(lang)}`;
+    sendRequest(url, (response) => {
+      updateMetaDescription(response.description);
+    }, (error) => {
+      console.error('Error fetching statement:', error);
+    });
   }
 }
 
 // Function to update the document title
 function updateDocumentTitle(title) {
-  document.title = title; // Sets the document's title
+  document.title = title;
 }
 
-// Function to update canonical tags for SEO and accessibility
+// Function to update canonical tags for SEO
 function updateCanonicalTags() {
-  document.querySelectorAll('link[rel="canonical"]').forEach(function(tag) {tag.remove();});
-  let canonicalTag = document.createElement('link');
+  document.querySelectorAll('link[rel="canonical"]').forEach(tag => tag.remove());
+  const canonicalTag = document.createElement('link');
   canonicalTag.rel = 'canonical';
-  canonicalTag.href = 'https://davidherren.ch/' + config.currentLanguage + '/' + config.currentSlug;
+  canonicalTag.href = `https://davidherren.ch/${config.currentLanguage}/${config.currentSlug}`;
   document.head.appendChild(canonicalTag);
 }
 
-// Function to update hreflang tags for SEO and accessibility
+// Function to update hreflang tags for SEO
 function updateHrefLangTags() {
-  document.querySelectorAll('link[rel="alternate"]').forEach(tag => tag.remove()); // Removes existing hreflang tags
+  document.querySelectorAll('link[rel="alternate"]').forEach(tag => tag.remove());
   const availableLanguages = ['de', 'en'];
-  availableLanguages.forEach(lang => { // Iterate through available languages to create hreflang tags
-    let linkTag = document.createElement('link');
+  availableLanguages.forEach(lang => {
+    const linkTag = document.createElement('link');
     linkTag.rel = 'alternate';
     linkTag.hreflang = lang;
-    linkTag.href = window.location.origin + '/' + lang + '/' + config.currentSlug;
+    linkTag.href = `${window.location.origin}/${lang}/${config.currentSlug}`;
     document.head.appendChild(linkTag);
   });
 }
 
-// Wrap loadWorks in a function that attempts to call it, and retries if it fails
+// Wrap loadWorks in a function that retries if it fails
 function attemptLoadWorks(slug, popstate, attempt = 1) {
   if (typeof loadWorks === "function") {
     loadWorks(slug, popstate);
-  } else if (attempt <= 3) { // Retry up to 3 times
+  } else if (attempt <= 3) {
     setTimeout(() => {
       attemptLoadWorks(slug, popstate, attempt + 1);
-    }, 1000); // Wait 1 second before retrying
+    }, 1000);
   } else {
     console.error("Failed to load work details after 3 attempts.");
   }
