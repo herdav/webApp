@@ -1,9 +1,8 @@
-/* style.css for davidherren.ch / 2025-03-09 */
+/* style.css for davidherren.ch / 2026-04-15 */
 
 @font-face {
   font-family: "RTAliasRough";
-  src:
-    url("/fonts/RTAliasRough-Regular.woff2") format("woff2"),
+  src: url("/fonts/RTAliasRough-Regular.woff2") format("woff2"),
     url("/fonts/RTAliasRough-Regular.woff") format("woff");
   font-weight: normal;
   font-style: normal;
@@ -34,12 +33,14 @@
   --spacing: 2rem;
   --markColorA: hsl(0, 0%, 100%);
   --markColorB: hsl(0, 0%, 20%);
-  --bgColor: hsl(0, 0%, 97%);
+  --bgColor: rgb(247, 247, 247);
   --fontColor: hsl(0, 0%, 10%);
   --darkGray: hsl(0, 0%, 25%);
   --menuBg: hsl(0, 0%, 95%);
   --buttonBg: hsl(0, 0%, 84%);
-  --contrastColor: hsl(160, 100%, 50%);
+  --contrastColor: rgb(0, 255, 170);
+  --fontSizeBig: 1.2rem;
+  --fontSizeSmall: 1.1rem;
 }
 
 ::selection {
@@ -89,7 +90,7 @@ a:visited {
 }
 
 h1 {
-  font-size: 1rem;
+  font-size: var(--fontSizeSmall);
   margin: 0em;
   color: var(--fontColor);
   font-weight: bold;
@@ -102,7 +103,7 @@ h2 {
 h3 {
   margin: 0px;
   font-weight: normal;
-  font-size: 1rem;
+  font-size: var(--fontSizeSmall);
 }
 
 p {
@@ -135,7 +136,7 @@ mark {
   justify-content: center;
   align-items: center;
   font-family: "RTAliasRough", sans-serif;
-  font-size: 1rem;
+  font-size: var(--fontSizeSmall);
   letter-spacing: 0.1rem;
   height: 2rem;
   background-color: var(--markColorB);
@@ -187,7 +188,6 @@ mark {
   align-items: center;
   justify-content: center;
   background-color: var(--contrastColor);
-  /*backdrop-filter: blur(200px);*/
   visibility: collapse;
   flex-direction: column;
 }
@@ -197,10 +197,10 @@ mark {
 }
 
 .index-item-inner-text p {
-  padding: var(--spacing);
+  padding: var(--spacing) var(--spacing) 0 var(--spacing);
   text-align: center;
   color: var(--markColorA);
-  font-size: 1.2rem;
+  font-size: var(--fontSizeBig);
   line-height: 150%;
 }
 
@@ -248,7 +248,7 @@ mark {
   background-color: var(--contrastColor);
   color: white;
   font-family: "RTAliasRough", sans-serif;
-  font-size: 1rem !important;
+  font-size: var(--fontSizeSmall) !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -266,12 +266,24 @@ mark {
 
 .pattern {
   background-color: var(--bgColor);
-  background-image: linear-gradient(45deg, hsl(0, 0%, 100%) 25%, transparent 25%, transparent 75%, #ffffff 75%, #ffffff),
-    linear-gradient(45deg, #ffffff 25%, transparent 25%, transparent 75%, #ffffff 75%, #ffffff);
+  background-image: linear-gradient(
+      45deg,
+      hsl(0, 0%, 100%) 25%,
+      transparent 25%,
+      transparent 75%,
+      #ffffff 75%,
+      #ffffff
+    ),
+    linear-gradient(
+      45deg,
+      #ffffff 25%,
+      transparent 25%,
+      transparent 75%,
+      #ffffff 75%,
+      #ffffff
+    );
   background-size: 32px 32px;
-  background-position:
-    0 0,
-    16px 16px;
+  background-position: 0 0, 16px 16px;
   background-attachment: fixed;
 }
 
@@ -315,6 +327,10 @@ mark {
   color: var(--darkGray);
   overflow: hidden;
   width: auto;
+}
+
+#title-text {
+    font-weight: normal;
 }
 
 #menu-title {
@@ -378,7 +394,7 @@ mark {
 #menu-title a:visited {
   font-family: "RTAliasRough", sans-serif;
   color: var(--fontColor);
-  font-size: 1rem;
+  font-size: var(--fontSizeSmall);
   letter-spacing: 0.1rem;
   margin-top: 0em;
   margin-bottom: 0em;
@@ -461,12 +477,9 @@ mark {
   text-decoration: none;
   border: none;
   background: var(--buttonBg);
-  box-shadow:
-    inset -2px -2px var(--markColorB),
-    inset 2px 2px var(--markColorB),
-    inset -4px -4px rgb(158, 158, 158),
-    inset 4px 4px #ffffff;
-  font-size: 1rem;
+  box-shadow: inset -2px -2px var(--markColorB), inset 2px 2px var(--markColorB),
+    inset -4px -4px rgb(158, 158, 158), inset 4px 4px #ffffff;
+  font-size: var(--fontSizeSmall);
   letter-spacing: 0.1rem;
   padding: 0.5rem 1rem;
   text-wrap: nowrap;
@@ -475,11 +488,8 @@ mark {
 .button-navigation.button-highlighted,
 .button-navigation:active {
   color: var(--fontColor);
-  box-shadow:
-    inset -2px -2px var(--markColorB),
-    inset 2px 2px var(--markColorB),
-    inset -4px -4px #ffffff,
-    inset 4px 4px rgb(158, 158, 158);
+  box-shadow: inset -2px -2px var(--markColorB), inset 2px 2px var(--markColorB),
+    inset -4px -4px #ffffff, inset 4px 4px rgb(158, 158, 158);
 }
 
 .button-navigation:visited {
@@ -545,12 +555,15 @@ mark {
 .translateY-01 {
   transform: translateY(-24px);
 }
+
 .translateY-02 {
   transform: translateY(-8px);
 }
+
 .translateY-03 {
   transform: translateY(8px);
 }
+
 .translateY-04 {
   transform: translateY(24px);
 }
@@ -565,7 +578,7 @@ mark {
 }
 
 #content-bottom {
-  max-height: calc(100vh - 5 * var(--spacing));
+  /*max-height: calc(100vh - 5 * var(--spacing));*/
   overflow: hidden;
   margin-top: calc(4 * var(--spacing));
   display: flex;
@@ -577,7 +590,7 @@ mark {
 #content a,
 #content h1,
 #content h2 {
-  font-size: 1.2rem;
+  font-size: var(--fontSizeBig);
   line-height: 150%;
 }
 
@@ -625,22 +638,14 @@ mark {
   margin-left: 6rem;
 }
 
-/*
-@-moz-document url-prefix() {
-  .work-title-sub {
-    position: relative;
-    top: auto;
-    margin-left: auto;
-  }
-}*/
-
-#content-inner-right-text {
+/*#content-inner-right-text {
   min-height: calc(100vh - 2 * var(--spacing));
-}
+}*/
 
 #work-text {
   overflow-y: scroll;
   padding-right: 2rem;
+  /* background-color: var(--bgColor); */
 }
 
 #work-text::-webkit-scrollbar {
@@ -648,8 +653,9 @@ mark {
 }
 
 #work-text-description {
-  font-weight: bold;
-  margin-bottom: var(--spacing);
+  display: none;
+  /*font-weight: bold;*/
+  /*margin-bottom: var(--spacing);*/
 }
 
 #work-infos {
@@ -691,54 +697,71 @@ mark {
 .translate-00 {
   transform: translateX(0px);
 }
+
 .translate-04 {
   transform: translateX(4px);
 }
+
 .translate-08 {
   transform: translateX(8px);
 }
+
 .translate-12 {
   transform: translateX(12px);
 }
+
 .translate-16 {
   transform: translateX(16px);
 }
+
 .translate-20 {
   transform: translateX(20px);
 }
+
 .translate-24 {
   transform: translateX(24px);
 }
+
 .translate-28 {
   transform: translateX(28px);
 }
+
 .translate-32 {
   transform: translateX(32px);
 }
+
 .translate-36 {
   transform: translateX(36px);
 }
+
 .translate-40 {
   transform: translateX(40px);
 }
+
 .translate-44 {
   transform: translateX(44px);
 }
+
 .translate-48 {
   transform: translateX(48px);
 }
+
 .translate-52 {
   transform: translateX(52px);
 }
+
 .translate-56 {
   transform: translateX(56px);
 }
+
 .translate-60 {
   transform: translateX(60px);
 }
+
 .translate-64 {
   transform: translateX(64px);
 }
+
 .translate-68 {
   transform: translateX(68px);
 }
@@ -755,7 +778,7 @@ mark {
   transform: rotate(90deg);
 }
 
-.work-images {
+#work-images {
   width: auto;
   display: flex;
   flex-direction: column;
@@ -766,6 +789,17 @@ mark {
 .abb-anchor {
   height: 0;
   margin: 0;
+}
+
+#footnotes,
+#itemizations p,
+#itemizations a,
+#literature p {
+  font-size: var(--fontSizeSmall) !important;
+}
+
+.footnote {
+  color: var(--contrastColor);
 }
 
 #work-video {
@@ -854,7 +888,6 @@ mark {
 @media screen and (max-width: 1024px) {
   :root {
     --spacing: 1rem;
-    --fontSize: 1rem;
   }
 
   #content {
@@ -870,11 +903,10 @@ mark {
   }
 
   #content-inner-left p {
-    font-size: 1.2rem !important;
+    font-size: var(--fontSizeSmall) !important;
   }
 
-  #content-inner-center,
-  #embedded-model {
+  #content-inner-center {
     display: none;
   }
 
@@ -890,14 +922,13 @@ mark {
   #menu-title h2,
   #menu-title a,
   #menu-title a:visited {
-    font-size: var(--fontSize);
+    font-size: var(--fontSizeBig);
   }
 
   #content p,
   #content a,
   #content h1,
   #content h2 {
-    font-size: 1.4rem;
     line-height: 150%;
   }
 
@@ -947,15 +978,19 @@ mark {
     padding-right: 0rem;
   }
 
+  #content-inner-left-text {
+    display: none;
+  }
+
+  /*
   .work-title-sub {
     display: none;
-    /*
     position: fixed;
     bottom: var(--spacing);
     top: unset;
     margin-left: calc(2*var(--spacing));
-    margin-right: calc(2*var(--spacing));*/
-  }
+    margin-right: calc(2*var(--spacing));
+  }*/
 
   .work-image-title {
     justify-content: center;
@@ -983,6 +1018,7 @@ mark {
   #content-inner {
     flex-wrap: wrap;
   }
+
   .index-item {
     margin: 0;
     width: calc(50% - 1.5 * var(--spacing));
