@@ -1,4 +1,4 @@
-<?php // data.php for davidherren.ch / 2025-03-09
+<?php // data.php for davidherren.ch / 2026-05-11
 
 include './php/db.php';
 include './php/fetchData.php';
@@ -22,14 +22,13 @@ if (isset($_GET['index']) && isset($_GET['lang'])) {
 
   if (count($indexResult) > 0) {
 
-  #shuffle($indexResult);
-
     foreach ($indexResult as $index => $row) {
       $title = $row["title"];
       $slug = $row["slug"];
       $year = $row["year"];
       $prog = $row["in_progress"];
       $description = $row["description_$lang"];
+      $datatype = getImageFormat($slug . '-prev', 'prev');
       $htmlOutput .= "<a class='index-item' href='/" . htmlspecialchars($lang) . "/" . htmlspecialchars($slug) . "'>";
       $htmlOutput .= "<div class='index-item-inner'>";
       if ($prog == 1) {
@@ -39,7 +38,7 @@ if (isset($_GET['index']) && isset($_GET['lang'])) {
       $htmlOutput .= "<h2>" . htmlspecialchars($title) . "</h2>";
       $htmlOutput .= "<p>" . htmlspecialchars($year) . "<br><i>" . htmlspecialchars($description) . "</i></p>";
       $htmlOutput .= "</div>";
-      $htmlOutput .= "<img src='/img/prev/" . htmlspecialchars($slug) . "-prev.jpg' loading='lazy' alt='" . htmlspecialchars($title) . " - " . htmlspecialchars($year) . " © David Herren'>";
+      $htmlOutput .= "<img src='/img/prev/" . htmlspecialchars($slug) . "-prev." . $datatype . "' loading='lazy' alt='" . htmlspecialchars($title) . " - " . htmlspecialchars($year) . " © David Herren'>";
       $htmlOutput .= "</div></a>";
     }
   } else {
@@ -79,13 +78,15 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
 
     if ($workimages[0]['alt']) {
       if ($workimages[0]['created']) {
+        $imageFormat0 = getImageFormat($workData['slug'] . '-0');
         $htmlOutput .= <<<HTML
-        <img src="/img/{$workData['slug']}-0.{$workimages[0]['datatype']}" alt="{$workimages[0]['alt']}, {$workimages[0]['year']} - Foto: {$workimages[0]['created']}">
+        <img src="/img/{$workData['slug']}-0.{$imageFormat0}" alt="{$workimages[0]['alt']}, {$workimages[0]['year']} - Foto: {$workimages[0]['created']}">
         HTML;
       }
     } else {
+      $imageFormat0 = getImageFormat($workData['slug'] . '-0');
       $htmlOutput .= <<<HTML
-        <img src="/img/{$workData['slug']}-0.{$workimages[0]['datatype']}" alt="{$workData['title']} © {$workimages[0]['year']} {$workimages[0]['copyright']}">
+        <img src="/img/{$workData['slug']}-0.{$imageFormat0}" alt="{$workData['title']} © {$workimages[0]['year']} {$workimages[0]['copyright']}">
     HTML;
     }
 
@@ -129,9 +130,9 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
 
     if (!empty($workData["vimeo_id"])) {
       $vimeoId = $workData["vimeo_id"];
-      $vimeoRatio = $workData["vimeo_ratio"];
-      if (!empty($workData["vimeo_$lang"])) {
-        $vimeoText = $workData["vimeo_$lang"];
+      $videoRatio = $workData["video_ratio"];
+      if (!empty($workData["video_$lang"])) {
+        $vimeoText = $workData["video_$lang"];
       } else {
         $vimeoText = 'Video @ <a href="https://vimeo.com/{$vimeoId}" target="_blank">Vimeo</a>';
       }
@@ -144,6 +145,28 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
           </div>
           <div class="frame-title-text">
           <p>$vimeoText</p>
+          </div>
+        </div></div>
+      HTML;
+    }
+
+    if (!empty($workData["video_id"])) {
+      $videoId = $workData["video_id"];
+      $videoRatio = $workData["video_ratio"];
+      if (!empty($workData["video_$lang"])) {
+        $videoText = $workData["video_$lang"];
+      } else {
+        $videoText = 'Video @ <a href="https://davidherren.ch/video/{$videoId}.mp4 target="_blank">Video</a>';
+      }
+      $htmlOutput .= <<<HTML
+      <div class="work-video-title">
+        <div class="frame work-title-sub pattern">
+          <div class="frame-title">
+            <a href="#top" class="frame-title-left button-navigation"></a>
+            <h3 class="frame-title-center">$workTitle</h3>
+          </div>
+          <div class="frame-title-text">
+          <p>$videoText</p>
           </div>
         </div></div>
       HTML;
@@ -220,14 +243,35 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     HTML;
 
     // Check if info_$lang is not empty and use it, otherwise use year, media, size
-    if (!empty($workData["info_$lang"])) {
+    if (!empty($workData["info_$lang"]) && (!empty($workData["media_$lang"]) || !empty($workData["size_$lang"]) || !empty($workData["edition"]))) {
+      // If info exists AND at least one of media, size, or edition exists
+      $parts = [$workData["year"]];
+      if (!empty($workData["media_$lang"])) {
+        $parts[] = $workData["media_$lang"];
+      }
+      if (!empty($workData["size_$lang"])) {
+        $parts[] = $workData["size_$lang"];
+      }
+      if (!empty($workData["edition"])) {
+        $parts[] = htmlspecialchars($workData["edition"]);
+      }
+      $htmlOutput .= "<p>" . implode(", ", $parts) . "<br> {$workData["info_$lang"]}</p>";
+    } else if (!empty($workData["info_$lang"])) {
+      // If only info exists (without media, size, or edition)
       $htmlOutput .= "<p>{$workData["year"]}, {$workData["info_$lang"]}</p>";
     } else {
-      $htmlOutput .= "<p>{$workData["year"]}, {$workData["media_$lang"]}, {$workData["size_$lang"]}";
-      if (!empty($workData["edition"])) {
-        $htmlOutput .= ", " . htmlspecialchars($workData["edition"]);
+      // If info doesn't exist
+      $parts = [$workData["year"]];
+      if (!empty($workData["media_$lang"])) {
+        $parts[] = $workData["media_$lang"];
       }
-      $htmlOutput .= "</p>";
+      if (!empty($workData["size_$lang"])) {
+        $parts[] = $workData["size_$lang"];
+      }
+      if (!empty($workData["edition"])) {
+        $parts[] = htmlspecialchars($workData["edition"]);
+      }
+      $htmlOutput .= "<p>" . implode(", ", $parts) . "</p>";
     }
 
     $htmlOutput .= "</div>"; // Closing tag for work-infos div
@@ -243,11 +287,11 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
     $htmlOutput .= '</div></div><div id="work-adds">';
 
     // Code for displaying additional images
-    $htmlOutput .= "<div class='work-images'>";
+    $htmlOutput .= "<div id='work-images'>";
     foreach ($workimages as $image) {
       $workTitle      = htmlspecialchars($workData["title"]);
       $imageName      = htmlspecialchars($image["name"]);
-      $imageType      = htmlspecialchars($image["datatype"]);
+      $imageType      = getImageFormat($image["name"]);
       $imageAlt       = htmlspecialchars($image["alt"]);
       $imageCreated   = htmlspecialchars($image["created"]);
       $imageCopyright = htmlspecialchars($image["copyright"]);
@@ -257,11 +301,9 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
       if ($imageAlt) {
         if ($imageCreated) {
           $htmlOutput .= "<div class='abb-anchor' id='_abb{$imageNumber}'></div><img src='/img/{$imageName}.{$imageType}' alt='$imageAlt, $imageYear - Foto: $imageCreated'>";
-        }
-        else if ($imageCopyright && !$imageCreated) {
+        } else if ($imageCopyright && !$imageCreated) {
           $htmlOutput .= "<div class='abb-anchor' id='_abb{$imageNumber}'></div><img src='/img/{$imageName}.{$imageType}' alt='$imageAlt © $imageYear $imageCopyright'>";
-        }
-        else {
+        } else {
           $htmlOutput .= "<div class='abb-anchor' id='_abb{$imageNumber}'></div><img src='/img/{$imageName}.{$imageType}' alt='$imageAlt'>";
         }
       } else if ($imageCreated) {
@@ -275,13 +317,29 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
 
     // Code for vimeo video
     if (!empty($workData["vimeo_id"])) {
-      $padding = 10000 / $workData['vimeo_ratio'];
+      $padding = 10000 / $workData['video_ratio'];
       $htmlOutput .= <<<HTML
       <div id='work-video'>
         <div style="padding:{$padding}% 0 0 0;position:relative;">
           <iframe title="Vimeo Player" src="https://player.vimeo.com/video/{$workData['vimeo_id']}?title=0&byline=0&portrait=0&badge=0&dnt=1&app_id=58479" frameborder="0" allow="fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
         </div>
         <script src="https://player.vimeo.com/api/player.js"></script>
+      </div>
+      HTML;
+    }
+
+    // Code for video (not Vimeo)
+    if (!empty($workData["video_id"])) {
+      $padding = 10000 / $workData['video_ratio'];
+      $poster = "https://davidherren.ch/video/{$workData['video_id']}.png";
+      $htmlOutput .= <<<HTML
+      <div id='work-video'>
+        <div style="padding:{$padding}% 0 0 0;position:relative;">
+          <video id="video-player" autoplay muted controls preload="metadata" poster="{$poster}" style="position:absolute;top:0;left:0;width:100%;height:100%;" oncontextmenu="return false;" controlsList="nodownload">
+          <source src="https://davidherren.ch/video/{$workData['video_id']}.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+          </video>
+        </div>
       </div>
       HTML;
     }
@@ -306,17 +364,19 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
         $year = $row["year"];
         if ($thisSlug != $slug) {
           $description = $lang === 'de' ? $row["description_de"] : $row["description_en"];
+          $datatype = getImageFormat($thisSlug . '-prev', 'prev');
           $htmlOutput .= "<a class='index-item work' href='/" . htmlspecialchars($lang) . "/" . htmlspecialchars($thisSlug) . "'>";
           $htmlOutput .= "<div class='index-item-inner'>";
           $htmlOutput .= "<div class='index-item-inner-text'>";
-          $htmlOutput .= "<h2>" . htmlspecialchars($title) . "</h2>";
-          $htmlOutput .= "<p>" . htmlspecialchars($year) . "<br><i>" . htmlspecialchars($description) . "</i></p>";
+          $htmlOutput .= "<h2>" . htmlspecialchars($title) . "</h2><p>";
+          // $htmlOutput .= htmlspecialchars($year) . "<br>";
+          $htmlOutput .= "<i>" . htmlspecialchars($description) . "</i></p>";
           $htmlOutput .= "</div>";
-          $htmlOutput .= "<img src='/img/prev/" . htmlspecialchars($thisSlug) . "-prev.jpg' alt='" . htmlspecialchars($title) . " - " . htmlspecialchars($year) . " © David Herren'>";
+          $htmlOutput .= "<img src='/img/prev/" . htmlspecialchars($thisSlug) . "-prev." . $datatype . "' alt='" . htmlspecialchars($title) . " - " . htmlspecialchars($year) . " © David Herren'>";
           $htmlOutput .= "</div></a>";
 
           $displayCount++;
-          if ($displayCount >= 8) {
+          if ($displayCount >= 12) {
             break;
           }
         }
