@@ -1,4 +1,4 @@
-<?php // fetchData.php for davidherren.ch / 2024-10-24
+<?php // fetchData.php for davidherren.ch / 2026-05-11
 class fetchData {
   private $conn;
 
@@ -8,7 +8,7 @@ class fetchData {
 
   public function fetchWorks($slug, $lang) {
     $sql = "SELECT slug, title, year, edition,
-                    vimeo_id, vimeo_ratio, vimeo_de, vimeo_en, 3d, 3d_de, 3d_en, github,
+                    video_id, vimeo_id, video_ratio, video_de, video_en, 3d, 3d_de, 3d_en, github,
                     info_$lang, media_$lang, size_$lang, text_$lang, description_$lang,
                     info_de, media_de, size_de, text_de, description_de, img_alt, publish, in_progress
             FROM works 
@@ -37,7 +37,7 @@ class fetchData {
   }
 
   public function fetchWorkImages($slug, $lang) {
-    $sqlImages = "SELECT name, datatype, text_$lang, text_de, alt, created, year, copyright
+    $sqlImages = "SELECT name, text_$lang, text_de, alt, created, year, copyright
                   FROM images
                   WHERE slug = :slug";
     $stmtImages = $this->conn->prepare($sqlImages);
