@@ -1,4 +1,4 @@
-/* style.css for davidherren.ch / 2026-04-15 */
+/* style.css for davidherren.ch / 2026-05-13 */
 
 @font-face {
   font-family: "RTAliasRough";
@@ -779,6 +779,14 @@ mark {
 }
 
 #work-images {
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+  margin-top: var(--spacing);
+}
+
+#work-videos {
   width: auto;
   display: flex;
   flex-direction: column;
