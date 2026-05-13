@@ -1,4 +1,4 @@
-// style.js for davidherren.ch / 2024-10-15
+// style.js for davidherren.ch / 2026-05-13
 
 { // Animate Words with each word appearing with an initial delay
   let isAnimating = false;
@@ -177,13 +177,13 @@ function handleScrollLogic(pointerButton, svgArrow, isLeftExpanded) {
 function handleScrollElementTitles() {
   // Dynamically showing titles based on scroll position
   const contentRight = document.querySelector('#content-inner-right');
-  // Select images, the embedded model, and the video by their specific selectors
+  // Select images, the embedded model, and all videos by their specific selectors
   const images = contentRight.querySelectorAll('img');
-  const video = contentRight.querySelector('#work-video');
+  const videos = contentRight.querySelectorAll('.work-video');
   const model = contentRight.querySelector('#embedded-model');
 
   const allElements = [...images]; // Start with all images
-  if (video) allElements.push(video); // Add the video if it exists
+  allElements.push(...videos); // Add all videos
   if (model) allElements.push(model); // Add the 3D model if it exists
 5
   const allTitleDivs = document.querySelectorAll('#content-inner-left .work-image-title, #content-inner-left .work-video-title, #content-inner-left .work-model-title');
