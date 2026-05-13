@@ -1,4 +1,4 @@
-<?php // data.php for davidherren.ch / 2026-05-11
+<?php // data.php for davidherren.ch / 2026-05-13
 
 include './php/db.php';
 include './php/fetchData.php';
@@ -58,6 +58,7 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
 
   if ($workData) {
     $workimages = $database->fetchWorkImages($slug, $lang);
+    $workvideos = $database->fetchWorkVideos($slug, $lang);
     $worklinks = $database->fetchWorkLinks($slug);
 
     $htmlOutput = <<<HTML
@@ -128,37 +129,17 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
       }
     }
 
-    if (!empty($workData["vimeo_id"])) {
-      $vimeoId = $workData["vimeo_id"];
-      $videoRatio = $workData["video_ratio"];
-      if (!empty($workData["video_$lang"])) {
-        $vimeoText = $workData["video_$lang"];
-      } else {
-        $vimeoText = 'Video @ <a href="https://vimeo.com/{$vimeoId}" target="_blank">Vimeo</a>';
-      }
-      $htmlOutput .= <<<HTML
-      <div class="work-video-title">
-        <div class="frame work-title-sub pattern">
-          <div class="frame-title">
-            <a href="#top" class="frame-title-left button-navigation"></a>
-            <h3 class="frame-title-center">$workTitle</h3>
-          </div>
-          <div class="frame-title-text">
-          <p>$vimeoText</p>
-          </div>
-        </div></div>
-      HTML;
-    }
-
-    if (!empty($workData["video_id"])) {
-      $videoId = $workData["video_id"];
-      $videoRatio = $workData["video_ratio"];
-      if (!empty($workData["video_$lang"])) {
-        $videoText = $workData["video_$lang"];
-      } else {
-        $videoText = 'Video @ <a href="https://davidherren.ch/video/{$videoId}.mp4 target="_blank">Video</a>';
-      }
-      $htmlOutput .= <<<HTML
+    // Loop through all videos for left content titles
+    if (!empty($workvideos) && count($workvideos) > 0) {
+      foreach ($workvideos as $video) {
+        if ($video["platform"] == "vimeo") {
+          $videoId = $video["video_id"];
+          if (!empty($video["text_$lang"])) {
+            $videoText = $video["text_$lang"];
+          } else {
+            $videoText = 'Video @ <a href="https://vimeo.com/{$videoId}" target="_blank">Vimeo</a>';
+          }
+          $htmlOutput .= <<<HTML
       <div class="work-video-title">
         <div class="frame work-title-sub pattern">
           <div class="frame-title">
@@ -170,6 +151,27 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
           </div>
         </div></div>
       HTML;
+        } else if ($video["platform"] == "video") {
+          $videoId = $video["video_id"];
+          if (!empty($video["text_$lang"])) {
+            $videoText = $video["text_$lang"];
+          } else {
+            $videoText = 'Video @ <a href="https://davidherren.ch/video/{$videoId}.mp4" target="_blank">Video</a>';
+          }
+          $htmlOutput .= <<<HTML
+      <div class="work-video-title">
+        <div class="frame work-title-sub pattern">
+          <div class="frame-title">
+            <a href="#top" class="frame-title-left button-navigation"></a>
+            <h3 class="frame-title-center">$workTitle</h3>
+          </div>
+          <div class="frame-title-text">
+          <p>$videoText</p>
+          </div>
+        </div></div>
+      HTML;
+        }
+      }
     }
 
     if (!empty($workData["3d"]) && $workData["3d"] == 1) {
@@ -315,34 +317,44 @@ if (isset($_GET['works']) && isset($_GET['lang']) && isset($_GET['slug'])) {
 
     $htmlOutput .= "</div>";
 
-    // Code for vimeo video
-    if (!empty($workData["vimeo_id"])) {
-      $padding = 10000 / $workData['video_ratio'];
-      $htmlOutput .= <<<HTML
-      <div id='work-video'>
+    // Code for displaying videos
+    $htmlOutput .= "<div id='work-videos'>";
+    if (!empty($workvideos) && count($workvideos) > 0) {
+      $videoCounter = 0;
+      foreach ($workvideos as $video) {
+        if ($video["platform"] == "vimeo") {
+          $videoId = $video["video_id"];
+          $videoRatio = $video["ratio"];
+          $padding = 10000 / $videoRatio;
+          $autoplayParam = ($video["autoplay"] == 1) ? "&autoplay=1" : "";
+          $htmlOutput .= <<<HTML
+      <div class='work-video' id='work-video-{$videoCounter}'>
         <div style="padding:{$padding}% 0 0 0;position:relative;">
-          <iframe title="Vimeo Player" src="https://player.vimeo.com/video/{$workData['vimeo_id']}?title=0&byline=0&portrait=0&badge=0&dnt=1&app_id=58479" frameborder="0" allow="fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+          <iframe title="Vimeo Player" src="https://player.vimeo.com/video/{$videoId}?title=0&byline=0&portrait=0&badge=0&dnt=1&app_id=58479{$autoplayParam}" frameborder="0" allow="fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
         </div>
         <script src="https://player.vimeo.com/api/player.js"></script>
       </div>
       HTML;
-    }
-
-    // Code for video (not Vimeo)
-    if (!empty($workData["video_id"])) {
-      $padding = 10000 / $workData['video_ratio'];
-      $poster = "https://davidherren.ch/video/{$workData['video_id']}.png";
-      $htmlOutput .= <<<HTML
-      <div id='work-video'>
+        } else if ($video["platform"] == "video") {
+          $videoId = $video["video_id"];
+          $videoRatio = $video["ratio"];
+          $padding = 10000 / $videoRatio;
+          $autoplayAttr = ($video["autoplay"] == 1) ? "autoplay" : "";
+          $htmlOutput .= <<<HTML
+      <div class='work-video' id='work-video-{$videoCounter}'>
         <div style="padding:{$padding}% 0 0 0;position:relative;">
-          <video id="video-player" autoplay muted controls preload="metadata" poster="{$poster}" style="position:absolute;top:0;left:0;width:100%;height:100%;" oncontextmenu="return false;" controlsList="nodownload">
-          <source src="https://davidherren.ch/video/{$workData['video_id']}.mp4" type="video/mp4">
+          <video {$autoplayAttr} muted controls preload="metadata" style="position:absolute;top:0;left:0;width:100%;height:100%;" oncontextmenu="return false;" controlsList="nodownload">
+          <source src="https://davidherren.ch/video/{$videoId}.mp4" type="video/mp4">
           Your browser does not support the video tag.
           </video>
         </div>
       </div>
       HTML;
+        }
+        $videoCounter++;
+      }
     }
+    $htmlOutput .= "</div>"; // Closing tag for work-videos div
 
     // Code for 3D model viewer
     if (!empty($workData["3d"]) && $workData["3d"] == 1) {
