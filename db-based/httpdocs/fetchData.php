@@ -1,4 +1,4 @@
-<?php // fetchData.php for davidherren.ch / 2026-05-11
+<?php // fetchData.php for davidherren.ch / 2026-05-13
 class fetchData {
   private $conn;
 
@@ -8,7 +8,7 @@ class fetchData {
 
   public function fetchWorks($slug, $lang) {
     $sql = "SELECT slug, title, year, edition,
-                    video_id, vimeo_id, video_ratio, video_de, video_en, 3d, 3d_de, 3d_en, github,
+                    3d, 3d_de, 3d_en, github,
                     info_$lang, media_$lang, size_$lang, text_$lang, description_$lang,
                     info_de, media_de, size_de, text_de, description_de, img_alt, publish, in_progress
             FROM works 
@@ -60,6 +60,32 @@ class fetchData {
     });
     return $images;
   }
+
+  public function fetchWorkVideos($slug, $lang) {
+    $sqlVideos = "SELECT name, video_id, platform, text_$lang, text_de, alt, created,
+                  year, copyright, ratio, autoplay, priority
+                  FROM videos
+                  WHERE slug = :slug";
+    $stmtVideos = $this->conn->prepare($sqlVideos);
+    $stmtVideos->bindParam(':slug', $slug, PDO::PARAM_STR);
+    $stmtVideos->execute();
+    $videos = $stmtVideos->fetchAll(PDO::FETCH_ASSOC);
+  
+    foreach ($videos as $key => $video) {
+        if (empty($video["text_$lang"])) {
+            $videos[$key]["text_$lang"] = $video["text_de"];
+        }
+        if (preg_match('/-(\d+)$/', $video['name'], $matches)) {
+            $videos[$key]['number'] = (int)$matches[1];
+        } else {
+            $videos[$key]['number'] = null;
+        }
+    }
+    usort($videos, function($a, $b) {
+        return strnatcmp($a['name'], $b['name']);
+    });
+    return $videos;
+  }
   
   public function fetchWorkLinks($slug) {
     $sqlLinks = "SELECT links.address, links.description
@@ -106,7 +132,7 @@ class fetchData {
         }
     }
     return $results;
-}
+  }
 
   public function fetchExhibitionMainLink($exhibitionTitle) {
     $sql = "SELECT links.address FROM exhibitions_links
